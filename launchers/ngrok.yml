@@ -1,0 +1,7 @@
+version: "2"
+authtoken: 32hPYi2DgjvBv5a1xqYdBfkW4on_5UKfs6MuN4QHyuXpBUfM8
+tunnels:
+  pos-server:
+    addr: 3000
+    proto: http
+    subdomain: tu-sistema-pos-unico

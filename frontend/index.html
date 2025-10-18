@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛒 Sistema POS - Prototipo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%), url('fondo_almacen2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: auto;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .clock {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.527), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 0 1px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.9);
+        }
+
+        .product-card.selected {
+            border: 3px solid #667eea;
+            background: #f0f4ff;
+        }
+
+        .product-info {
+            margin-top: 10px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-code {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stock {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .category {
+            font-style: italic;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .cart-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgb(0, 0, 0);
+            border: 2px solid #2196f3;
+        }
+
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-total {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .payment-method {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .payment-method input {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .payment-method input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .receipt {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .receipt.visible {
+            display: block;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            animation: alertFadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes alertFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutUp {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+    
+<body>
+    <!-- Modal para selección de producto -->
+    <div id="productModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:rgb(255, 255, 255); border-radius:12px; padding:30px; min-width:320px; max-width:90vw; box-shadow:0 8-8px 32px rgba(0,0,0,0.2); position:relative;">
+            <button onclick="closeProductModal()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
+            <div id="modalProductInfo"></div>
+            <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
+                <label>Cantidad:</label>
+                <button type="button" onclick="changeModalQuantity(-1)" style="font-size:20px; width:32px; height:32px;">-</button>
+                <input type="number" id="modalQuantityInput" value="1" min="1" style="width:60px; font-size:18px; text-align:center;">
+                <button type="button" onclick="changeModalQuantity(1)" style="font-size:20px; width:32px; height:32px;">+</button>
+                <button onclick="addToCartFromModal(); event.stopPropagation();" style="margin-left:15px;">🛒 Agregar al Carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar hora -->
+    <div id="timeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:rgb(255, 255, 255); border-radius:12px; padding:30px; min-width:320px; max-width:90vw; box-shadow:0 8-8px 32px rgba(0,0,0,0.2); position:relative;">
+            <button onclick="closeTimeModal()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
+            <h3>🕒 Configurar Hora del Sistema</h3>
+            <div style="margin-top:15px; display:flex; flex-direction:column; gap:15px;">
+                <div>
+                    <label>Fecha:</label>
+                    <input type="date" id="timeDateInput" style="width:100%; padding:8px; font-size:16px;">
+                </div>
+                <div>
+                    <label>Hora:</label>
+                    <input type="time" id="timeTimeInput" style="width:100%; padding:8px; font-size:16px;">
+                </div>
+                <button onclick="setSystemTime()" style="padding:10px; background:#667eea; color:white; border:none; border-radius:8px; cursor:pointer;">💾 Establecer Hora</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>🛒 Sistema POS - Prototipo</h1>
+                    <p>Sistema de Punto de Venta Interactivo</p>
+                </div>
+                <div id="clock" class="clock" onclick="openTimeModal()" style="cursor: pointer;">--:--:--</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="activateBtn" onclick="window.location.href='/activate'" style="padding: 10px 20px; background: #ffc107; color: #000; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                        ⭐ Activar Premium
+                    </button>
+                    <button id="dashboardBtn" onclick="accessDashboard()" style="padding: 10px 20px; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                        📊 Panel de Control
+                    </button>
+                    <button id="loginBtn" onclick="login()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                        Iniciar Sesión
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sección de Búsqueda y Productos -->
+            <div class="search-section">
+                <h2>🔍 Buscar Productos</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por nombre o código..." style="flex: 1;">
+                    <select id="categoryFilter">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                    <button onclick="searchProducts()">Buscar</button>
+                    <button id="promotionFilterBtn" onclick="togglePromotionFilter()" style="background: #ff6b6b; color: white;">🎉 En Promoción</button>
+                </div>
+
+                <div class="results-grid" id="resultsGrid">
+                    <div class="loading">🔍 Escribe para buscar productos...</div>
+                </div>
+
+                <!-- Producto Seleccionado (Sección en desuso) -->
+                <div id="selectedProduct" style="display: none;"></div>
+            </div>
+
+            <!-- Sección del Carrito y Pago -->
+            <div class="cart-section">
+                <h2>🛒 Carrito de Compras</h2>
+                <div class="cart-items" id="cartItems">
+                    <div style="text-align: center; color: #7f8c8d; padding: 20px;">
+                        El carrito está vacío
+                    </div>
+                </div>
+
+                <div class="cart-total" id="cartTotal">
+                    Total: $0.00
+                </div>
+
+                <h3>💳 Métodos de Pago</h3>
+                <div class="payment-methods">
+                    <div class="payment-method" onclick="togglePaymentMethod('efectivo')">
+                        💵 Efectivo
+                        <input type="number" id="efectivo-amount" placeholder="Monto" min="0" step="0.01" style="margin-top: 5px; width: 100%; display: none;">
+                        <button onclick="setMaxAmount('efectivo')" style="margin-top: 5px; font-size: 12px; padding: 4px 8px; display: none;" id="efectivo-max">MAX</button>
+                    </div>
+                    <div class="payment-method" onclick="togglePaymentMethod('transferencia')">
+                        📲 Transferencia
+                        <input type="number" id="transferencia-amount" placeholder="Monto" min="0" step="0.01" style="margin-top: 5px; width: 100%; display: none;">
+                        <button onclick="setMaxAmount('transferencia')" style="margin-top: 5px; font-size: 12px; padding: 4px 8px; display: none;" id="transferencia-max">MAX</button>
+                    </div>
+                    <div class="payment-method" onclick="togglePaymentMethod('debito')">
+                        💳 Débito
+                        <input type="number" id="debito-amount" placeholder="Monto" min="0" step="0.01" style="margin-top: 5px; width: 100%; display: none;">
+                        <button onclick="setMaxAmount('debito')" style="margin-top: 5px; font-size: 12px; padding: 4px 8px; display: none;" id="debito-max">MAX</button>
+                    </div>
+                    <div class="payment-method" onclick="togglePaymentMethod('credito')">
+                        💳 Crédito
+                        <input type="number" id="credito-amount" placeholder="Monto" min="0" step="0.01" style="margin-top: 5px; width: 100%; display: none;">
+                        <button onclick="setMaxAmount('credito')" style="margin-top: 5px; font-size: 12px; padding: 4px 8px; display: none;" id="credito-max">MAX</button>
+                    </div>
+                </div>
+
+                <div class="payment-summary" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><strong>Total a Pagar:</strong></span>
+                        <span id="totalToPay">$0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><strong>Total Pagado:</strong></span>
+                        <span id="totalPaid">$0.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><strong>Vuelto:</strong></span>
+                        <span id="change">$0.00</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="payBtn" onclick="validateAndProcessPayment()" style="flex: 1; padding: 15px; background: #27ae60;">
+                        ✅ Procesar Pago
+                    </button>
+                    <button onclick="resetSystem()" style="flex: 1; padding: 15px; background: #e74c3c;">
+                        🆕 Nueva Venta
+                    </button>
+                </div>
+
+
+                <!-- Últimas Facturas -->
+                <div class="recent-invoices" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h3>📄 Últimas Facturas</h3>
+                    <div id="recentInvoicesList" style="margin-top: 10px;">
+                        <div style="text-align: center; color: #7f8c8d;">Cargando...</div>
+                    </div>
+                </div>
+
+                <!-- Recibo/Factura -->
+                <div class="receipt" id="receipt">
+                    <h3>🧾 Factura Generada</h3>
+                    <div id="receiptDetails"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="resetSystem()" style="flex: 1; background: #e74c3c;">
+                            🆕 Nueva Venta
+                        </button>
+                        <button onclick="cancelCurrentSale()" style="flex: 1; background: #dc3545;">
+                            ❌ Cancelar Venta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer con marca de agua -->
+        <footer style="margin-top: 20px; padding: 10px; text-align: center; color: #7f8c8d; font-size: 0.8em; border-top: 1px solid #eee;">
+            <p>🛡️ Sistema POS Protegido - Licencia requerida para distribución</p>
+            <p>© 2024 Sistema POS. Todos los derechos reservados. Distribución no autorizada prohibida.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Variables globales adicionales para index.html
+        let selectedPaymentMethods = {};
+        let showOnlyPromotions = false;
+        let categoriesCache = null;
+        let searchTimeout = null;
+        let recentInvoicesCache = [];
+        let productsCache = {};
+        let currentOffset = 0;
+        let isLoadingMore = false;
+        let hasMoreProducts = true;
+        // API_BASE ya está declarado en script.js
+
+        // Funciones específicas de index.html
+        function calcularTotal() {
+            return cart.reduce((sum, item) => sum + (parseFloat(item.precio) * item.cantidad), 0);
+        }
+
+        function showAlert(message, type) {
+            let alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 2000);
+        }
+
+        async function loadCategories() {
+            // Use cache if available
+            if (categoriesCache) {
+                populateCategories(categoriesCache);
+                return;
+            }
+
+            const select = document.getElementById('categoryFilter');
+            select.innerHTML = '<option value="">Todas las categorías</option>';
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const res = await fetch(`${API_BASE}/categories`, { headers });
+                if (res.status === 401) {
+                    // Silently fail - categories require authentication but don't prompt
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(`Error ${res.status}: ${res.statusText}`);
+                }
+                const categories = await res.json();
+                categoriesCache = categories; // Cache the result
+                populateCategories(categories);
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function populateCategories(categories) {
+            const select = document.getElementById('categoryFilter');
+            select.innerHTML = '<option value="">Todas las categorías</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        }
+
+        function debouncedSearchProducts() {
+            // Clear existing timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            // Set new timeout for 300ms delay
+            searchTimeout = setTimeout(() => {
+                searchProducts();
+            }, 300);
+        }
+
+        async function searchProducts(loadMore = false) {
+            if (isLoadingMore && !loadMore) return; // Evitar múltiples llamadas
+
+            const searchTerm = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+
+            if (!loadMore) {
+                currentOffset = 0;
+                hasMoreProducts = true;
+            }
+
+            if (!hasMoreProducts && loadMore) return;
+
+            // Si no hay términos de búsqueda y no hay categoría seleccionada, usar endpoint con descuentos
+            let url = `${API_BASE}/products/with-discounts`;
+            if (searchTerm || category || showOnlyPromotions) {
+                url = `${API_BASE}/products/search`;
+                const params = [];
+                if (searchTerm) params.push(`q=${encodeURIComponent(searchTerm)}`);
+                if (category) params.push(`category=${encodeURIComponent(category)}`);
+                if (showOnlyPromotions) params.push(`only_promotions=true`);
+                params.push(`offset=${currentOffset}`);
+                if (params.length > 0) url += '?' + params.join('&');
+            }
+
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            if (!loadMore) {
+                resultsGrid.innerHTML = '<div class="loading">🔄 Buscando productos...</div>';
+            } else {
+                isLoadingMore = true;
+                // Agregar indicador de carga al final
+                const loadMoreIndicator = document.createElement('div');
+                loadMoreIndicator.className = 'loading';
+                loadMoreIndicator.id = 'loadMoreIndicator';
+                loadMoreIndicator.textContent = '🔄 Cargando más productos...';
+                resultsGrid.appendChild(loadMoreIndicator);
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const res = await fetch(url, { headers });
+                if (res.status === 401) {
+                    // Silently fail - products require authentication but don't prompt automatically
+                    resultsGrid.innerHTML = '<div class="alert error">❌ Inicia sesión para ver los productos.</div>';
+                    return;
+                }
+                let response = await res.json();
+
+                // Extraer productos del response (nueva estructura con paginación)
+                let products = response.products || response;
+                const pagination = response.pagination || { hasMore: products.length === 50 };
+
+                hasMoreProducts = pagination.hasMore;
+                currentOffset += products.length;
+
+                displayResults(products, loadMore);
+
+                // Remover indicador de carga
+                const loadMoreIndicator = document.getElementById('loadMoreIndicator');
+                if (loadMoreIndicator) loadMoreIndicator.remove();
+
+                // Agregar botón "Cargar más" si hay más productos
+                if (hasMoreProducts && !document.getElementById('loadMoreBtn')) {
+                    const loadMoreBtn = document.createElement('button');
+                    loadMoreBtn.id = 'loadMoreBtn';
+                    loadMoreBtn.textContent = '📦 Cargar más productos';
+                    loadMoreBtn.onclick = () => searchProducts(true);
+                    loadMoreBtn.style.cssText = 'width: 100%; padding: 12px; margin-top: 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;';
+                    resultsGrid.appendChild(loadMoreBtn);
+                } else if (!hasMoreProducts) {
+                    const loadMoreBtn = document.getElementById('loadMoreBtn');
+                    if (loadMoreBtn) loadMoreBtn.remove();
+                }
+
+            } catch (error) {
+                console.error('Error in searchProducts:', error);
+                if (!loadMore) {
+                    resultsGrid.innerHTML = '<div class="alert error">❌ Error al cargar productos: ' + error.message + '</div>';
+                } else {
+                    const loadMoreIndicator = document.getElementById('loadMoreIndicator');
+                    if (loadMoreIndicator) loadMoreIndicator.remove();
+                }
+            } finally {
+                isLoadingMore = false;
+            }
+        }
+
+        function togglePromotionFilter() {
+            showOnlyPromotions = !showOnlyPromotions;
+            const btn = document.getElementById('promotionFilterBtn');
+            if (showOnlyPromotions) {
+                btn.style.background = '#ff4757';
+                btn.style.boxShadow = '0 4px 8px rgba(255, 71, 87, 0.3)';
+                btn.style.transform = 'scale(1.05)';
+                btn.textContent = '🎉 Solo Promociones';
+            } else {
+                btn.style.background = '#ff6b6b';
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'scale(1)';
+                btn.textContent = '🎉 En Promoción';
+            }
+            searchProducts();
+        }
+
+        function displayResults(products, append = false) {
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            if (!append && products.length === 0) {
+                resultsGrid.innerHTML = '<div class="alert error">❌ No se encontraron productos</div>';
+                return;
+            }
+
+            if (!append) {
+                // Limpiar grid si no es append
+                resultsGrid.innerHTML = '';
+            }
+
+            if (products.length === 0 && append) {
+                return; // No hay productos nuevos para append
+            }
+
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+
+            products.forEach(product => {
+                // Cachear producto para evitar GET adicional
+                productsCache[product.id] = product;
+
+                const hasDiscount = product.descuento_porcentaje && product.descuento_porcentaje > 0;
+                const originalPrice = parseFloat(product.precio);
+                const discountedPrice = parseFloat(product.precio_con_descuento || product.precio);
+
+                const card = document.createElement('div');
+                card.className = `product-card ${hasDiscount ? 'promotion' : ''}`;
+                card.onclick = () => selectProduct(product.id);
+
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <span class="product-code">${product.codigo}</span>
+                        <div class="product-name">${product.nombre}</div>
+                        ${hasDiscount ? `<div style="color: #e74c3c; font-weight: bold; font-size: 0.9em;">🎉 ${product.descuento_porcentaje}% OFF</div>` : ''}
+                    </div>
+                    <div class="product-info">
+                        <div class="price">
+                            <span style="font-size: 0.8em;">💰</span>
+                            ${hasDiscount ? `<span style="text-decoration: line-through; color: #7f8c8d; font-size: 0.9em;">${formatCurrency(originalPrice)}</span> ` : ''}
+                            ${formatCurrency(discountedPrice)}
+                        </div>
+                        <div class="stock" style="${product.stock == 0 ? 'color: red;' : ''}">Stock: ${product.stock}</div>
+                        <div class="category">${product.categoria}</div>
+                    </div>
+                `;
+
+                fragment.appendChild(card);
+            });
+
+            resultsGrid.appendChild(fragment);
+        }
+
+        async function selectProduct(productId) {
+            try {
+                let product;
+
+                // Buscar en cache primero
+                if (productsCache[productId]) {
+                    product = productsCache[productId];
+                } else {
+                    // Si no está en cache, hacer fetch
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (authCredentials) {
+                        headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                    }
+
+                    const res = await fetch(`${API_BASE}/products/${productId}`, { headers });
+                    if (res.status === 401) {
+                        isLoggedIn = false;
+                        updateUIBasedOnAuth();
+                        showAlert('❌ Autenticación requerida', 'error');
+                        return;
+                    }
+                    if (!res.ok) {
+                        throw new Error('Error al obtener producto');
+                    }
+
+                    product = await res.json();
+                    // Cachear para futuras selecciones
+                    productsCache[productId] = product;
+                }
+
+                selectedProduct = { ...product };
+
+                // Usar precio con descuento pre-calculado
+                const hasDiscount = product.descuento_porcentaje > 0;
+                const originalPrice = parseFloat(product.precio);
+                const discountedPrice = parseFloat(product.precio_con_descuento || product.precio);
+
+                selectedProduct.precio_original = originalPrice;
+                selectedProduct.precio = discountedPrice;
+                selectedProduct.tiene_descuento = hasDiscount;
+                selectedProduct.descuento_porcentaje = hasDiscount ? product.descuento_porcentaje : 0;
+
+                let priceDisplay = `Precio: ${formatCurrency(discountedPrice)}`;
+                if (hasDiscount) {
+                    priceDisplay = `Precio: <span style="text-decoration: line-through; color: #7f8c8d;">${formatCurrency(originalPrice)}</span> ${formatCurrency(discountedPrice)} (${product.descuento_porcentaje}% OFF)`;
+                }
+
+                document.getElementById('modalProductInfo').innerHTML = `
+                    <div style="font-size:1.5em; font-weight:bold; margin-bottom:8px;">${selectedProduct.codigo} - ${selectedProduct.nombre}</div>
+                    ${priceDisplay}<br>
+                    Stock disponible: <span style="${selectedProduct.stock == 0 ? 'color: red;' : ''}">${selectedProduct.stock}</span><br>
+                    Categoría: ${selectedProduct.categoria}
+                `;
+                document.getElementById('modalQuantityInput').value = 1;
+                document.getElementById('modalQuantityInput').max = selectedProduct.stock;
+
+                document.getElementById('productModal').style.display = 'flex';
+            } catch (error) {
+                showAlert('❌ Error al seleccionar producto', 'error');
+            }
+        }
+
+        function changeModalQuantity(delta) {
+            const input = document.getElementById('modalQuantityInput');
+            let value = parseInt(input.value, 10) || 1;
+            let max = parseInt(input.max, 10) || 1;
+            value += delta;
+            if (value < 1) value = 1;
+            if (value > max) value = max;
+            input.value = value;
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        function addToCartFromModal() {
+            const quantity = parseInt(document.getElementById('modalQuantityInput').value, 10);
+            if (!selectedProduct || quantity < 1 || quantity > selectedProduct.stock) {
+                showAlert('❌ Cantidad inválida', 'error');
+                return;
+            }
+
+            const existing = cart.find(item => item.id === selectedProduct.id);
+            if (existing) {
+                if (existing.cantidad + quantity > selectedProduct.stock) {
+                    showAlert('❌ Stock insuficiente', 'error');
+                    return;
+                }
+                existing.cantidad += quantity;
+            } else {
+                cart.push({ ...selectedProduct, cantidad: quantity });
+            }
+
+            updateCart();
+            closeProductModal();
+            showAlert('✅ Producto agregado al carrito', 'success');
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const totalElement = document.getElementById('cartTotal');
+
+            // Limpiar completamente el contenedor primero
+            cartItems.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">
+                    El carrito está vacío
+                </div>`;
+                totalElement.textContent = `Total: $0.00`;
+                updatePaymentSummary();
+                return;
+            }
+
+            // Crear fragmento para todos los elementos
+            const fragment = document.createDocumentFragment();
+
+            cart.forEach(item => {
+                const precioUnitario = parseFloat(item.tiene_descuento ? item.precio_original : item.precio);
+                const precioConDescuento = parseFloat(item.precio);
+                const subtotal = precioConDescuento * item.cantidad;
+                const ahorroTotal = item.tiene_descuento ? (precioUnitario - precioConDescuento) * item.cantidad : 0;
+
+                let priceDisplay = `${item.nombre} x${item.cantidad}`;
+                if (item.tiene_descuento) {
+                    priceDisplay += ` 🎉 ${item.descuento_porcentaje}% OFF`;
+                }
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                if (item.tiene_descuento) {
+                    cartItem.style.borderLeft = '4px solid #e74c3c';
+                    cartItem.style.background = 'linear-gradient(90deg, #fff5f5 0%, #ffffff 100%)';
+                }
+
+                cartItem.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; ${item.tiene_descuento ? 'color: #e74c3c;' : ''}">${priceDisplay}</div>
+                        ${item.tiene_descuento ? `
+                            <div style="font-size: 0.9em; color: #27ae60; margin-top: 4px; font-weight: 500;">
+                                <span style="text-decoration: line-through; color: #7f8c8d; font-size: 0.9em;">${formatCurrency(precioUnitario)}</span>
+                                → <strong style="color: #e74c3c;">${formatCurrency(precioConDescuento)}</strong> c/u
+                                ${ahorroTotal > 0 ? `<br><em style="color: #27ae60;">💰 Ahorro: ${formatCurrency(ahorroTotal)}</em>` : ''}
+                            </div>
+                        ` : `
+                            <div style="font-size: 0.8em; color: #7f8c8d;">
+                                Precio: ${formatCurrency(precioUnitario)} c/u
+                            </div>
+                        `}
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: bold; font-size: 1.1em; ${item.tiene_descuento ? 'color: #e74c3c;' : ''}">${formatCurrency(subtotal)}</div>
+                        <button class="remove-item-btn" data-product-id="${item.id}" style="font-size: 14px; padding: 2px 6px; margin-top: 4px;">❌</button>
+                    </div>
+                `;
+
+                fragment.appendChild(cartItem);
+            });
+
+            cartItems.appendChild(fragment);
+
+            const total = calcularTotal();
+            totalElement.textContent = `Total: ${formatCurrency(total)}`;
+            updatePaymentSummary();
+        }
+
+        function removeFromCart(productId) {
+            const initialCartSize = cart.length;
+            cart = cart.filter(item => String(item.id) !== String(productId));
+
+            if (cart.length < initialCartSize) {
+                updateCart();
+                showAlert('🗑️ Producto removido del carrito', 'success');
+            } else {
+                console.log(`Error: No se encontró el producto con ID ${productId} en el carrito.`);
+                showAlert('❌ Error al remover el producto', 'error');
+            }
+        }
+
+        function togglePaymentMethod(method) {
+            const methodDiv = document.querySelector(`.payment-method[onclick*="togglePaymentMethod('${method}')"]`);
+            const input = document.getElementById(`${method}-amount`);
+            const maxBtn = document.getElementById(`${method}-max`);
+            if (methodDiv.classList.contains('selected')) {
+                methodDiv.classList.remove('selected');
+                input.style.display = 'none';
+                maxBtn.style.display = 'none';
+                input.value = '';
+                delete selectedPaymentMethods[method];
+            } else {
+                methodDiv.classList.add('selected');
+                input.style.display = 'block';
+                maxBtn.style.display = 'inline-block';
+                selectedPaymentMethods[method] = 0;
+                setTimeout(() => input.focus(), 100);
+            }
+            updatePaymentSummary();
+        }
+
+        function updatePaymentSummary() {
+            const totalToPay = calcularTotal();
+            document.getElementById('totalToPay').textContent = formatCurrency(totalToPay);
+
+            let totalPaid = 0;
+            for (const method in selectedPaymentMethods) {
+                const amount = parseFloat(document.getElementById(`${method}-amount`).value) || 0;
+                selectedPaymentMethods[method] = amount;
+                totalPaid += amount;
+            }
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+
+            const change = totalToPay > 0 ? totalPaid - totalToPay : 0;
+            document.getElementById('change').textContent = formatCurrency(Math.max(0, change));
+        }
+
+        function setMaxAmount(method) {
+            const totalToPay = calcularTotal();
+            let currentPaid = 0;
+            for (const m in selectedPaymentMethods) {
+                if (m !== method) currentPaid += selectedPaymentMethods[m];
+            }
+            const remaining = totalToPay - currentPaid;
+            const input = document.getElementById(`${method}-amount`);
+            input.value = remaining > 0 ? remaining.toFixed(2) : '0.00';
+            updatePaymentSummary();
+        }
+
+        function simulatePayment() {
+            if (cart.length === 0) {
+                showAlert('❌ El carrito está vacío', 'error');
+                return;
+            }
+
+            let totalPaid = 0;
+            const paymentDetails = [];
+            for (const method in selectedPaymentMethods) {
+                const amount = selectedPaymentMethods[method];
+                if (amount > 0) {
+                    totalPaid += amount;
+                    paymentDetails.push({ metodo: method, monto: amount });
+                }
+            }
+
+            // Calcular total
+            const total = calcularTotal();
+
+            // Generar factura simulada detallada
+            const invoiceNumber = `SIM-${Date.now()}`;
+            let invoiceDetails = `🎭 SIMULACIÓN DE COMPRA\n\n`;
+            invoiceDetails += `Factura: ${invoiceNumber}\n`;
+            invoiceDetails += `Fecha: ${new Date().toLocaleString()}\n`;
+            if (paymentDetails.length > 0) {
+                if (paymentDetails.length > 1) {
+                    invoiceDetails += `Método de Pago: ${paymentDetails.map(p => p.metodo.toUpperCase()).join('/')}\n\n`;
+                } else {
+                    invoiceDetails += `Método de Pago: ${paymentDetails[0].metodo.toUpperCase()}\n\n`;
+                }
+            } else {
+                invoiceDetails += `Método de Pago: No especificado\n\n`;
+            }
+            invoiceDetails += `PRODUCTOS:\n`;
+
+            cart.forEach((item, index) => {
+                const precioUnitario = parseFloat(item.tiene_descuento ? item.precio_original : item.precio);
+                const precioConDescuento = parseFloat(item.precio);
+                const subtotal = precioConDescuento * item.cantidad;
+                invoiceDetails += `${index + 1}. ${item.nombre}\n`;
+                invoiceDetails += `   Código: ${item.codigo}\n`;
+                if (item.tiene_descuento) {
+                    invoiceDetails += `   Precio: ${formatCurrency(precioUnitario)} → ${formatCurrency(precioConDescuento)} (${item.descuento_porcentaje}% OFF)\n`;
+                } else {
+                    invoiceDetails += `   Precio: ${formatCurrency(precioUnitario)}\n`;
+                }
+                invoiceDetails += `   Cantidad: ${item.cantidad} × ${formatCurrency(precioConDescuento)} = ${formatCurrency(subtotal)}\n\n`;
+            });
+
+            invoiceDetails += `TOTAL: ${formatCurrency(total)}\n\n`;
+            invoiceDetails += `⚠️ ESTA ES UNA SIMULACIÓN - No se procesó ningún pago real`;
+
+            // Mostrar factura en alert
+            alert(invoiceDetails);
+
+            // Limpiar carrito
+            cart = [];
+            updateCart();
+            selectedPaymentMethods = {};
+            document.querySelectorAll('.payment-method.selected').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.payment-method input, .payment-method button').forEach(el => {
+                el.style.display = 'none';
+                if (el.tagName === 'INPUT') el.value = '';
+            });
+        }
+
+        function validateAndProcessPayment() {
+            // Validación rápida antes de procesar
+            let hasSelectedMethod = false;
+            let hasAmount = false;
+
+            ['efectivo', 'transferencia', 'debito', 'credito'].forEach(method => {
+                const methodDiv = document.querySelector(`.payment-method[onclick*="togglePaymentMethod('${method}')"]`);
+                if (methodDiv && methodDiv.classList.contains('selected')) {
+                    hasSelectedMethod = true;
+                    const amount = parseFloat(document.getElementById(`${method}-amount`).value) || 0;
+                    if (amount > 0) hasAmount = true;
+                }
+            });
+
+            if (!hasSelectedMethod) {
+                showSmallAlert('Selecciona un método de pago', 'warning');
+                return;
+            }
+
+            if (!hasAmount) {
+                showSmallAlert('Ingresa el monto a pagar', 'warning');
+                return;
+            }
+
+            // Si pasa validación, procesar pago
+            processPayment();
+        }
+
+        function showSmallAlert(message, type = 'info') {
+            // Crear alert pequeño y discreto
+            const alert = document.createElement('div');
+            alert.className = `small-alert ${type}`;
+            alert.textContent = message;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'warning' ? '#fff3cd' : '#d1ecf1'};
+                color: ${type === 'warning' ? '#856404' : '#0c5460'};
+                border: 1px solid ${type === 'warning' ? '#ffeaa7' : '#bee5eb'};
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                animation: slideInDown 0.3s ease-out;
+            `;
+
+            document.body.appendChild(alert);
+
+            // Auto-remover después de 2 segundos
+            setTimeout(() => {
+                alert.style.animation = 'slideOutUp 0.3s ease-in';
+                setTimeout(() => alert.remove(), 300);
+            }, 2000);
+        }
+
+        async function processPayment() {
+            if (cart.length === 0) {
+                showAlert('❌ El carrito está vacío', 'error');
+                return;
+            }
+
+            // Verificar autenticación y pedir credenciales si es necesario
+            let tempCredentials = authCredentials;
+            if (!tempCredentials) {
+                const username = prompt('Usuario para procesar pago:');
+                const password = prompt('Contraseña:');
+                if (username && password) {
+                    tempCredentials = { username, password };
+                } else {
+                    showAlert('❌ Credenciales requeridas para procesar el pago', 'error');
+                    return;
+                }
+            }
+
+            const totalToPay = calcularTotal();
+            let totalPaid = 0;
+            const paymentDetails = [];
+            for (const method in selectedPaymentMethods) {
+                const amount = selectedPaymentMethods[method];
+                if (amount > 0) {
+                    totalPaid += amount;
+                    paymentDetails.push({ metodo: method, monto: amount });
+                }
+            }
+            if (paymentDetails.length === 0) {
+                showAlert('❌ Selecciona al menos un método de pago y ingresa montos', 'error');
+                return;
+            }
+            if (totalPaid < totalToPay) {
+                showAlert('❌ El monto pagado es insuficiente', 'error');
+                return;
+            }
+
+            const change = Math.max(0, totalPaid - totalToPay);
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (tempCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(tempCredentials.username + ':' + tempCredentials.password);
+                }
+
+                const requestData = {
+                    items: cart.map(item => ({
+                        id: item.id,
+                        nombre: item.nombre,
+                        cantidad: item.cantidad,
+                        precio: parseFloat(item.precio_original || item.precio),
+                        descuento_porcentaje: item.tiene_descuento ? item.descuento_porcentaje : 0
+                    })),
+                    pagos: paymentDetails,
+                    total: totalToPay,
+                    vuelto: change
+                };
+
+                console.log('Enviando datos de venta:', requestData);
+
+                const res = await fetch(`${API_BASE}/sales`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(requestData)
+                });
+                if (res.status === 401) {
+                    showAlert('❌ Credenciales incorrectas', 'error');
+                    return;
+                }
+                if (!res.ok) {
+                    let errorMsg = 'Error al procesar la venta';
+                    try {
+                        const errorData = await res.json();
+                        errorMsg += ': ' + (errorData.error || res.statusText);
+                    } catch (e) {
+                        errorMsg += ': ' + res.statusText;
+                    }
+                    throw new Error(errorMsg);
+                }
+                const data = await res.json();
+                generateInvoice(data.total, data.numero_factura, paymentDetails, change, data.fecha_venta);
+
+                // Agregar la nueva venta al cache sin recargar
+                const newSale = {
+                    numero_factura: data.numero_factura,
+                    total: data.total,
+                    fecha: data.fecha_venta || new Date().toISOString(),
+                    items: cart.map(item => ({
+                        nombre: item.nombre,
+                        cantidad: item.cantidad,
+                        precio_unitario: parseFloat(item.precio),
+                        precio_original: parseFloat(item.precio_original || item.precio),
+                        descuento_porcentaje: item.tiene_descuento ? item.descuento_porcentaje : 0
+                    }))
+                };
+                addNewSaleToCache(newSale);
+
+                // Actualizar factura general
+                updateGeneralInvoice();
+
+                cart = [];
+                updateCart();
+                selectedPaymentMethods = {};
+                document.querySelectorAll('.payment-method.selected').forEach(el => el.classList.remove('selected'));
+                document.querySelectorAll('.payment-method input, .payment-method button').forEach(el => {
+                    el.style.display = 'none';
+                    if (el.tagName === 'INPUT') el.value = '';
+                });
+                showAlert('✅ Venta registrada exitosamente', 'success');
+            } catch (error) {
+                showAlert('❌ Error al procesar el pago', 'error');
+                console.error('Error en processPayment:', error);
+            }
+        }
+
+        function generateInvoice(total, facturaNumber, paymentDetails, change, fechaVenta) {
+            const receipt = document.getElementById('receipt');
+            const receiptDetails = document.getElementById('receiptDetails');
+
+            receipt.classList.add('visible');
+
+            // Usar la fecha de la venta si está disponible, sino usar la fecha actual
+            const saleDate = fechaVenta ? new Date(fechaVenta) : new Date();
+
+            // Formatear métodos de pago
+            let paymentMethodsText = '';
+            if (Array.isArray(paymentDetails) && paymentDetails.length > 0) {
+                if (paymentDetails[0].metodo) {
+                    // Pagos detallados con método y monto
+                    paymentMethodsText = paymentDetails.map(p => `• ${p.metodo.toUpperCase()}: ${formatCurrency(p.monto)}`).join('<br>');
+                } else {
+                    // Solo métodos sin montos (compatibilidad)
+                    paymentMethodsText = paymentDetails.join('/');
+                }
+            } else {
+                paymentMethodsText = 'No especificado';
+            }
+
+            // Calcular total de ahorros
+            const totalAhorros = cart.reduce((sum, item) => {
+                if (item.tiene_descuento) {
+                    const precioUnitario = parseFloat(item.precio_original);
+                    const precioConDescuento = parseFloat(item.precio);
+                    return sum + (precioUnitario - precioConDescuento) * item.cantidad;
+                }
+                return sum;
+            }, 0);
+
+            receiptDetails.innerHTML = `
+                <strong>Factura #${facturaNumber}</strong><br>
+                Fecha: ${saleDate.toLocaleString('es-AR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                })}<br>
+                <strong>Método(s) de Pago:</strong><br>
+                ${paymentMethodsText}
+                <br>
+                <strong>Productos:</strong><br>
+                ${cart.map(item => {
+                    const precioUnitario = parseFloat(item.tiene_descuento ? item.precio_original : item.precio);
+                    const precioConDescuento = parseFloat(item.precio);
+                    const subtotal = precioConDescuento * item.cantidad;
+                    const ahorroUnitario = item.tiene_descuento ? precioUnitario - precioConDescuento : 0;
+                    const ahorroTotal = ahorroUnitario * item.cantidad;
+
+                    let productLine = `• ${item.nombre} - ${item.cantidad} × `;
+
+                    if (item.tiene_descuento) {
+                        productLine += `<span style="text-decoration: line-through;">${formatCurrency(precioUnitario)}</span> ${formatCurrency(precioConDescuento)} = ${formatCurrency(subtotal)} (${item.descuento_porcentaje}% OFF - Ahorro: ${formatCurrency(ahorroTotal)})`;
+                    } else {
+                        productLine += `${formatCurrency(precioUnitario)} = ${formatCurrency(subtotal)}`;
+                    }
+
+                    return productLine;
+                }).join('<br>')}
+                <br>
+                ${totalAhorros > 0 ? `<strong>Total Ahorro: ${formatCurrency(totalAhorros)}</strong><br>` : ''}
+                <strong>Total: ${formatCurrency(total)}</strong><br>
+                <strong>Vuelto: ${formatCurrency(change)}</strong>
+            `;
+        }
+
+        async function loadRecentInvoices(forceReload = false) {
+            const list = document.getElementById('recentInvoicesList');
+
+            // Usar cache si está disponible y no se fuerza recarga
+            if (!forceReload && recentInvoicesCache.length > 0) {
+                updateRecentInvoicesDisplay();
+                return;
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const res = await fetch(`${API_BASE}/sales`, { headers });
+                if (res.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    list.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Autenticación requerida</div>';
+                    return;
+                }
+                const sales = await res.json();
+                recentInvoicesCache = sales.slice(0, 5); // Actualizar cache
+                updateRecentInvoicesDisplay();
+            } catch (error) {
+                list.innerHTML = '<div style="text-align: center; color: #7f8c8d;">Error al cargar facturas</div>';
+            }
+        }
+
+        function updateRecentInvoicesDisplay() {
+            const list = document.getElementById('recentInvoicesList');
+            if (recentInvoicesCache.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: #7f8c8d;">No hay facturas recientes</div>';
+                return;
+            }
+            list.innerHTML = recentInvoicesCache.map(sale => {
+                // Calcular si hay descuentos en esta venta
+                const hasDiscounts = sale.items && sale.items.some(item => item.descuento_porcentaje && item.descuento_porcentaje > 0);
+
+                // Calcular total de ahorros
+                const totalAhorros = sale.items ? sale.items.reduce((sum, item) => {
+                    if (item.descuento_porcentaje && item.descuento_porcentaje > 0) {
+                        const precioOriginal = parseFloat(item.precio_original || item.precio_unitario);
+                        const precioConDescuento = parseFloat(item.precio_unitario);
+                        return sum + (precioOriginal - precioConDescuento) * item.cantidad;
+                    }
+                    return sum;
+                }, 0) : 0;
+
+                return `
+                <div style="border-bottom: 1px solid #eee; padding: 8px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>${sale.numero_factura}</strong>
+                        <span style="font-weight: bold; ${hasDiscounts ? 'color: #27ae60;' : ''}">${formatCurrency(sale.total)}${hasDiscounts ? ' 🎉' : ''}</span>
+                    </div>
+                    <small>${new Date(sale.fecha).toLocaleString('es-AR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    })}</small>
+                    ${hasDiscounts ? `<br><small style="color: #27ae60;">Ahorro total: ${formatCurrency(totalAhorros)}</small>` : ''}
+                </div>
+            `;
+            }).join('');
+        }
+
+        function addNewSaleToCache(saleData) {
+            // Agregar la nueva venta al inicio del cache
+            recentInvoicesCache.unshift(saleData);
+            // Mantener solo las últimas 5
+            if (recentInvoicesCache.length > 5) {
+                recentInvoicesCache = recentInvoicesCache.slice(0, 5);
+            }
+            updateRecentInvoicesDisplay();
+        }
+
+        function updateGeneralInvoice() {
+            const container = document.getElementById('generalInvoiceContent');
+
+            if (recentInvoicesCache.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d;">No hay ventas procesadas</div>';
+                return;
+            }
+
+            // Crear resumen de todas las ventas
+            const allItems = {};
+            let totalGeneral = 0;
+            let totalVentas = 0;
+
+            recentInvoicesCache.forEach(sale => {
+                totalVentas++;
+                totalGeneral += parseFloat(sale.total || 0);
+
+                if (sale.items) {
+                    sale.items.forEach(item => {
+                        const key = item.nombre;
+                        if (!allItems[key]) {
+                            allItems[key] = {
+                                nombre: item.nombre,
+                                cantidad: 0,
+                                precio_unitario: parseFloat(item.precio_unitario || 0),
+                                subtotal: 0
+                            };
+                        }
+                        allItems[key].cantidad += parseInt(item.cantidad || 0);
+                        allItems[key].subtotal += (parseFloat(item.precio_unitario || 0) * parseInt(item.cantidad || 0));
+                    });
+                }
+            });
+
+            // Generar HTML para la factura general
+            let html = `
+                <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>Total de Ventas:</strong>
+                        <span>${totalVentas}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong>Monto Total General:</strong>
+                        <span style="color: #27ae60; font-weight: bold;">${formatCurrency(totalGeneral)}</span>
+                    </div>
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold;">Producto</th>
+                                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">Cantidad Total</th>
+                                <th style="padding: 8px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            Object.values(allItems).forEach(item => {
+                html += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${item.nombre}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.cantidad}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatCurrency(item.subtotal)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function resetSystem() {
+            cart = [];
+            selectedProduct = null;
+            selectedPaymentMethods = {};
+
+            document.getElementById('selectedProduct').style.display = '';
+            document.getElementById('receipt').classList.remove('visible');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+
+            updateCart();
+
+            document.querySelectorAll('.product-card.selected, .payment-method.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            document.querySelectorAll('.payment-method input').forEach(input => {
+                input.style.display = 'none';
+                input.value = '';
+            });
+
+            showAlert('🔄 Sistema reiniciado', 'success');
+            loadRecentInvoices();
+        }
+
+        // Función para cancelar la venta actual (desde el recibo)
+        function cancelCurrentSale() {
+            // Obtener el número de factura del recibo actual
+            const receiptDetails = document.getElementById('receiptDetails');
+            const facturaMatch = receiptDetails.innerHTML.match(/Factura #([A-Z0-9-]+)/);
+
+            if (!facturaMatch) {
+                showAlert('❌ No se pudo identificar la factura actual', 'error');
+                return;
+            }
+
+            const numeroFactura = facturaMatch[1];
+
+            if (!confirm(`¿Está seguro de que desea cancelar la venta ${numeroFactura}?\n\nEsta acción no se puede deshacer y restaurará el stock de los productos.`)) {
+                return;
+            }
+
+            // Pedir credenciales para cancelar venta
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para cancelar la venta');
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+            // Buscar el ID de la venta por número de factura
+            fetch(`${API_BASE}/sales`, { headers })
+                .then(response => response.json())
+                .then(sales => {
+                    const sale = sales.find(s => s.numero_factura === numeroFactura);
+                    if (!sale) {
+                        throw new Error('Venta no encontrada');
+                    }
+
+                    return fetch(`${API_BASE}/sales/${sale.id}`, {
+                        method: 'DELETE',
+                        headers: headers
+                    });
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        const errorData = response.json();
+                        throw new Error(errorData.error || 'Error al cancelar la venta');
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    showAlert(result.message || 'Venta cancelada exitosamente', 'success');
+
+                    // Resetear el sistema después de cancelar
+                    resetSystem();
+
+                    // Recargar las facturas recientes
+                    loadRecentInvoices(true);
+                })
+                .catch(error => {
+                    console.error('Error cancelando venta:', error);
+                    showAlert('Error al cancelar la venta: ' + error.message, 'error');
+                });
+        }
+
+        // Función para actualizar el reloj (optimizada con Visibility API)
+        let clockInterval = null;
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}hs:${minutes}m:${seconds}s`;
+            const clockElement = document.getElementById('clock');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+
+        function startClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            updateClock(); // Actualizar inmediatamente
+            clockInterval = setInterval(updateClock, 1000);
+        }
+
+        function stopClock() {
+            if (clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+            }
+        }
+
+        // Función de limpieza de memoria
+        function cleanupMemory() {
+            // Limpiar timeouts
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+                searchTimeout = null;
+            }
+
+            // Limpiar cache si es necesario (cada 5 minutos)
+            setTimeout(() => {
+                categoriesCache = null;
+            }, 300000); // 5 minutos
+        }
+
+        // Funciones para modal de tiempo
+        function openTimeModal() {
+            const now = new Date();
+            const dateString = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const timeString = now.toTimeString().slice(0, 5); // HH:MM
+            document.getElementById('timeDateInput').value = dateString;
+            document.getElementById('timeTimeInput').value = timeString;
+            document.getElementById('timeModal').style.display = 'flex';
+        }
+
+        function closeTimeModal() {
+            document.getElementById('timeModal').style.display = 'none';
+        }
+
+        function setSystemTime() {
+            const date = document.getElementById('timeDateInput').value;
+            const time = document.getElementById('timeTimeInput').value;
+            if (!date || !time) {
+                showAlert('❌ Selecciona fecha y hora', 'error');
+                return;
+            }
+
+            const instructions = `Para cambiar la hora del sistema:\n\n1. Presiona Win + I para abrir Configuración\n2. Ve a "Hora e idioma" > "Fecha y hora"\n3. Desactiva "Establecer hora automáticamente"\n4. Cambia la fecha a: ${date}\n5. Cambia la hora a: ${time}\n6. Recarga esta página para ver los cambios\n\n¿Has completado estos pasos?`;
+            alert(instructions);
+            closeTimeModal();
+            updateClock(); // Actualizar el display
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize authentication state and update UI
+            loadAuthFromStorage();
+
+            // Verificar estado de licencia
+            checkLicenseStatus();
+
+            // Verificar autenticación al cargar POS
+                if (!checkPOSAccess()) {
+                    return; // No continuar si no está autenticado
+                }
+    
+                // Verificar si se debe refrescar datos desde dashboard
+                if (sessionStorage.getItem('refreshPOSData') === 'true') {
+                    sessionStorage.removeItem('refreshPOSData');
+                    // Refrescar datos después de un pequeño delay para asegurar que todo esté cargado
+                    setTimeout(() => {
+                        loadCategories();
+                        searchProducts();
+                        loadRecentInvoices();
+                    }, 100);
+                }
+
+            // Iniciar el reloj inteligente
+            startClock();
+
+            // Pausar/reanudar reloj basado en visibilidad de página
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    stopClock();
+                } else {
+                    startClock();
+                }
+            });
+
+            document.getElementById('searchInput').addEventListener('input', debouncedSearchProducts);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (searchTimeout) clearTimeout(searchTimeout);
+                    searchProducts();
+                }
+            });
+            document.getElementById('categoryFilter').addEventListener('change', searchProducts);
+            document.getElementById('productModal').addEventListener('click', function(e) {
+                if (e.target === this) closeProductModal();
+            });
+
+            document.getElementById('cartItems').addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-item-btn')) {
+                    const productId = event.target.dataset.productId;
+                    removeFromCart(productId);
+                }
+            });
+
+            ['efectivo', 'transferencia', 'debito', 'credito'].forEach(method => {
+                const input = document.getElementById(`${method}-amount`);
+                const maxBtn = document.getElementById(`${method}-max`);
+                input.addEventListener('input', updatePaymentSummary);
+                input.addEventListener('click', e => e.stopPropagation());
+                input.addEventListener('focus', () => {
+                    const methodDiv = input.closest('.payment-method');
+                    if (!methodDiv.classList.contains('selected')) {
+                        togglePaymentMethod(method);
+                    }
+                });
+                maxBtn.addEventListener('click', e => e.stopPropagation());
+            });
+
+            // Cargar datos iniciales sin requerir autenticación automática
+            loadCategories();
+            searchProducts();
+            // No cargar loadRecentInvoices() automáticamente para evitar prompts de auth
+            updateGeneralInvoice();
+        });
+
+        // Manejar navegación hacia atrás del navegador
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                // La página se cargó desde el cache (navegación hacia atrás)
+                // Refrescar datos para mostrar cambios desde dashboard
+                loadCategories();
+                searchProducts();
+                loadRecentInvoices();
+            }
+        });
+
+        // Limpiar recursos antes de salir
+        window.addEventListener('beforeunload', cleanupMemory);
+
+        // Función para acceder al dashboard (usa la de script.js)
+
+        // Función legacy para compatibilidad
+        function selectPaymentMethod(method) {
+            togglePaymentMethod(method);
+        }
+
+        // Función para verificar acceso al POS (requiere login)
+        function checkPOSAccess() {
+            if (!isLoggedIn) {
+                const username = prompt('Usuario requerido para acceder al sistema POS:');
+                const password = prompt('Contraseña:');
+
+                if (username && password) {
+                    authCredentials = { username, password };
+                    isLoggedIn = true;
+                    sessionStorage.setItem('authCredentials', JSON.stringify(authCredentials));
+                    updateUIBasedOnAuth();
+                    alert('✅ Sesión iniciada correctamente');
+                    return true;
+                } else {
+                    alert('❌ Credenciales requeridas para acceder al sistema POS');
+                    // Redirigir a la página de activación como fallback
+                    window.location.href = '/activate';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Función para verificar estado de licencia y actualizar botón
+        async function checkLicenseStatus() {
+            try {
+                const response = await fetch('/api/license-status');
+                const data = await response.json();
+
+                const activateBtn = document.getElementById('activateBtn');
+                if (data.activated) {
+                    const daysText = `${data.days_remaining} día${data.days_remaining !== 1 ? 's' : ''}`;
+
+                    if (data.days_remaining <= 5) {
+                        // 5 días o menos: botón naranja con alerta
+                        activateBtn.textContent = `⚠️ Quedan ${daysText}!`;
+                        activateBtn.style.background = '#fd7e14';
+                    } else {
+                        // Más de 5 días: botón verde normal
+                        activateBtn.textContent = `✅ Premium (${daysText})`;
+                        activateBtn.style.background = '#28a745';
+                    }
+                    activateBtn.onclick = () => window.location.href='/activate';
+                } else {
+                    activateBtn.textContent = '⭐ Activar Premium';
+                    activateBtn.style.background = '#ffc107';
+                    activateBtn.onclick = () => window.location.href='/activate';
+                }
+            } catch (error) {
+                console.error('Error checking license status:', error);
+            }
+        }
+
+        // Exponer funciones globalmente
+        window.selectProduct = selectProduct;
+        window.closeProductModal = closeProductModal;
+        window.changeModalQuantity = changeModalQuantity;
+        window.addToCartFromModal = addToCartFromModal;
+        window.removeFromCart = removeFromCart;
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.togglePaymentMethod = togglePaymentMethod;
+        window.setMaxAmount = setMaxAmount;
+        window.processPayment = processPayment;
+        window.simulatePayment = simulatePayment;
+        window.resetSystem = resetSystem;
+        window.searchProducts = searchProducts;
+        window.updateCart = updateCart;
+        window.accessDashboard = accessDashboard;
+        window.openTimeModal = openTimeModal;
+        window.closeTimeModal = closeTimeModal;
+        window.setSystemTime = setSystemTime;
+        window.checkLicenseStatus = checkLicenseStatus;
+        window.checkPOSAccess = checkPOSAccess;
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activación del Sistema POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activation-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .activate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .activate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .activate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .deactivate-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-left: 1rem;
+        }
+
+        .deactivate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .deactivate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="activation-container">
+        <div class="logo">🛒</div>
+        <h1 class="title">Sistema POS - Activación de Características Premium</h1>
+
+        <form id="activationForm">
+            <div class="form-group">
+                <label for="licenseKey">Clave de Activación (6 dígitos):</label>
+                <input type="text" id="licenseKey" name="licenseKey" required
+                       placeholder="Ingrese su clave de activación" maxlength="6" pattern="[0-9]{6}">
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="activate-btn" id="activateBtn">
+                    Activar Sistema
+                </button>
+                <button type="button" class="deactivate-btn" id="deactivateBtn">
+                    Dar de Baja
+                </button>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Activando sistema...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="footer">
+            <p><strong>Características Premium que se activan:</strong></p>
+            <ul style="text-align: left; margin: 10px 0;">
+                <li>📊 Generación de reportes avanzados</li>
+                <li>🎉 Más de 3 promociones activas</li>
+                <li>📋 Registro de operaciones del sistema</li>
+            </ul>
+
+            <p><strong>⚠️ Información importante sobre la activación:</strong></p>
+            <ul style="text-align: left; margin: 10px 0; font-size: 0.9em;">
+                <li>🔑 Cada código de activación es de un solo uso</li>
+                <li>⏰ La licencia dura exactamente 1 mes desde la activación</li>
+                <li>🚨 El botón mostrará los días restantes y se pondrá naranja cuando queden 5 días o menos</li>
+                <li>❌ Al expirar la licencia, se eliminan automáticamente todas las promociones</li>
+                <li>🔄 El sistema regresa al modo gratuito con limitaciones</li>
+            </ul>
+
+            <p>Si no tiene una clave de licencia, contacte al administrador del sistema.</p>
+        </div>
+    </div>
+
+    <script>
+        // Función de activación
+        document.getElementById('activationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleActivation();
+        });
+
+        // Función de desactivación
+        document.getElementById('deactivateBtn').addEventListener('click', async () => {
+            await handleDeactivation();
+        });
+
+        async function handleActivation() {
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const activateBtn = document.getElementById('activateBtn');
+            const deactivateBtn = document.getElementById('deactivateBtn');
+            const loading = document.getElementById('loading');
+            const message = document.getElementById('message');
+
+            if (!licenseKey) {
+                showMessage('Por favor ingrese una clave de activación', 'error');
+                return;
+            }
+
+            if (licenseKey.length !== 6) {
+                showMessage('La clave debe tener exactamente 6 dígitos', 'error');
+                return;
+            }
+
+            if (!/^\d{6}$/.test(licenseKey)) {
+                showMessage('La clave debe contener solo números', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            activateBtn.disabled = true;
+            deactivateBtn.disabled = true;
+            loading.style.display = 'block';
+            message.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/activate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        licenseKey: licenseKey,
+                        clientData: {
+                            activated_at: new Date().toISOString(),
+                            user_agent: navigator.userAgent
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message, 'success');
+                    // Redirigir después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showMessage(result.error || 'Error al activar la licencia', 'error');
+                }
+            } catch (error) {
+                showMessage('Error de conexión. Verifique su conexión a internet.', 'error');
+            } finally {
+                activateBtn.disabled = false;
+                deactivateBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function handleDeactivation() {
+            const activateBtn = document.getElementById('activateBtn');
+            const deactivateBtn = document.getElementById('deactivateBtn');
+            const loading = document.getElementById('loading');
+            const message = document.getElementById('message');
+
+            // Mostrar loading
+            activateBtn.disabled = true;
+            deactivateBtn.disabled = true;
+            loading.style.display = 'block';
+            message.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/deactivate-license', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message, 'success');
+                    // Recargar página después de 2 segundos
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showMessage(result.error || 'Error al desactivar la licencia', 'error');
+                }
+            } catch (error) {
+                showMessage('Error de conexión. Verifique su conexión a internet.', 'error');
+            } finally {
+                activateBtn.disabled = false;
+                deactivateBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

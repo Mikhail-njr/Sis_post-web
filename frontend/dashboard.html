@@ -1,0 +1,3720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control del Sistema POS</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #585d64;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #d8d8d86e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.9);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #37a388;
+            font-weight: bold;
+            color: #0c5358;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .loading, .error {
+            text-align: center;
+            padding: 20px;
+            color: #472001;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .product-row {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .product-row:hover {
+            background-color: #e8f4f8 !important;
+        }
+        .product-row.selected {
+            background-color: #d1ecf1 !important;
+            border-left: 4px solid #17a2b8;
+        }
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .edit-modal.show {
+            display: flex;
+        }
+        .edit-form {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #138496;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .edit-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .edit-button:hover {
+            background: #218838;
+        }
+
+
+        /* Invoice Collapse/Expand Styles */
+        .invoice-card.collapsed .invoice-items,
+        .invoice-card.collapsed .invoice-total {
+            display: none;
+        }
+        .invoice-card.collapsed {
+            padding: 15px;
+        }
+        .invoice-card.collapsed .invoice-header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .collapse-icon {
+            float: right;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            transition: transform 0.3s;
+        }
+        .collapse-icon:hover {
+            color: #333;
+        }
+        .invoice-card.collapsed .collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Dashboard Section Collapse/Expand Styles */
+        .dashboard-section.collapsed .section-content {
+            display: none;
+        }
+        .dashboard-section.collapsed {
+            margin: 10px 0 20px 0;
+            background: linear-gradient(135deg, #cbd9e8 0%, #e1e7f25e 100%);
+            border: 1px solid #83aed9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgb(36, 10, 10);
+            transition: all 0.3s cubic-bezier(.51,.07,.58,1);
+            background-color: rgb(215, 227, 209);
+        }
+        .dashboard-section.collapsed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 128, 255, 0.3);
+        }
+
+        /* Highlight expanded sections */
+        .dashboard-section:not(.collapsed) {
+            background: linear-gradient(135deg, #9dd9e0 0%, #041ca1 100%);
+            border: 1px solid #870a92ea;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(9, 117, 167, 0.308);
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .section-header {
+            cursor: pointer;
+            position: relative;
+            padding: 15px 20px;
+            margin: 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .section-title {
+            flex: 1;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        .dashboard-section:not(.collapsed) .section-title {
+            color: #2c3e50;
+            text-shadow: none;
+        }
+        .dashboard-section.collapsed .section-header {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(3px);
+        }
+        .dashboard-section.collapsed .section-header:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .section-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        .section-icon:hover {
+            color: #17a2b8;
+            transform: translateY(-50%) scale(1.2);
+            text-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
+        }
+        .dashboard-section:not(.collapsed) .section-icon {
+            color: #28a745;
+            text-shadow: none;
+        }
+        .dashboard-section:not(.collapsed) .section-icon:hover {
+            color: #1e7e34;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .dashboard-section.collapsed .section-icon {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        .dashboard-section.collapsed .section-icon:hover {
+            transform: translateY(-50%) rotate(180deg) scale(1.2);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Switch Toggle Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #17a2b8;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #17a2b8;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 24px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h1>📊 Panel de Control</h1>
+                <div id="license-status" style="font-size: 14px; color: #666; margin-top: 5px;">
+                    <span id="license-indicator">Cargando estado de licencia...</span>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
+                <!-- Operaciones del Día -->
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px; border: 1px solid #bbdefb;">
+                    <span style="font-weight: bold; color: #1976d2; font-size: 14px;">🧮 Operaciones:</span>
+                    <input type="number" id="dineroInicial" step="0.01" min="0" placeholder="500,00" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px;">
+                    <button id="closeRegisterBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #1976d2; color: white;">
+                        Cierre de Caja
+                    </button>
+                    <button id="returnToPOSBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #1976d2; color: white;" onclick="returnToPOS()">
+                        🏪 Ir a Caja
+                    </button>
+                </div>
+
+                <!-- Gestión de Datos -->
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff3e0; border-radius: 8px; border: 1px solid #ffcc02;">
+                    <span style="font-weight: bold; color: #f57c00; font-size: 14px;">💾 Datos:</span>
+                    <select id="dataActionSelect" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
+                        <option value="">Seleccionar acción...</option>
+                        <option value="backup">💾 Crear Backup</option>
+                        <option value="restore">📤 Restaurar Backup</option>
+                        <option value="report">📧 Generar Reporte</option>
+                        <option value="reset">🔄 Resetear Datos</option>
+                    </select>
+                    <button id="executeDataActionBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #ff9800; color: white;" onclick="executeDataAction()" disabled>
+                        Ejecutar
+                    </button>
+                    <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="restoreBackup(this)">
+                </div>
+
+                <!-- Soporte y Sistema -->
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e8f5e8; border-radius: 8px; border: 1px solid #c8e6c9;">
+                    <span style="font-weight: bold; color: #388e3c; font-size: 14px;">🛠️ Sistema:</span>
+                    <select id="systemActionSelect" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
+                        <option value="">Seleccionar acción...</option>
+                        <option value="support">📞 Soporte Técnico</option>
+                        <option value="session">🔐 Gestionar Sesión</option>
+                        <option value="license">⭐ Estado de Licencia</option>
+                        <option value="settings">⚙️ Configuraciones</option>
+                    </select>
+                    <button id="executeSystemActionBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #4caf50; color: white;" onclick="executeSystemAction()" disabled>
+                        Ejecutar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Cierre de Caja -->
+        <div id="cierreModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">🧮 Cierre de Caja</h3>
+
+                <!-- Sección de entrada (solo dinero inicial) -->
+                <div id="cierre-input-section" style="margin-bottom: 20px;">
+                    <label for="dineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500;">Dinero Inicial del Día:</label>
+                    <input type="number" id="dineroInicial" step="0.01" min="0" placeholder="500.00" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+
+                <!-- Sección de resultados (oculta inicialmente) -->
+                <div id="cierre-results-section" style="display: none;">
+                    <div class="cierre-resultados">
+                        <h4 style="margin-bottom: 15px; color: #2c3e50;">📊 Resultados del Cierre</h4>
+                        <p><strong>Dinero Inicial:</strong> <span id="cierre-inicial">$0,00</span></p>
+                        <p><strong>Total Ventas:</strong> <span id="cierre-total">$0,00</span></p>
+                        <div id="cierre-payment-totals" style="display: none; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <h5 style="margin: 0 0 10px 0; color: #2c3e50;">💳 Pagos por Método:</h5>
+                            <!-- Los totales por método de pago se mostrarán aquí -->
+                        </div>
+                        <p><strong>Total Esperado:</strong> <span id="cierre-esperado">$0,00</span></p>
+                        <p><strong>Diferencia:</strong> <span id="cierre-diferencia">$0,00</span></p>
+                        <p><strong>Cantidad de Ventas:</strong> <span id="cierre-cantidad">0</span></p>
+                        <p><strong>Fecha:</strong> <span id="cierre-fecha">-</span></p>
+                    </div>
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin: 15px 0; font-size: 14px;">
+                        <strong>⚠️ Revisar Información:</strong> Verifique que los cálculos sean correctos antes de confirmar el cierre.
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="calculateCloseRegister()">Calcular Cierre</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCierreModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Ventas -->
+        <div id="ventas-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">🧾 Ventas Registradas</span>
+                <span class="section-icon">▼</span>
+            </h2>
+            <div class="section-content">
+                <!-- Controles de fecha -->
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <h4 style="margin: 0 0 15px 0; color: #2c3e50;">📅 Filtrar por Fecha</h4>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="sales-date" style="font-weight: 500;">Fecha específica:</label>
+                            <input type="date" id="sales-date" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="sales-start-date" style="font-weight: 500;">Desde:</label>
+                            <input type="date" id="sales-start-date" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="sales-end-date" style="font-weight: 500;">Hasta:</label>
+                            <input type="date" id="sales-end-date" style="padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button id="filter-sales-btn" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;">🔍 Filtrar</button>
+                            <button id="clear-filter-btn" class="btn btn-secondary" style="font-size: 14px; padding: 8px 16px;">🗑️ Limpiar</button>
+                            <button id="today-sales-btn" class="btn btn-secondary" style="font-size: 14px; padding: 8px 16px; background: #28a745; color: white;">📅 Hoy</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        💡 Por defecto se muestran las ventas de hoy. Usa los filtros para ver otras fechas.
+                    </div>
+                </div>
+                <div class="loading">Cargando ventas...</div>
+                <div id="ventas-container" style="display:none;">
+                    <!-- Las ventas se mostrarán aquí agrupadas por factura -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Promociones -->
+        <div id="promociones-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">🎉 Promociones</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openCreatePromotionModal()" style="font-size: 14px; padding: 10px 20px;">
+                        ➕ Crear Promoción
+                    </button>
+                    <button class="btn btn-secondary" onclick="cleanDuplicatePromotions()" style="font-size: 14px; padding: 10px 20px; background: #ff6b6b; color: white; margin-left: 10px;" title="Limpia productos que están en múltiples promociones">
+                        🧹 Limpiar Duplicados
+                    </button>
+                </div>
+                <div class="loading">Cargando promociones...</div>
+                <div id="promociones-container" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- Sección de Métricas de Ventas -->
+        <div id="metricas-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📈 Métricas de Ventas</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div class="metricas-container">
+                    <div class="metricas-grid">
+                        <div class="metrica-card">
+                            <h3>Productos Más Vendidos</h3>
+                            <table id="top-products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Posición</th>
+                                        <th>Producto</th>
+                                        <th>Código</th>
+                                        <th>Cantidad Vendida</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Productos -->
+        <div id="productos-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📦 Productos Disponibles</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openAddProductModal()" style="font-size: 14px; padding: 10px 20px;">
+                        ➕ Agregar Nuevo Producto
+                    </button>
+                    <button id="editSelectedBtn" class="btn btn-secondary" disabled style="font-size: 14px; padding: 10px 20px; margin-left: 10px;">
+                        ✏️ Editar Producto
+                    </button>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-secondary" onclick="alert('Usa Ctrl+F para buscar en la página')">🔍 Buscar</button>
+                    <button id="sortBtn" class="btn btn-secondary" onclick="toggleSortMode()" style="margin-left: 10px;">📊 Stock ↓</button>
+                </div>
+                <div class="loading">Cargando productos...</div>
+                <table id="productos-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Seleccionar</th>
+                            <th>ID</th>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección de Historial de Cierres -->
+        <div id="historial-cierres-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📋 Historial de Cierres de Caja</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div class="loading">Cargando historial...</div>
+                <table id="historial-cierres-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Dinero Inicial</th>
+                            <th>Total Ventas</th>
+                            <th>Total Esperado</th>
+                            <th>Diferencia</th>
+                            <th>Cantidad Ventas</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Sección de Proveedores -->
+        <div id="proveedores-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">🏢 Proveedores</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openAddSupplierModal()" style="font-size: 14px; padding: 10px 20px;">
+                        ➕ Agregar Proveedor
+                    </button>
+                </div>
+                <div class="loading">Cargando proveedores...</div>
+                <table id="proveedores-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Proveedor</th>
+                            <th>Nombre de Contacto</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Productos/Servicios</th>
+                            <th>Cond. de Pago</th>
+                            <th>Estatus</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección de Registro de Operaciones -->
+        <div id="operations-log-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📋 Registro de Operaciones</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-secondary" onclick="loadOperationsLog()" style="font-size: 14px; padding: 10px 20px;">
+                        🔄 Actualizar
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearOperationsLog()" style="font-size: 14px; padding: 10px 20px; background: #dc3545; color: white;">
+                        🗑️ Limpiar Registro
+                    </button>
+                </div>
+
+                <!-- Configuración de Logging -->
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <h4 style="margin: 0 0 10px 0; color: #2c3e50;">⚙️ Configuración del Registro</h4>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label for="logging-toggle" style="font-weight: 500; cursor: pointer;">
+                            Habilitar registro de actividad:
+                        </label>
+                        <label class="switch">
+                            <input type="checkbox" id="logging-toggle" onchange="toggleLogging(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="logging-status" style="font-size: 12px; color: #666;">Cargando...</span>
+                    </div>
+                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">
+                        Deshabilitar para ahorrar consumo del sistema. Las operaciones no se registrarán cuando esté desactivado.
+                    </p>
+                </div>
+
+                <div class="loading">Cargando registro de operaciones...</div>
+                <div id="operations-log-container" style="display:none;">
+                    <div id="operations-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: #f8f9fa;">
+                        <!-- Las operaciones se mostrarán aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de edición de producto -->
+        <div id="editModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">✏️ Editar Producto</h3>
+                <form id="editProductForm">
+                    <input type="hidden" id="editProductId">
+
+                    <div class="form-group">
+                        <label for="editCodigo">Código:</label>
+                        <input type="text" id="editCodigo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editNombre">Nombre:</label>
+                        <input type="text" id="editNombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDescripcion">Descripción:</label>
+                        <input type="text" id="editDescripcion">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPrecio">Precio:</label>
+                        <input type="number" id="editPrecio" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStock">Stock:</label>
+                        <input type="number" id="editStock" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCategoria">Categoría:</label>
+                        <input type="text" id="editCategoria" list="editCategoriaList" placeholder="Seleccionar o escribir nueva categoría">
+                        <datalist id="editCategoriaList">
+                            <option value="COND - Condimentos">
+                            <option value="BEB - Bebidas">
+                            <option value="ACEI - Aceites">
+                            <option value="VER - Verduras">
+                            <option value="FRUT - Frutas">
+                            <option value="CARN - Carnes">
+                            <option value="LACT - Lácteos">
+                            <option value="PAN - Panadería">
+                            <option value="CONF - Confitería">
+                            <option value="LIM - Limpieza">
+                            <option value="OTRO - Otros">
+                        </datalist>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de agregar producto -->
+        <div id="addModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ Agregar Nuevo Producto</h3>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label for="addCategoria">Categoría:</label>
+                        <input type="text" id="addCategoria" list="categoriaList" placeholder="Seleccionar o escribir nueva categoría" required onchange="generateProductCode()">
+                        <datalist id="categoriaList">
+                            <option value="COND - Condimentos">
+                            <option value="BEB - Bebidas">
+                            <option value="ACEI - Aceites">
+                            <option value="VER - Verduras">
+                            <option value="FRUT - Frutas">
+                            <option value="CARN - Carnes">
+                            <option value="LACT - Lácteos">
+                            <option value="PAN - Panadería">
+                            <option value="CONF - Confitería">
+                            <option value="LIM - Limpieza">
+                            <option value="OTRO - Otros">
+                        </datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addCodigo">Código generado:</label>
+                        <input type="text" id="addCodigo" required placeholder="Se generará automáticamente" readonly onchange="checkCodeAvailability()">
+                        <small style="color: #666; font-size: 12px;">Código único generado automáticamente</small>
+                        <div id="codeAvailability" style="margin-top: 5px; font-size: 12px; font-weight: bold;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addNombre">Nombre:</label>
+                        <input type="text" id="addNombre" required placeholder="Nombre del producto">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addDescripcion">Descripción:</label>
+                        <input type="text" id="addDescripcion" placeholder="Descripción opcional">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addPrecio">Precio:</label>
+                        <input type="number" id="addPrecio" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addStock">Stock:</label>
+                        <input type="number" id="addStock" min="0" required placeholder="0">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de agregar proveedor -->
+        <div id="addSupplierModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ Agregar Nuevo Proveedor</h3>
+                <form id="addSupplierForm">
+                    <div class="form-group">
+                        <label for="addNombreProveedor">Nombre del Proveedor:</label>
+                        <input type="text" id="addNombreProveedor" required placeholder="Ej: Distribuidora ABC">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addNombreContacto">Nombre de Contacto:</label>
+                        <input type="text" id="addNombreContacto" placeholder="Ej: Juan Pérez">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addTelefono">Teléfono:</label>
+                        <input type="tel" id="addTelefono" placeholder="Ej: +54 11 1234-5678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addEmail">Email:</label>
+                        <input type="email" id="addEmail" placeholder="Ej: contacto@proveedor.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addProductosServicios">Productos/Servicios:</label>
+                        <textarea id="addProductosServicios" placeholder="Ej: Alimentos, Bebidas, Limpieza" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addCondicionesPago">Condiciones de Pago:</label>
+                        <input type="text" id="addCondicionesPago" placeholder="Ej: 30 días, Contado, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addEstatus">Estatus:</label>
+                        <select id="addEstatus">
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addNotas">Notas:</label>
+                        <textarea id="addNotas" placeholder="Información adicional" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddSupplierModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Proveedor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de editar proveedor -->
+        <div id="editSupplierModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">✏️ Editar Proveedor</h3>
+                <form id="editSupplierForm">
+                    <input type="hidden" id="editSupplierId">
+
+                    <div class="form-group">
+                        <label for="editNombreProveedor">Nombre del Proveedor:</label>
+                        <input type="text" id="editNombreProveedor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editNombreContacto">Nombre de Contacto:</label>
+                        <input type="text" id="editNombreContacto">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTelefono">Teléfono:</label>
+                        <input type="tel" id="editTelefono">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEmail">Email:</label>
+                        <input type="email" id="editEmail">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductosServicios">Productos/Servicios:</label>
+                        <textarea id="editProductosServicios" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCondicionesPago">Condiciones de Pago:</label>
+                        <input type="text" id="editCondicionesPago">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEstatus">Estatus:</label>
+                        <select id="editEstatus">
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editNotas">Notas:</label>
+                        <textarea id="editNotas" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditSupplierModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de crear promoción -->
+        <div id="createPromotionModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 800px; width: 95%;">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">🎉 Crear Nueva Promoción</h3>
+                <form id="createPromotionForm">
+
+                    <div class="form-group">
+                        <label for="promotionTitle">Título de la Promoción:</label>
+                        <input type="text" id="promotionTitle" required placeholder="Ej: Semana de Descuentos">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productSearch">Buscar Productos:</label>
+                        <input type="text" id="productSearch" placeholder="Escribe para buscar productos..." onkeyup="searchProducts()">
+                        <div id="productSearchResults" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Productos Seleccionados:</label>
+                        <div id="selectedProducts" style="min-height: 100px; border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #f8f9fa;">
+                            <p style="color: #666; margin: 0;">No hay productos seleccionados</p>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeCreatePromotionModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Finalizar Promoción</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de opciones de reporte -->
+        <div id="reportOptionsModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 500px; width: 90%;">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Opciones del Reporte</h3>
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Seleccione las secciones que desea incluir en el reporte:</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeFacturas" checked style="margin-right: 10px;">
+                        🧾 <strong>Facturas</strong> - Detalle de todas las ventas realizadas
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeCierres" checked style="margin-right: 10px;">
+                        📋 <strong>Cierres de Caja</strong> - Historial de cierres de caja
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeProductos" checked style="margin-right: 10px;">
+                        📦 <strong>Productos</strong> - Lista de productos disponibles
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeProveedores" style="margin-right: 10px;">
+                        🏢 <strong>Proveedores</strong> - Información de proveedores
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                    <button type="button" onclick="selectAllSections()" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 10px;">Seleccionar Todo</button>
+                    <button type="button" onclick="deselectAllSections()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Deseleccionar Todo</button>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeReportOptionsModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="generateSelectedReport()">Generar Reporte</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de soporte -->
+        <div id="supportModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 400px; width: 90%;">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">📞 Soporte Técnico</h3>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">¿Necesitas ayuda? Contáctanos:</p>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #2c3e50;">📧 Email:</strong><br>
+                            <span style="color: #666;">mikhail.njr@gmail.com</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #2c3e50;">📱 Teléfono:</strong><br>
+                            <span style="color: #666;">+54 3434721177</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #2c3e50;">⏰ Horario de atención:</strong><br>
+                            <span style="color: #666;">Lunes a Viernes: 9:00 - 18:00</span>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 12px; margin-bottom: 0;">
+                        Respuesta estimada: 24-48 horas hábiles
+                    </p>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeSupportModal()">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="contactSupport()">Contactar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de opciones de reset -->
+        <div id="resetOptionsModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 500px; width: 90%;">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">🔄 Opciones de Reset</h3>
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Seleccione los datos que desea eliminar:</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetVentas" checked style="margin-right: 10px;">
+                        🧾 <strong>Ventas y Facturas</strong> - Eliminar todas las ventas realizadas
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetCierres" checked style="margin-right: 10px;">
+                        📋 <strong>Cierres de Caja</strong> - Eliminar historial de cierres de caja
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetProveedores" style="margin-right: 10px;">
+                        🏢 <strong>Proveedores</strong> - Eliminar información de proveedores
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetPromociones" style="margin-right: 10px;">
+                        🎉 <strong>Promociones</strong> - Eliminar todas las promociones
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetLog" checked style="margin-right: 10px;">
+                        📋 <strong>Registro de Operaciones</strong> - Limpiar el log de operaciones
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="resetMetricas" style="margin-right: 10px;">
+                        📊 <strong>Métricas</strong> - Resetear estadísticas calculadas (productos más vendidos, etc.)
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px;">
+                    <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer. Los productos permanecerán intactos.
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                    <button type="button" onclick="selectAllResetSections()" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 10px;">Seleccionar Todo</button>
+                    <button type="button" onclick="deselectAllResetSections()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Deseleccionar Todo</button>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeResetOptionsModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="performSelectiveReset()" style="background: #dc3545;">🗑️ Resetear Datos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer con marca de agua -->
+    <footer style="margin-top: 20px; padding: 10px; text-align: center; color: #7f8c8d; font-size: 0.8em; border-top: 1px solid #eee;">
+        <p>🛡️ Panel de Control Protegido - Sistema POS con Licencia Requerida</p>
+        <p>© 2024 Sistema POS. Todos los derechos reservados. Distribución no autorizada prohibida.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // API_BASE ya está declarado en script.js
+        // isLoggedIn y authCredentials también están en script.js
+
+        function formatCurrency(amount) {
+            return `$${parseFloat(amount).toFixed(2).replace('.', ',')}`;
+        }
+
+        function formatPaymentMethod(metodoPago, saleData) {
+            if (Array.isArray(metodoPago) && metodoPago.length > 0) {
+                if (metodoPago[0].metodo) {
+                    // Pagos detallados con método y monto
+                    const paymentDetails = metodoPago.map(p => `${p.metodo.toUpperCase()}: ${formatCurrency(p.monto)}`).join(', ');
+                    const changeText = saleData && saleData.vuelto > 0 ? ` (Vuelto: ${formatCurrency(saleData.vuelto)})` : '';
+                    return paymentDetails + changeText;
+                } else {
+                    // Solo métodos sin montos
+                    return metodoPago.join('/');
+                }
+            } else if (typeof metodoPago === 'string') {
+                // Método simple
+                const changeText = saleData && saleData.vuelto > 0 ? ` (Vuelto: ${formatCurrency(saleData.vuelto)})` : '';
+                return metodoPago.toUpperCase() + changeText;
+            }
+            return 'No especificado';
+        }
+
+        function showAlert(message, type) {
+            let alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 2000);
+        }
+
+        let globalProductosData = []; // Variable global para almacenar datos de productos
+        let currentSortMode = 1; // 0: Stock asc, 1: Stock desc, 2: ID asc
+
+        async function fetchAndDisplayData() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            // Fetch de productos
+            try {
+                const productosRes = await fetch(`${API_BASE}/products`, { headers });
+                if (productosRes.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!productosRes.ok) throw new Error('Network response for products was not ok');
+                const productos = await productosRes.json();
+                globalProductosData = productos; // Almacenar datos globalmente
+                displayTableData('productos', productos);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                const productosSection = document.querySelector('#productos-section');
+                if (productosSection) {
+                    productosSection.innerHTML = '<div class="error">Error al cargar productos. Asegúrate de que el servidor esté activo y que el endpoint /api/products funcione.</div>';
+                }
+            }
+
+            // Fetch de ventas (por defecto muestra ventas de hoy)
+            try {
+                console.log('Fetching sales data...');
+                // Por defecto, cargar ventas de hoy
+                const today = new Date().toISOString().split('T')[0];
+                const ventasRes = await fetch(`${API_BASE}/sales?date=${today}`, { headers });
+                console.log('Sales response status:', ventasRes.status);
+                if (ventasRes.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!ventasRes.ok) throw new Error('Network response for sales was not ok');
+                const ventas = await ventasRes.json();
+                console.log('Sales data received:', ventas);
+                displaySalesGrouped(ventas);
+            } catch (error) {
+                console.error('Error fetching sales:', error);
+                const ventasSection = document.querySelector('#ventas-section');
+                if (ventasSection) {
+                    ventasSection.innerHTML = '<div class="error">Error al cargar ventas. Asegúrate de que el servidor esté activo y que el endpoint /api/sales funcione.</div>';
+                }
+            }
+
+
+            // Fetch de promociones
+            try {
+                await loadPromotions();
+            } catch (error) {
+                console.error('Error fetching promotions:', error);
+                const promocionesSection = document.querySelector('#promociones-section');
+                if (promocionesSection) {
+                    promocionesSection.innerHTML = '<div class="error">Error al cargar promociones. Asegúrate de que el servidor esté activo.</div>';
+                }
+            }
+
+            // Fetch de registro de operaciones
+            try {
+                await loadOperationsLog();
+            } catch (error) {
+                console.error('Error fetching operations log:', error);
+                const operationsSection = document.querySelector('#operations-log-section');
+                if (operationsSection) {
+                    operationsSection.innerHTML = '<div class="error">Error al cargar registro de operaciones. Asegúrate de que el servidor esté activo.</div>';
+                }
+            }
+        }
+
+        function displayTableData(dataType, data) {
+            let container, table, tbody, loading;
+
+            if (dataType === 'productos') {
+                container = document.querySelector('#productos-section');
+                table = document.querySelector('#productos-table');
+                loading = document.querySelector('#productos-section .loading');
+            }
+
+            if (!container || !table) {
+                console.warn(`Container or table not found for ${dataType}`);
+                return;
+            }
+
+            tbody = table.querySelector('tbody');
+            if (!tbody) {
+                console.warn(`Table body not found for ${dataType}`);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                table.style.display = 'table';
+                if (loading) loading.style.display = 'none';
+
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    let rowContent = '';
+
+                    if (dataType === 'productos') {
+                        rowContent = `
+                            <td><input type="checkbox" class="product-checkbox" data-product-id="${item.id}"></td>
+                            <td>${item.id}</td>
+                            <td>${item.codigo}</td>
+                            <td>${item.nombre}</td>
+                            <td>${item.categoria || ''}</td>
+                            <td>${formatCurrency(item.precio)}</td>
+                            <td>${item.stock}</td>
+                            <td><button class="edit-button" onclick="editProduct(${item.id})">Editar</button></td>
+                        `;
+                        row.className = 'product-row';
+                        row.setAttribute('data-product-id', item.id);
+                    }
+
+                    row.innerHTML = rowContent;
+                    tbody.appendChild(row);
+                });
+
+                // Sección actualizada correctamente
+            } else {
+                table.style.display = 'none';
+                if (loading) {
+                    loading.textContent = 'No hay productos registrados.';
+                    loading.style.display = 'block';
+                }
+
+                // Sección sin datos
+            }
+        }
+
+
+        // Función para alternar entre modos de ordenamiento
+        function toggleSortMode() {
+            if (globalProductosData.length === 0) {
+                alert('No hay productos para ordenar');
+                return;
+            }
+
+            // Cambiar al siguiente modo (0 -> 1 -> 2 -> 0...)
+            currentSortMode = (currentSortMode + 1) % 3;
+
+            // Aplicar el ordenamiento según el modo actual
+            applySorting();
+
+            // Actualizar el texto del botón
+            updateSortButtonText();
+        }
+
+        // Función para aplicar el ordenamiento según el modo actual
+        function applySorting() {
+            let sortedProductos = [...globalProductosData];
+
+            switch (currentSortMode) {
+                case 0: // Stock ascendente (menor a mayor)
+                    sortedProductos.sort((a, b) => a.stock - b.stock);
+                    break;
+                case 1: // Stock descendente (mayor a menor)
+                    sortedProductos.sort((a, b) => b.stock - a.stock);
+                    break;
+                case 2: // ID ascendente
+                    sortedProductos.sort((a, b) => a.id - b.id);
+                    break;
+            }
+
+            // Mostrar los datos ordenados
+            displayTableData('productos', sortedProductos);
+        }
+
+        // Función para actualizar el texto del botón según el modo actual
+        function updateSortButtonText() {
+            const sortBtn = document.getElementById('sortBtn');
+            if (!sortBtn) return;
+
+            switch (currentSortMode) {
+                case 0:
+                    sortBtn.textContent = '📊 Stock ↑';
+                    break;
+                case 1:
+                    sortBtn.textContent = '📊 Stock ↓';
+                    break;
+                case 2:
+                    sortBtn.textContent = '🆔 ID ↑';
+                    break;
+            }
+        }
+
+        // Variables para el estado de edición
+        let selectedProductId = null;
+
+        // Función para editar producto
+        async function editProduct(productId) {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                // Obtener datos del producto
+                const response = await fetch(`${API_BASE}/products/${productId}`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al obtener producto');
+
+                const product = await response.json();
+
+                // Llenar el formulario con los datos actuales
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('editCodigo').value = product.codigo;
+                document.getElementById('editNombre').value = product.nombre;
+                document.getElementById('editDescripcion').value = product.descripcion || '';
+                document.getElementById('editPrecio').value = product.precio;
+                document.getElementById('editStock').value = product.stock;
+                document.getElementById('editCategoria').value = product.categoria || '';
+
+                // Mostrar el modal
+                document.getElementById('editModal').classList.add('show');
+
+            } catch (error) {
+                console.error('Error al cargar producto para editar:', error);
+                alert('Error al cargar el producto para editar');
+            }
+        }
+
+        // Función para cerrar el modal de edición
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            document.getElementById('editProductForm').reset();
+            selectedProductId = null;
+        }
+
+        // Función para guardar cambios del producto
+        async function saveProductChanges(event) {
+            event.preventDefault();
+
+            const productId = document.getElementById('editProductId').value;
+            const formData = {
+                codigo: document.getElementById('editCodigo').value.trim(),
+                nombre: document.getElementById('editNombre').value.trim(),
+                descripcion: document.getElementById('editDescripcion').value.trim(),
+                precio: parseFloat(document.getElementById('editPrecio').value),
+                stock: parseInt(document.getElementById('editStock').value),
+                categoria: document.getElementById('editCategoria').value.trim()
+            };
+
+            // Validaciones básicas
+            if (!formData.codigo || !formData.nombre || isNaN(formData.precio) || isNaN(formData.stock)) {
+                alert('Por favor complete todos los campos requeridos correctamente');
+                return;
+            }
+
+            if (formData.precio < 0 || formData.stock < 0) {
+                alert('El precio y stock no pueden ser negativos');
+                return;
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/products/${productId}`, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al actualizar producto');
+                }
+
+                const result = await response.json();
+
+                // Cerrar modal
+                closeEditModal();
+
+                // Mostrar mensaje de éxito
+                alert('Producto actualizado exitosamente');
+
+                // Recargar los datos
+                await fetchAndDisplayData();
+
+            } catch (error) {
+                console.error('Error al guardar cambios:', error);
+                alert('Error al guardar cambios: ' + error.message);
+            }
+        }
+
+        // Función para abrir modal de agregar producto
+        function openAddProductModal() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        // Función para generar código de producto automáticamente
+        async function generateProductCode() {
+            const categoriaInput = document.getElementById('addCategoria');
+            const codigoInput = document.getElementById('addCodigo');
+            const categoria = categoriaInput.value.trim();
+
+            if (!categoria) {
+                codigoInput.value = '';
+                return;
+            }
+
+            // Extraer código de categoría (primera parte antes del guion)
+            const categoriaCode = categoria.split(' - ')[0] || categoria.split(' ')[0] || 'PROD';
+
+            try {
+                // Obtener todos los productos para verificar códigos existentes
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+
+                const response = await fetch(`${API_BASE}/products`, { headers });
+                if (!response.ok) throw new Error('Error al obtener productos');
+
+                const products = await response.json();
+
+                // Encontrar el último número usado para esta categoría
+                let maxNumber = 0;
+                products.forEach(product => {
+                    if (product.codigo && product.codigo.startsWith(categoriaCode + '-')) {
+                        const numberPart = product.codigo.split('-')[1];
+                        const number = parseInt(numberPart, 10);
+                        if (!isNaN(number) && number > maxNumber) {
+                            maxNumber = number;
+                        }
+                    }
+                });
+
+                // Generar el siguiente número
+                const nextNumber = maxNumber + 1;
+                const generatedCode = `${categoriaCode}-${String(nextNumber).padStart(3, '0')}`;
+
+                // Verificar que el código no esté ocupado (doble verificación)
+                const codeExists = products.some(product => product.codigo === generatedCode);
+                if (codeExists) {
+                    // Si existe, incrementar hasta encontrar uno libre
+                    let counter = nextNumber + 1;
+                    let uniqueCode = `${categoriaCode}-${String(counter).padStart(3, '0')}`;
+                    while (products.some(product => product.codigo === uniqueCode)) {
+                        counter++;
+                        uniqueCode = `${categoriaCode}-${String(counter).padStart(3, '0')}`;
+                    }
+                    codigoInput.value = uniqueCode;
+                } else {
+                    codigoInput.value = generatedCode;
+                }
+
+                // Verificar disponibilidad del código generado
+                checkCodeAvailability();
+
+            } catch (error) {
+                console.error('Error generando código:', error);
+                // Fallback: generar código básico
+                const timestamp = Date.now().toString().slice(-4);
+                codigoInput.value = `${categoriaCode}-${timestamp}`;
+                checkCodeAvailability();
+            }
+        }
+
+        // Función para verificar disponibilidad del código
+        async function checkCodeAvailability() {
+            const codigoInput = document.getElementById('addCodigo');
+            const availabilityDiv = document.getElementById('codeAvailability');
+            const code = codigoInput.value.trim();
+
+            if (!code) {
+                availabilityDiv.textContent = '';
+                return;
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+
+                const response = await fetch(`${API_BASE}/products`, { headers });
+                if (!response.ok) throw new Error('Error al verificar código');
+
+                const products = await response.json();
+                const codeExists = products.some(product => product.codigo === code);
+
+                if (codeExists) {
+                    availabilityDiv.textContent = '❌ Código ya existe - será reemplazado automáticamente';
+                    availabilityDiv.style.color = '#e74c3c';
+                    // Generar un nuevo código disponible
+                    generateUniqueCode();
+                } else {
+                    availabilityDiv.textContent = '✅ Código disponible';
+                    availabilityDiv.style.color = '#27ae60';
+                }
+
+            } catch (error) {
+                console.error('Error verificando código:', error);
+                availabilityDiv.textContent = '⚠️ Error al verificar código';
+                availabilityDiv.style.color = '#f39c12';
+            }
+        }
+
+        // Función auxiliar para generar código único cuando hay conflicto
+        async function generateUniqueCode() {
+            const categoriaInput = document.getElementById('addCategoria');
+            const codigoInput = document.getElementById('addCodigo');
+            const categoria = categoriaInput.value.trim();
+
+            if (!categoria) return;
+
+            const categoriaCode = categoria.split(' - ')[0] || categoria.split(' ')[0] || 'PROD';
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+
+                const response = await fetch(`${API_BASE}/products`, { headers });
+                if (!response.ok) return;
+
+                const products = await response.json();
+
+                // Encontrar el último número usado para esta categoría
+                let maxNumber = 0;
+                products.forEach(product => {
+                    if (product.codigo && product.codigo.startsWith(categoriaCode + '-')) {
+                        const numberPart = product.codigo.split('-')[1];
+                        const number = parseInt(numberPart, 10);
+                        if (!isNaN(number) && number > maxNumber) {
+                            maxNumber = number;
+                        }
+                    }
+                });
+
+                // Generar códigos hasta encontrar uno libre
+                let counter = maxNumber + 1;
+                let uniqueCode = `${categoriaCode}-${String(counter).padStart(3, '0')}`;
+                while (products.some(product => product.codigo === uniqueCode)) {
+                    counter++;
+                    uniqueCode = `${categoriaCode}-${String(counter).padStart(3, '0')}`;
+                }
+
+                codigoInput.value = uniqueCode;
+                checkCodeAvailability();
+
+            } catch (error) {
+                console.error('Error generando código único:', error);
+            }
+        }
+
+        // Función para cerrar modal de agregar producto
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('show');
+            document.getElementById('addProductForm').reset();
+        }
+
+        // Función para crear nuevo producto
+        async function createProduct(event) {
+            event.preventDefault();
+
+            const formData = {
+                codigo: document.getElementById('addCodigo').value.trim(),
+                nombre: document.getElementById('addNombre').value.trim(),
+                descripcion: document.getElementById('addDescripcion').value.trim(),
+                precio: parseFloat(document.getElementById('addPrecio').value),
+                stock: parseInt(document.getElementById('addStock').value),
+                categoria: document.getElementById('addCategoria').value.trim()
+            };
+
+            // Validaciones básicas
+            if (!formData.codigo || !formData.nombre || isNaN(formData.precio) || isNaN(formData.stock)) {
+                alert('Por favor complete todos los campos requeridos correctamente');
+                return;
+            }
+
+            if (formData.precio < 0 || formData.stock < 0) {
+                alert('El precio y stock no pueden ser negativos');
+                return;
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/products`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al crear producto');
+                }
+
+                const result = await response.json();
+
+                // Cerrar modal
+                closeAddModal();
+
+                // Mostrar mensaje de éxito
+                alert('Producto creado exitosamente');
+
+                // Recargar los datos
+                await fetchAndDisplayData();
+
+            } catch (error) {
+                console.error('Error al crear producto:', error);
+                alert('Error al crear producto: ' + error.message);
+            }
+        }
+
+        // Event listeners para el formulario de edición
+        document.getElementById('editProductForm').addEventListener('submit', saveProductChanges);
+
+        // Event listeners para el formulario de agregar producto
+        document.getElementById('addProductForm').addEventListener('submit', createProduct);
+
+        // Event listeners para el formulario de crear promoción
+        document.getElementById('createPromotionForm').addEventListener('submit', createPromotion);
+
+        // Cerrar modales al hacer clic fuera
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddModal();
+            }
+        });
+
+        // Event listeners para secciones colapsables
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const section = this.closest('.dashboard-section');
+                section.classList.toggle('collapsed');
+                const icon = this.querySelector('.section-icon');
+                if (section.classList.contains('collapsed')) {
+                    icon.textContent = '▶';
+                } else {
+                    icon.textContent = '▼';
+                }
+            });
+        });
+
+        // Event listeners para modal de opciones de reporte
+        document.getElementById('reportOptionsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReportOptionsModal();
+            }
+        });
+
+        // Event listeners para modal de soporte
+        document.getElementById('supportModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSupportModal();
+            }
+        });
+
+        // Event listeners para modal de opciones de reset
+        document.getElementById('resetOptionsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResetOptionsModal();
+            }
+        });
+
+        // Variables para promociones
+        let selectedPromotionProducts = [];
+        let allProducts = [];
+
+        // Función para cargar promociones
+        async function loadPromotions() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/promotions`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al cargar promociones');
+
+                const promotions = await response.json();
+                displayPromotions(promotions);
+            } catch (error) {
+                console.error('Error loading promotions:', error);
+                const section = document.querySelector('#promociones-section');
+                if (section) {
+                    section.innerHTML = '<div class="error">Error al cargar promociones. Asegúrate de que el servidor esté activo.</div>';
+                }
+            }
+        }
+
+        // Función para mostrar promociones
+        function displayPromotions(promotions) {
+            const container = document.querySelector('#promociones-container');
+            const loading = document.querySelector('#promociones-section .loading');
+
+            if (promotions && promotions.length > 0) {
+                container.style.display = 'block';
+                if (loading) loading.style.display = 'none';
+
+                container.innerHTML = promotions.map(promotion => `
+                    <div class="promotion-card collapsed" style="border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; background: #f8f9fa;">
+                        <div class="promotion-header" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePromotion(this)">
+                            <div>
+                                <h4 style="margin: 0; color: #2c3e50;">${promotion.titulo}</h4>
+                                <small style="color: #666;">${promotion.productos_count} productos • Creada: ${new Date(promotion.created_at).toLocaleDateString('es-AR')}</small>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="collapse-icon" style="font-size: 18px; color: #666;">▶</span>
+                                <button class="edit-button" onclick="event.stopPropagation(); deletePromotion(${promotion.id})" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Eliminar</button>
+                            </div>
+                        </div>
+                        <div class="promotion-details" style="display: none; padding: 15px; border-top: 1px solid #eee;">
+                            <div class="promotion-loading">Cargando productos...</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.style.display = 'none';
+                if (loading) {
+                    loading.textContent = 'No hay promociones registradas.';
+                    loading.style.display = 'block';
+                }
+            }
+        }
+
+        // Función para abrir modal de crear promoción
+        function openCreatePromotionModal() {
+            selectedPromotionProducts = [];
+            document.getElementById('promotionTitle').value = '';
+            document.getElementById('productSearch').value = '';
+            document.getElementById('productSearchResults').style.display = 'none';
+            updateSelectedProductsDisplay();
+            document.getElementById('createPromotionModal').classList.add('show');
+
+            // Cargar productos para búsqueda
+            loadProductsForPromotion();
+        }
+
+        // Función para cerrar modal de crear promoción
+        function closeCreatePromotionModal() {
+            document.getElementById('createPromotionModal').classList.remove('show');
+            selectedPromotionProducts = [];
+        }
+
+        // Función para cargar productos para promoción
+        async function loadProductsForPromotion() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/products`, { headers });
+                if (!response.ok) throw new Error('Error al cargar productos');
+                allProducts = await response.json();
+            } catch (error) {
+                console.error('Error loading products for promotion:', error);
+                alert('Error al cargar productos para la promoción');
+            }
+        }
+
+        // Función para buscar productos
+        function searchProducts() {
+            const query = document.getElementById('productSearch').value.toLowerCase().trim();
+            const resultsDiv = document.getElementById('productSearchResults');
+
+            if (query.length < 2) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            const filteredProducts = allProducts.filter(product =>
+                product.nombre.toLowerCase().includes(query) ||
+                product.codigo.toLowerCase().includes(query)
+            );
+
+            if (filteredProducts.length > 0) {
+                resultsDiv.innerHTML = filteredProducts.map(product => `
+                    <div style="padding: 8px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="addProductToPromotion(${product.id})">
+                        <strong>${product.nombre}</strong> (${product.codigo}) - $${product.precio}
+                    </div>
+                `).join('');
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.innerHTML = '<div style="padding: 8px; color: #666;">No se encontraron productos</div>';
+                resultsDiv.style.display = 'block';
+            }
+        }
+
+        // Función para agregar producto a la promoción
+        function addProductToPromotion(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            // Verificar si ya está seleccionado
+            if (selectedPromotionProducts.find(p => p.id === productId)) {
+                alert('Este producto ya está seleccionado');
+                return;
+            }
+
+            selectedPromotionProducts.push({
+                id: product.id,
+                nombre: product.nombre,
+                precio: product.precio,
+                descuento_porcentaje: 0
+            });
+
+            updateSelectedProductsDisplay();
+            document.getElementById('productSearch').value = '';
+            document.getElementById('productSearchResults').style.display = 'none';
+        }
+
+        // Función para actualizar la visualización de productos seleccionados
+        function updateSelectedProductsDisplay() {
+            const container = document.getElementById('selectedProducts');
+
+            if (selectedPromotionProducts.length === 0) {
+                container.innerHTML = '<p style="color: #666; margin: 0;">No hay productos seleccionados</p>';
+                return;
+            }
+
+            container.innerHTML = selectedPromotionProducts.map(product => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; background: white;">
+                    <div>
+                        <strong>${product.nombre}</strong><br>
+                        <small>Precio: $${product.precio}</small>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div>
+                            <label style="font-size: 12px;">Descuento %:</label><br>
+                            <input type="number" min="0" max="100" value="${product.descuento_porcentaje}"
+                                   onchange="updateProductDiscount(${product.id}, this.value)"
+                                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <button type="button" onclick="removeProductFromPromotion(${product.id})"
+                                style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Función para actualizar descuento de producto
+        function updateProductDiscount(productId, discount) {
+            const product = selectedPromotionProducts.find(p => p.id === productId);
+            if (product) {
+                product.descuento_porcentaje = parseFloat(discount) || 0;
+            }
+        }
+
+        // Función para remover producto de la promoción
+        function removeProductFromPromotion(productId) {
+            selectedPromotionProducts = selectedPromotionProducts.filter(p => p.id !== productId);
+            updateSelectedProductsDisplay();
+        }
+
+        // Función para crear promoción
+        async function createPromotion(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('promotionTitle').value.trim();
+            if (!title) {
+                alert('Por favor ingresa un título para la promoción');
+                return;
+            }
+
+            if (selectedPromotionProducts.length === 0) {
+                alert('Por favor selecciona al menos un producto');
+                return;
+            }
+
+            // Verificar que todos los productos tengan descuento válido
+            const invalidProducts = selectedPromotionProducts.filter(p => p.descuento_porcentaje <= 0 || p.descuento_porcentaje > 100);
+            if (invalidProducts.length > 0) {
+                alert('Todos los productos deben tener un descuento válido (1-100%)');
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            const promotionData = {
+                titulo: title,
+                items: selectedPromotionProducts.map(p => ({
+                    producto_id: p.id,
+                    descuento_porcentaje: p.descuento_porcentaje
+                }))
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/promotions`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(promotionData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+
+                    // Si es error de límite de promociones, ofrecer activar licencia
+                    if (errorData.requiresLicense && errorData.activateUrl) {
+                        const activate = confirm(errorData.message + '\n\n' + errorData.suggestion + '\n\n¿Deseas activar una licencia ahora?');
+                        if (activate) {
+                            window.open(errorData.activateUrl, '_blank');
+                        }
+                        return;
+                    }
+
+                    throw new Error(errorData.error || 'Error al crear promoción');
+                }
+
+                const result = await response.json();
+                alert('Promoción creada exitosamente');
+                closeCreatePromotionModal();
+                loadPromotions(); // Recargar la lista
+
+            } catch (error) {
+                console.error('Error creating promotion:', error);
+                alert('Error al crear promoción: ' + error.message);
+            }
+        }
+
+        // Función para expandir/contraer promoción
+        async function togglePromotion(headerElement) {
+            const card = headerElement.closest('.promotion-card');
+            const details = card.querySelector('.promotion-details');
+            const icon = headerElement.querySelector('.collapse-icon');
+            const promotionId = card.querySelector('.edit-button').getAttribute('onclick').match(/deletePromotion\((\d+)\)/)[1];
+
+            card.classList.toggle('collapsed');
+
+            if (card.classList.contains('collapsed')) {
+                details.style.display = 'none';
+                icon.textContent = '▶';
+            } else {
+                details.style.display = 'block';
+                icon.textContent = '▼';
+                // Cargar productos de la promoción
+                await loadPromotionProducts(promotionId, details);
+            }
+        }
+
+        // Función para cargar productos de una promoción
+        async function loadPromotionProducts(promotionId, detailsContainer) {
+            const loading = detailsContainer.querySelector('.promotion-loading');
+            loading.style.display = 'block';
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/promotions/${promotionId}`, { headers });
+                if (!response.ok) throw new Error('Error al cargar productos de la promoción');
+
+                const promotion = await response.json();
+
+                loading.style.display = 'none';
+
+                if (promotion.items && promotion.items.length > 0) {
+                    detailsContainer.innerHTML = `
+                        <h5 style="margin-bottom: 15px; color: #2c3e50;">Productos en Promoción:</h5>
+                        <div class="promotion-products">
+                            ${promotion.items.map(item => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 8px; background: white;">
+                                    <div>
+                                        <strong>${item.producto_nombre}</strong><br>
+                                        <small style="color: #666;">Precio original: $${item.precio_original}</small>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div>
+                                            <label style="font-size: 12px; display: block;">Descuento %:</label>
+                                            <input type="number" min="0" max="100" value="${item.descuento_porcentaje}"
+                                                   onchange="updatePromotionItemDiscount(${promotionId}, ${item.id}, this.value)"
+                                                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+                                        </div>
+                                        <button type="button" onclick="removeProductFromPromotion(${promotionId}, ${item.id})"
+                                                style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 15px; text-align: right;">
+                            <button onclick="savePromotionChanges(${promotionId})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Guardar Cambios</button>
+                        </div>
+                    `;
+                } else {
+                    detailsContainer.innerHTML = '<p style="color: #666; margin: 0;">Esta promoción no tiene productos.</p>';
+                }
+
+            } catch (error) {
+                console.error('Error loading promotion products:', error);
+                loading.textContent = 'Error al cargar productos';
+            }
+        }
+
+        // Función para actualizar descuento de un item en promoción
+        function updatePromotionItemDiscount(promotionId, itemId, newDiscount) {
+            // Esta función se puede implementar si queremos actualizar en tiempo real
+            // Por ahora, los cambios se guardan cuando se hace clic en "Guardar Cambios"
+            console.log(`Update discount for promotion ${promotionId}, item ${itemId} to ${newDiscount}%`);
+        }
+
+        // Función para remover producto de promoción
+        async function removeProductFromPromotion(promotionId, productId) {
+            if (!confirm('¿Estás seguro de que quieres remover este producto de la promoción?')) {
+                return;
+            }
+
+            // Por simplicidad, recrearemos la promoción sin este producto
+            // En una implementación más avanzada, podríamos tener un endpoint específico
+            try {
+                // Obtener la promoción actual
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+
+                const response = await fetch(`${API_BASE}/promotions/${promotionId}`, { headers });
+                if (!response.ok) throw new Error('Error al obtener promoción');
+
+                const promotion = await response.json();
+
+                // Filtrar el producto a remover
+                const updatedItems = promotion.items.filter(item => item.id != productId);
+
+                // Si no quedan productos, eliminar la promoción
+                if (updatedItems.length === 0) {
+                    await deletePromotion(promotionId);
+                    return;
+                }
+
+                // Recrear la promoción con los productos restantes
+                await deletePromotion(promotionId);
+
+                // Crear nueva promoción
+                const createResponse = await fetch(`${API_BASE}/promotions`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        titulo: promotion.titulo,
+                        items: updatedItems.map(item => ({
+                            producto_id: item.producto_id,
+                            descuento_porcentaje: item.descuento_porcentaje
+                        }))
+                    })
+                });
+
+                if (!createResponse.ok) {
+                    const errorData = await createResponse.json();
+                    throw new Error(errorData.error || 'Error al actualizar promoción');
+                }
+
+                alert('Producto removido de la promoción');
+                loadPromotions(); // Recargar la lista
+
+            } catch (error) {
+                console.error('Error removing product from promotion:', error);
+                alert('Error al remover producto: ' + error.message);
+            }
+        }
+
+        // Función para guardar cambios en promoción
+        async function savePromotionChanges(promotionId) {
+            // Esta función guardaría los cambios realizados en los descuentos
+            // Por ahora, simplemente recargamos las promociones
+            alert('Cambios guardados (funcionalidad básica implementada)');
+            loadPromotions();
+        }
+
+        // Función para mostrar opciones de reset
+        function resetData() {
+            // Mostrar modal de opciones de reset (autenticación se verifica al ejecutar el reset)
+            document.getElementById('resetOptionsModal').classList.add('show');
+        }
+
+        // Función para ejecutar el reset selectivo
+        async function performSelectiveReset() {
+            // Verificar autenticación antes de proceder
+            if (!isLoggedIn) {
+                const username = prompt('Usuario:');
+                const password = prompt('Contraseña:');
+                if (username && password) {
+                    authCredentials = { username, password };
+                    isLoggedIn = true;
+                    sessionStorage.setItem('authCredentials', JSON.stringify(authCredentials));
+                    updateUIBasedOnAuth();
+                } else {
+                    alert('Credenciales requeridas para resetear datos');
+                    return;
+                }
+            }
+
+            // Obtener opciones seleccionadas
+            const resetVentas = document.getElementById('resetVentas').checked;
+            const resetCierres = document.getElementById('resetCierres').checked;
+            const resetProveedores = document.getElementById('resetProveedores').checked;
+            const resetPromociones = document.getElementById('resetPromociones').checked;
+            const resetLog = document.getElementById('resetLog').checked;
+            const resetMetricas = document.getElementById('resetMetricas').checked;
+
+            // Verificar que al menos una opción esté seleccionada
+            if (!resetVentas && !resetCierres && !resetProveedores && !resetPromociones && !resetLog) {
+                alert('Debe seleccionar al menos una opción para resetear');
+                return;
+            }
+
+            // Confirmación final
+            const confirmMessage = '¿Está seguro de que desea resetear los datos seleccionados? Esta acción no se puede deshacer.';
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            // Cerrar modal
+            closeResetOptionsModal();
+
+            // Headers para autenticación
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                showAlert('Reseteando datos...', 'success');
+
+                // Enviar opciones de reset al servidor
+                const response = await fetch(`${API_BASE}/reset-data-selective`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        resetVentas,
+                        resetCierres,
+                        resetProveedores,
+                        resetPromociones,
+                        resetLog
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al resetear datos');
+                }
+
+                const result = await response.json();
+                showAlert(result.message || 'Datos reseteados exitosamente', 'success');
+
+                // Recargar datos para actualizar la interfaz
+                fetchAndDisplayData();
+
+            } catch (error) {
+                console.error('Error reseteando datos:', error);
+                showAlert('Error al resetear datos: ' + error.message, 'error');
+            }
+        }
+
+        // Función para crear backup de datos
+        async function createBackup() {
+            // Pedir credenciales primero
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para crear backup');
+                return;
+            }
+
+            if (!confirm('¿Desea crear una copia de respaldo de todos los datos del sistema? Esto incluirá productos, ventas, proveedores, promociones y cierres de caja.')) {
+                return;
+            }
+
+            showAlert('Creando copia de respaldo...', 'success');
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+                // Recolectar todos los datos importantes
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    version: '1.0',
+                    data: {}
+                };
+
+                // Productos
+                try {
+                    const productsRes = await fetch(`${API_BASE}/products`, { headers });
+                    if (productsRes.ok) {
+                        backupData.data.products = await productsRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up products:', e);
+                    backupData.data.products = [];
+                }
+
+                // Ventas
+                try {
+                    const salesRes = await fetch(`${API_BASE}/sales`, { headers });
+                    if (salesRes.ok) {
+                        backupData.data.sales = await salesRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up sales:', e);
+                    backupData.data.sales = [];
+                }
+
+                // Proveedores
+                try {
+                    const suppliersRes = await fetch(`${API_BASE}/suppliers`, { headers });
+                    if (suppliersRes.ok) {
+                        backupData.data.suppliers = await suppliersRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up suppliers:', e);
+                    backupData.data.suppliers = [];
+                }
+
+                // Promociones
+                try {
+                    const promotionsRes = await fetch(`${API_BASE}/promotions`, { headers });
+                    if (promotionsRes.ok) {
+                        const promotions = await promotionsRes.json();
+                        // Obtener detalles completos de cada promoción
+                        backupData.data.promotions = [];
+                        for (const promo of promotions) {
+                            try {
+                                const detailRes = await fetch(`${API_BASE}/promotions/${promo.id}`, { headers });
+                                if (detailRes.ok) {
+                                    const detail = await detailRes.json();
+                                    backupData.data.promotions.push(detail);
+                                } else {
+                                    backupData.data.promotions.push(promo);
+                                }
+                            } catch (e) {
+                                backupData.data.promotions.push(promo);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Error backing up promotions:', e);
+                    backupData.data.promotions = [];
+                }
+
+                // Cierres de caja
+                try {
+                    const cierresRes = await fetch(`${API_BASE}/cierres`, { headers });
+                    if (cierresRes.ok) {
+                        backupData.data.cierres_caja = await cierresRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up cierres:', e);
+                    backupData.data.cierres_caja = [];
+                }
+
+                // Registro de operaciones
+                try {
+                    const operationsRes = await fetch(`${API_BASE}/operations-log?limit=10000`, { headers });
+                    if (operationsRes.ok) {
+                        backupData.data.operations_log = await operationsRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up operations log:', e);
+                    backupData.data.operations_log = [];
+                }
+
+                // Estadísticas generales
+                try {
+                    const statsRes = await fetch(`${API_BASE}/stats`, { headers });
+                    if (statsRes.ok) {
+                        backupData.data.stats = await statsRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Error backing up stats:', e);
+                    backupData.data.stats = {};
+                }
+
+                // Crear archivo JSON y descargarlo
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_pos_${new Date().toISOString().split('T')[0]}_${Date.now()}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showAlert('✅ Copia de respaldo creada exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error creating backup:', error);
+                showAlert('❌ Error al crear la copia de respaldo: ' + error.message, 'error');
+            }
+        }
+
+        // Función para restaurar backup desde archivo JSON
+        async function restoreBackup(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Pedir credenciales primero
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para restaurar backup');
+                fileInput.value = '';
+                return;
+            }
+
+            if (!confirm('⚠️ ¿Está seguro de que desea restaurar el backup? Esta acción reemplazará todos los datos actuales del sistema.')) {
+                fileInput.value = '';
+                return;
+            }
+
+            showAlert('🔄 Restaurando backup...', 'success');
+
+            try {
+                const fileContent = await file.text();
+                const backupData = JSON.parse(fileContent);
+
+                // Validar estructura del backup
+                if (!backupData.data || !backupData.timestamp || !backupData.version) {
+                    throw new Error('El archivo de backup no tiene la estructura correcta');
+                }
+
+                const headers = { 'Content-Type': 'application/json' };
+                headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+                const response = await fetch(`${API_BASE}/restore-backup`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(backupData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al restaurar el backup');
+                }
+
+                const result = await response.json();
+                showAlert('✅ Backup restaurado exitosamente', 'success');
+
+                // Limpiar input file
+                fileInput.value = '';
+
+                // Recargar datos para actualizar la interfaz
+                fetchAndDisplayData();
+
+            } catch (error) {
+                console.error('Error restoring backup:', error);
+                showAlert('❌ Error al restaurar el backup: ' + error.message, 'error');
+                fileInput.value = '';
+            }
+        }
+
+        // Función para regresar al POS
+        function returnToPOS() {
+            // Establecer una bandera en sessionStorage para indicar que se debe refrescar
+            sessionStorage.setItem('refreshPOSData', 'true');
+            // Redirigir a index.html
+            window.location.href = 'index.html';
+        }
+
+        // Función para limpiar promociones duplicadas
+        async function cleanDuplicatePromotions() {
+            // Pedir credenciales primero
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para limpiar promociones duplicadas');
+                return;
+            }
+
+            if (!confirm('¿Estás seguro de que quieres limpiar productos duplicados en promociones?\n\nEsto removerá productos que están en múltiples promociones, manteniendo solo la promoción más antigua para cada producto.')) {
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+            try {
+                showAlert('🧹 Limpiando promociones duplicadas...', 'success');
+
+                const response = await fetch(`${API_BASE}/clean-duplicate-promotions`, {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al limpiar promociones duplicadas');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`✅ ${result.message}`, 'success');
+                    if (result.details && result.details.length > 0) {
+                        console.log('Detalles de limpieza:', result.details);
+                        alert(`Detalles de la limpieza:\n\n${result.details.map(d => `• ${d.producto}: mantenido en "${d.mantenido_en}"`).join('\n')}`);
+                    }
+                    loadPromotions(); // Recargar la lista de promociones
+                } else {
+                    throw new Error(result.message || 'Error desconocido');
+                }
+
+            } catch (error) {
+                console.error('Error cleaning duplicate promotions:', error);
+                showAlert('❌ Error al limpiar promociones duplicadas: ' + error.message, 'error');
+            }
+        }
+
+        // Función para eliminar promoción
+        async function deletePromotion(promotionId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta promoción?')) {
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/promotions/${promotionId}`, {
+                    method: 'DELETE',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al eliminar promoción');
+                }
+
+                alert('Promoción eliminada exitosamente');
+                loadPromotions(); // Recargar la lista
+
+            } catch (error) {
+                console.error('Error deleting promotion:', error);
+                alert('Error al eliminar promoción: ' + error.message);
+            }
+        }
+
+        // Función para cargar registro de operaciones
+        async function loadOperationsLog() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            const container = document.getElementById('operations-log-container');
+            const loading = document.querySelector('#operations-log-section .loading');
+            const list = document.getElementById('operations-list');
+
+            try {
+                loading.style.display = 'block';
+                container.style.display = 'none';
+
+                // Cargar estado del logging
+                await loadLoggingStatus();
+
+                const response = await fetch(`${API_BASE}/operations-log?limit=50`, { headers });
+                if (!response.ok) throw new Error('Error al cargar registro de operaciones');
+
+                const operations = await response.json();
+
+                loading.style.display = 'none';
+                container.style.display = 'block';
+
+                if (operations.length === 0) {
+                    list.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No hay operaciones registradas</div>';
+                    return;
+                }
+
+                list.innerHTML = operations.map(operation => {
+                    const fecha = new Date(operation.created_at).toLocaleString('es-AR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    });
+
+                    let icon = '📝';
+                    let bgColor = '#e8f4f8';
+
+                    switch (operation.tipo_operacion) {
+                        case 'VENTA':
+                            icon = '💰';
+                            bgColor = '#d4edda';
+                            break;
+                        case 'PRODUCTO_CREADO':
+                            icon = '📦';
+                            bgColor = '#d1ecf1';
+                            break;
+                        case 'PRODUCTO_EDITADO':
+                            icon = '✏️';
+                            bgColor = '#fff3cd';
+                            break;
+                        case 'PROMOCION_CREADA':
+                            icon = '🎉';
+                            bgColor = '#f8d7da';
+                            break;
+                        case 'LOG_LIMPIADO':
+                            icon = '🗑️';
+                            bgColor = '#f8d7da';
+                            break;
+                        case 'CONFIGURACION_ACTUALIZADA':
+                            icon = '⚙️';
+                            bgColor = '#e8f4f8';
+                            break;
+                    }
+
+                    return `
+                        <div style="display: flex; align-items: flex-start; margin-bottom: 10px; padding: 10px; border-radius: 6px; background: ${bgColor}; border-left: 4px solid #17a2b8;">
+                            <div style="font-size: 18px; margin-right: 10px;">${icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #2c3e50;">${operation.descripcion}</div>
+                                <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                                    ${fecha} • ${operation.usuario || 'Sistema'}
+                                    ${operation.entidad_afectada ? ` • ${operation.entidad_afectada}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading operations log:', error);
+                loading.textContent = 'Error al cargar registro de operaciones';
+            }
+        }
+
+        // Función para limpiar registro de operaciones
+        async function clearOperationsLog() {
+            // Pedir credenciales primero
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para limpiar el registro de operaciones');
+                return;
+            }
+
+            if (!confirm('¿Estás seguro de que quieres limpiar todo el registro de operaciones? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+            try {
+                const response = await fetch(`${API_BASE}/operations-log`, {
+                    method: 'DELETE',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al limpiar registro');
+                }
+
+                alert('Registro de operaciones limpiado exitosamente');
+                loadOperationsLog(); // Recargar la lista
+
+            } catch (error) {
+                console.error('Error clearing operations log:', error);
+                alert('Error al limpiar registro: ' + error.message);
+            }
+        }
+
+        // Función para cargar el estado del logging
+        async function loadLoggingStatus() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/settings/logging-enabled`, { headers });
+                if (!response.ok) throw new Error('Error al cargar configuración de logging');
+
+                const data = await response.json();
+                const toggle = document.getElementById('logging-toggle');
+                const status = document.getElementById('logging-status');
+
+                toggle.checked = data.enabled;
+                status.textContent = data.enabled ? 'Habilitado' : 'Deshabilitado';
+                status.style.color = data.enabled ? '#28a745' : '#dc3545';
+
+            } catch (error) {
+                console.error('Error loading logging status:', error);
+                document.getElementById('logging-status').textContent = 'Error al cargar';
+                document.getElementById('logging-status').style.color = '#dc3545';
+            }
+        }
+
+        // Función para alternar el estado del logging
+        async function toggleLogging(enabled) {
+            // Verificar si tiene licencia para activar logging
+            if (enabled) {
+                try {
+                    const licenseResponse = await fetch(`${API_BASE}/license-status`);
+                    const licenseData = await licenseResponse.json();
+
+                    if (!licenseData.activated) {
+                        const activate = confirm('Requiere licencia para activar el registro de operaciones.\n\n¿Deseas activar una licencia ahora?');
+                        if (activate) {
+                            window.open('/activate', '_blank');
+                        }
+                        document.getElementById('logging-toggle').checked = false;
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error checking license for logging:', error);
+                    alert('Error al verificar permisos para logging');
+                    document.getElementById('logging-toggle').checked = false;
+                    return;
+                }
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/settings/logging-enabled`, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify({ enabled: enabled })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al actualizar configuración');
+                }
+
+                const result = await response.json();
+                const status = document.getElementById('logging-status');
+
+                status.textContent = enabled ? 'Habilitado' : 'Deshabilitado';
+                status.style.color = enabled ? '#28a745' : '#dc3545';
+
+                alert(result.message);
+
+            } catch (error) {
+                console.error('Error toggling logging:', error);
+                alert('Error al cambiar configuración: ' + error.message);
+                // Revertir el toggle en caso de error
+                document.getElementById('logging-toggle').checked = !enabled;
+            }
+        }
+
+        // Función para actualizar el estado del botón editar
+        function updateEditButton() {
+            const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+            const editBtn = document.getElementById('editSelectedBtn');
+            editBtn.disabled = checkedBoxes.length === 0;
+            if (checkedBoxes.length > 0) {
+                editBtn.classList.remove('btn-secondary');
+                editBtn.classList.add('btn-primary');
+            } else {
+                editBtn.classList.remove('btn-primary');
+                editBtn.classList.add('btn-secondary');
+            }
+        }
+
+        // Event listeners para checkboxes de productos
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('product-checkbox')) {
+                // Para selección única, desmarcar otros
+                if (e.target.checked) {
+                    document.querySelectorAll('.product-checkbox').forEach(cb => {
+                        if (cb !== e.target) cb.checked = false;
+                    });
+                }
+                updateEditButton();
+            }
+        });
+
+        // Event listener para el botón editar
+        document.getElementById('editSelectedBtn').addEventListener('click', function() {
+            const checkedBox = document.querySelector('.product-checkbox:checked');
+            if (checkedBox) {
+                const productId = checkedBox.getAttribute('data-product-id');
+                editProduct(productId);
+            }
+        });
+
+        // Función especial para mostrar ventas agrupadas por factura
+        function displaySalesGrouped(sales) {
+            console.log('displaySalesGrouped called with:', sales);
+
+            // Buscar el contenedor en la sección de ventas
+            const container = document.querySelector('#ventas-container');
+            const section = document.querySelector('#ventas-section');
+            const loading = section ? section.querySelector('.loading') : null;
+
+            console.log('Container found:', !!container);
+            console.log('Section found:', !!section);
+            console.log('Loading found:', !!loading);
+
+            if (!container) {
+                console.error('Ventas container not found!');
+                return;
+            }
+
+            if (sales && sales.length > 0) {
+                console.log('Displaying', sales.length, 'sales');
+
+                // Asegurar que el contenedor sea visible
+                container.style.display = 'block';
+
+                // Ocultar loading si existe
+                if (loading) {
+                    loading.style.display = 'none';
+                    console.log('Loading hidden');
+                }
+
+
+                // Generar HTML para las ventas
+                const salesHTML = sales.map(sale => `
+                    <div class="invoice-card collapsed" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fafafa;">
+                        <div class="invoice-header" style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px; position: relative;">
+                            <span class="collapse-icon" onclick="toggleInvoice(this)" title="Expandir/Contraer" style="cursor: pointer; font-size: 18px; color: #666;">▶</span>
+                            <h3 style="margin: 0; color: #2c3e50;">Factura: ${sale.numero_factura}</h3>
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                <span><strong>Fecha:</strong> ${new Date(sale.fecha).toLocaleString('es-AR', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit',
+                                    hour12: false
+                                })}</span>
+                                <span><strong>Pago:</strong> ${formatPaymentMethod(sale.metodo_pago, sale)}</span>
+                                <span style="color: #27ae60; font-weight: bold;">Total: ${formatCurrency(sale.total)}</span>
+                            </div>
+                        </div>
+
+                        <div class="invoice-items" style="margin-bottom: 15px;">
+                            <h4 style="margin: 5px 0; color: #34495e;">Productos:</h4>
+                            ${sale.items && sale.items.length > 0 ? `
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                    <thead>
+                                        <tr style="background: #f8f9fa;">
+                                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold; font-size: 0.9em;">Producto</th>
+                                            <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 0.9em;">Cant</th>
+                                            <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 0.9em;">Precio Unitario</th>
+                                            <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 0.9em;">Tipo</th>
+                                            <th style="padding: 8px; text-align: right; border: 1px solid #ddd; font-weight: bold; font-size: 0.9em;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${sale.items.map(item => {
+                                            const descuentoPorcentaje = parseFloat(item.descuento_porcentaje || 0);
+                                            const hasDiscount = descuentoPorcentaje > 0;
+                                            const precioOriginal = parseFloat(item.precio_original || item.precio_unitario);
+                                            const precioUnitario = parseFloat(item.precio_unitario);
+                                            const cantidad = item.cantidad || 0;
+                                            const subtotal = precioUnitario * cantidad;
+
+                                            console.log('Item discount check:', item.nombre, 'descuento_porcentaje:', item.descuento_porcentaje, 'hasDiscount:', hasDiscount);
+
+                                            let precioDisplay = '';
+                                            let tipoDisplay = '';
+
+                                            if (hasDiscount) {
+                                                precioDisplay = `<span style="text-decoration: line-through; color: #7f8c8d; margin-right: 5px;">${formatCurrency(precioOriginal)}</span><span style="color: #e74c3c; font-weight: bold;">${formatCurrency(precioUnitario)}</span>`;
+                                                tipoDisplay = `<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; font-weight: bold;">${descuentoPorcentaje}% OFF</span>`;
+                                            } else {
+                                                precioDisplay = `<span style="color: #27ae60; font-weight: bold;">${formatCurrency(precioUnitario)}</span>`;
+                                                tipoDisplay = `<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; font-weight: bold;">Regular</span>`;
+                                            }
+
+                                            return `
+                                                <tr style="${hasDiscount ? 'background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);' : 'background: #f9f9f9;'}">
+                                                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${item.nombre || 'Producto desconocido'}</td>
+                                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${cantidad}</td>
+                                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${precioDisplay}</td>
+                                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${tipoDisplay}</td>
+                                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; ${hasDiscount ? 'color: #e74c3c;' : 'color: #27ae60;'}">${formatCurrency(subtotal)}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            ` : '<div style="padding: 10px; color: #666;">No hay productos en esta venta</div>'}
+                        </div>
+
+                        <div class="invoice-total" style="text-align: right; font-size: 18px; font-weight: bold; color: #27ae60; border-top: 2px solid #bdc3c7; padding-top: 10px;">
+                            Total: ${formatCurrency(sale.total || 0)}
+                            <button class="btn btn-secondary" style="margin-left: 10px; background: #dc3545; color: white; font-size: 12px; padding: 5px 10px;" onclick="cancelSale(${sale.id}, '${sale.numero_factura}')">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                console.log('Generated HTML length:', salesHTML.length);
+                console.log('Generated HTML preview:', salesHTML.substring(0, 200) + '...');
+                container.innerHTML = salesHTML;
+                console.log('HTML set to container');
+
+            } else {
+                console.log('No sales to display');
+                container.style.display = 'none';
+                if (loading) {
+                    loading.textContent = 'No hay ventas registradas.';
+                    loading.style.display = 'block';
+                }
+
+            }
+        }
+
+
+        // Función para expandir/contraer facturas
+        function toggleInvoice(iconElement) {
+            const invoiceCard = iconElement.closest('.invoice-card');
+            invoiceCard.classList.toggle('collapsed');
+
+            // Cambiar el icono
+            if (invoiceCard.classList.contains('collapsed')) {
+                iconElement.textContent = '▶';
+            } else {
+                iconElement.textContent = '▼';
+            }
+        }
+
+        // Función para filtrar ventas por fecha
+        async function filterSales() {
+            const date = document.getElementById('sales-date').value;
+            const startDate = document.getElementById('sales-start-date').value;
+            const endDate = document.getElementById('sales-end-date').value;
+
+            let url = `${API_BASE}/sales`;
+
+            // Construir parámetros de consulta
+            const params = [];
+            if (date) {
+                params.push(`date=${date}`);
+            } else if (startDate && endDate) {
+                params.push(`start_date=${startDate}&end_date=${endDate}`);
+            } else if (startDate) {
+                params.push(`start_date=${startDate}`);
+            } else if (endDate) {
+                params.push(`end_date=${endDate}`);
+            }
+
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (authCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+            }
+
+            try {
+                showAlert('Cargando ventas filtradas...', 'success');
+                const response = await fetch(url, { headers });
+
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+
+                if (!response.ok) throw new Error('Error al filtrar ventas');
+
+                const ventas = await response.json();
+                displaySalesGrouped(ventas);
+                showAlert('Ventas filtradas exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error filtering sales:', error);
+                showAlert('Error al filtrar ventas: ' + error.message, 'error');
+            }
+        }
+
+        // Función para limpiar filtros y mostrar todas las ventas
+        async function clearSalesFilter() {
+            document.getElementById('sales-date').value = '';
+            document.getElementById('sales-start-date').value = '';
+            document.getElementById('sales-end-date').value = '';
+
+            // Recargar ventas por defecto (hoy)
+            await fetchAndDisplayData();
+            showAlert('Filtros limpiados - mostrando ventas de hoy', 'success');
+        }
+
+        // Función para mostrar ventas de hoy
+        async function showTodaySales() {
+            document.getElementById('sales-date').value = '';
+            document.getElementById('sales-start-date').value = '';
+            document.getElementById('sales-end-date').value = '';
+
+            // Recargar ventas por defecto (hoy)
+            await fetchAndDisplayData();
+            showAlert('Mostrando ventas de hoy', 'success');
+        }
+
+        // Función para cancelar una venta
+        async function cancelSale(saleId, numeroFactura) {
+            if (!confirm(`¿Está seguro de que desea cancelar la venta ${numeroFactura}?\n\nEsta acción no se puede deshacer y restaurará el stock de los productos.`)) {
+                return;
+            }
+
+            // Pedir credenciales para cancelar venta
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para cancelar la venta');
+                return;
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
+
+            try {
+                showAlert('Cancelando venta...', 'success');
+
+                const response = await fetch(`${API_BASE}/sales/${saleId}`, {
+                    method: 'DELETE',
+                    headers: headers
+                });
+
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al cancelar la venta');
+                }
+
+                const result = await response.json();
+                showAlert(result.message || 'Venta cancelada exitosamente', 'success');
+
+                // Recargar las ventas para actualizar la vista
+                await fetchAndDisplayData();
+
+            } catch (error) {
+                console.error('Error cancelando venta:', error);
+                showAlert('Error al cancelar la venta: ' + error.message, 'error');
+            }
+        }
+
+
+        // Funciones de autenticación
+        function login() {
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+
+            if (username && password) {
+                authCredentials = { username, password };
+                isLoggedIn = true;
+                sessionStorage.setItem('authCredentials', JSON.stringify(authCredentials));
+                updateUIBasedOnAuth();
+                alert('✅ Sesión iniciada correctamente');
+                fetchAndDisplayData(); // Recargar datos después del login
+            }
+        }
+
+        function logout() {
+            authCredentials = null;
+            isLoggedIn = false;
+            sessionStorage.removeItem('authCredentials');
+            updateUIBasedOnAuth();
+            alert('👋 Sesión cerrada');
+            // Redirigir al inicio si se cierra sesión desde dashboard
+            window.location.href = 'index.html';
+        }
+
+        function updateUIBasedOnAuth() {
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.textContent = isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión';
+                loginBtn.onclick = isLoggedIn ? logout : login;
+            }
+        }
+
+        // Verificar autenticación al cargar dashboard
+        function checkDashboardAccess() {
+            if (!isLoggedIn) {
+                alert('Debes iniciar sesión para acceder al Panel de Control');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Cargar y mostrar estado de licencia
+        async function loadLicenseStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/license-status`);
+                const data = await response.json();
+
+                const indicator = document.getElementById('license-indicator');
+
+                if (data.activated) {
+                    indicator.innerHTML = '<span style="color: #28a745;">✅ Licencia Activada - Características Premium Disponibles</span>';
+                } else {
+                    indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Licencia - Características Limitadas</span>';
+                }
+            } catch (error) {
+                console.error('Error loading license status:', error);
+                document.getElementById('license-indicator').innerHTML = '<span style="color: #ffc107;">⚠️ Error al cargar estado de licencia</span>';
+            }
+        }
+
+
+        // Cargar credenciales al iniciar
+        function loadAuthFromStorage() {
+            const stored = sessionStorage.getItem('authCredentials');
+            if (stored) {
+                authCredentials = JSON.parse(stored);
+                isLoggedIn = true;
+            }
+            updateUIBasedOnAuth();
+        }
+
+        // Función para ejecutar acción de datos seleccionada
+        function executeDataAction() {
+            const action = document.getElementById('dataActionSelect').value;
+            switch(action) {
+                case 'backup':
+                    createBackup();
+                    break;
+                case 'restore':
+                    document.getElementById('backupFileInput').click();
+                    break;
+                case 'report':
+                    generateReport();
+                    break;
+                case 'reset':
+                    resetData();
+                    break;
+                default:
+                    alert('Selecciona una acción válida');
+            }
+        }
+
+        // Función para ejecutar acción del sistema seleccionada
+        function executeSystemAction() {
+            const action = document.getElementById('systemActionSelect').value;
+            switch(action) {
+                case 'support':
+                    showSupportModal();
+                    break;
+                case 'session':
+                    if (isLoggedIn) {
+                        logout();
+                    } else {
+                        login();
+                    }
+                    break;
+                case 'license':
+                    loadLicenseStatus();
+                    alert('Estado de licencia actualizado');
+                    break;
+                case 'settings':
+                    alert('Configuraciones del sistema - Funcionalidad próximamente');
+                    break;
+                default:
+                    alert('Selecciona una acción válida');
+            }
+        }
+
+        // Función para generar reporte y enviar por email
+        async function generateReport() {
+            // Pedir credenciales siempre para esta operación crítica
+            const username = prompt('Usuario:');
+            const password = prompt('Contraseña:');
+            if (!username || !password) {
+                alert('Credenciales requeridas para generar el reporte');
+                return;
+            }
+            const tempCredentials = { username, password };
+
+            // Mostrar modal de opciones de reporte
+            document.getElementById('reportOptionsModal').classList.add('show');
+        }
+
+        // Función para cerrar modal de opciones de reporte
+        function closeReportOptionsModal() {
+            document.getElementById('reportOptionsModal').classList.remove('show');
+        }
+
+        // Función para mostrar modal de soporte
+        function showSupportModal() {
+            document.getElementById('supportModal').classList.add('show');
+        }
+
+        // Función para cerrar modal de soporte
+        function closeSupportModal() {
+            document.getElementById('supportModal').classList.remove('show');
+        }
+
+        // Función para contactar soporte
+        function contactSupport() {
+            // Abrir email client con asunto predefinido
+            const subject = encodeURIComponent('Soporte Técnico - Sistema POS');
+            const body = encodeURIComponent('Hola,\n\nNecesito ayuda con el Sistema POS.\n\nDescripción del problema:\n\n');
+            const mailtoUrl = `mailto:mikhail.njr@gmail.com?subject=${subject}&body=${body}`;
+            window.open(mailtoUrl, '_blank');
+
+            // También mostrar mensaje de confirmación
+            alert('Se abrió tu cliente de email. Si no se abre automáticamente, puedes contactarnos directamente a: mikhail.njr@gmail.com o +543434721177');
+
+            closeSupportModal();
+        }
+
+        // Función para cerrar modal de opciones de reset
+        function closeResetOptionsModal() {
+            document.getElementById('resetOptionsModal').classList.remove('show');
+        }
+
+        // Función para seleccionar todas las secciones de reset
+        function selectAllResetSections() {
+            document.getElementById('resetVentas').checked = true;
+            document.getElementById('resetCierres').checked = true;
+            document.getElementById('resetProveedores').checked = true;
+            document.getElementById('resetPromociones').checked = true;
+            document.getElementById('resetLog').checked = true;
+            document.getElementById('resetMetricas').checked = true;
+        }
+
+        // Función para deseleccionar todas las secciones de reset
+        function deselectAllResetSections() {
+            document.getElementById('resetVentas').checked = false;
+            document.getElementById('resetCierres').checked = false;
+            document.getElementById('resetProveedores').checked = false;
+            document.getElementById('resetPromociones').checked = false;
+            document.getElementById('resetLog').checked = false;
+            document.getElementById('resetMetricas').checked = false;
+        }
+
+        // Función para seleccionar todas las secciones
+        function selectAllSections() {
+            document.getElementById('includeFacturas').checked = true;
+            document.getElementById('includeCierres').checked = true;
+            document.getElementById('includeProductos').checked = true;
+            document.getElementById('includeProveedores').checked = true;
+        }
+
+        // Función para deseleccionar todas las secciones
+        function deselectAllSections() {
+            document.getElementById('includeFacturas').checked = false;
+            document.getElementById('includeCierres').checked = false;
+            document.getElementById('includeProductos').checked = false;
+            document.getElementById('includeProveedores').checked = false;
+        }
+
+        // Función para generar reporte con secciones seleccionadas
+        async function generateSelectedReport() {
+            // Verificar si tiene licencia para generar reportes
+            try {
+                const licenseResponse = await fetch(`${API_BASE}/can-generate-reports`);
+                const licenseData = await licenseResponse.json();
+
+                if (!licenseData.canGenerate) {
+                    const activate = confirm(licenseData.message + '\n\n¿Deseas activar una licencia ahora?');
+                    if (activate) {
+                        window.open('/activate', '_blank');
+                    }
+                    closeReportOptionsModal();
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking license for reports:', error);
+                alert('Error al verificar permisos para reportes');
+                closeReportOptionsModal();
+                return;
+            }
+
+            // Obtener credenciales (ya verificadas en generateReport)
+            let tempCredentials = authCredentials;
+            if (!tempCredentials) {
+                const username = prompt('Usuario:');
+                const password = prompt('Contraseña:');
+                if (username && password) {
+                    tempCredentials = { username, password };
+                } else {
+                    alert('Credenciales requeridas para generar el reporte');
+                    return;
+                }
+            }
+
+            // Pedir email
+            const email = prompt('Ingrese el correo electrónico del destinatario:');
+            if (!email || !email.includes('@')) {
+                alert('Correo electrónico inválido');
+                return;
+            }
+
+            // Pedir fecha opcional
+            const dateInput = prompt('Ingrese la fecha (YYYY-MM-DD) o deje vacío para toda la información:');
+            let filterDate = null;
+            if (dateInput && dateInput.trim()) {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInput.trim())) {
+                    alert('Formato de fecha inválido. Use YYYY-MM-DD');
+                    return;
+                }
+                filterDate = dateInput.trim();
+            }
+
+            // Obtener secciones seleccionadas
+            const includeFacturas = document.getElementById('includeFacturas').checked;
+            const includeCierres = document.getElementById('includeCierres').checked;
+            const includeProductos = document.getElementById('includeProductos').checked;
+            const includeProveedores = document.getElementById('includeProveedores').checked;
+
+            // Cerrar modal
+            closeReportOptionsModal();
+
+            // Headers para autenticación
+            const headers = { 'Content-Type': 'application/json' };
+            if (tempCredentials) {
+                headers['Authorization'] = 'Basic ' + btoa(tempCredentials.username + ':' + tempCredentials.password);
+            }
+
+            try {
+                // Mostrar loading
+                showAlert('Generando reporte...', 'success');
+
+                // Fetch ventas
+                const salesRes = await fetch(`${API_BASE}/sales`, { headers });
+                if (!salesRes.ok) throw new Error('Error al obtener ventas');
+                let sales = await salesRes.json();
+
+                // Filtrar por fecha si se especificó
+                if (filterDate) {
+                    sales = sales.filter(sale => sale.fecha.startsWith(filterDate));
+                }
+
+                // Fetch productos
+                const productsRes = await fetch(`${API_BASE}/products`, { headers });
+                if (!productsRes.ok) throw new Error('Error al obtener productos');
+                const products = await productsRes.json();
+
+                // Calcular total de unidades en stock
+                const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
+
+                // Fetch proveedores (opcional)
+                let suppliers = [];
+                try {
+                    const suppliersRes = await fetch(`${API_BASE}/suppliers`, { headers });
+                    if (suppliersRes.ok) {
+                        suppliers = await suppliersRes.json();
+                    }
+                } catch (e) {
+                    console.log('Proveedores no disponibles');
+                }
+
+                // Fetch cierres de caja
+                const cierresRes = await fetch(`${API_BASE}/cierres`, { headers });
+                if (!cierresRes.ok) throw new Error('Error al obtener cierres de caja');
+                const cierres = await cierresRes.json();
+
+                // Generar PDF con mejor formato
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Configuración de página
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = 20;
+                let y = 30;
+
+                // Título principal
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text('REPORTE DE ESTADO DEL COMERCIO', pageWidth / 2, y, { align: 'center' });
+                y += 15;
+
+                // Línea separadora
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 10;
+
+                // Fecha del reporte
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Fecha del reporte: ${new Date().toLocaleDateString('es-AR')}`, margin, y);
+                y += 10;
+
+                if (filterDate) {
+                    doc.text(`Datos filtrados por fecha: ${filterDate}`, margin, y);
+                    y += 15;
+                }
+
+                // ==========================================
+                // SECCIÓN 1: RESUMEN GENERAL
+                // ==========================================
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text('RESUMEN GENERAL', margin, y);
+                y += 8;
+                doc.setLineWidth(0.3);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 10;
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+
+                // Total productos
+                doc.text(`Productos en stock: ${totalStock} unidades`, margin, y);
+                y += 8;
+
+                // Resumen de ventas
+                const totalSales = sales.reduce((sum, sale) => sum + parseFloat(sale.total || 0), 0);
+                doc.text(`Total de ventas realizadas: ${sales.length}`, margin, y);
+                y += 8;
+                doc.text(`Monto total de ventas: ${formatCurrency(totalSales)}`, margin, y);
+                y += 15;
+
+                // ==========================================
+                // SECCIÓN 2: DETALLE DE VENTAS
+                // ==========================================
+                if (includeFacturas && sales.length > 0) {
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('DETALLE DE VENTAS', margin, y);
+                    y += 8;
+                    doc.setLineWidth(0.3);
+                    doc.line(margin, y, pageWidth - margin, y);
+                    y += 10;
+
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+
+                    sales.forEach((sale, index) => {
+                        if (y > 250) {
+                            doc.addPage();
+                            y = 30;
+                        }
+
+                        // Encabezado de factura (formato profesional)
+                        doc.setFontSize(12);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`FACTURA: ${sale.numero_factura}`, margin, y);
+                        y += 8;
+
+                        doc.setFontSize(9);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(`Fecha: ${new Date(sale.fecha).toLocaleDateString('es-AR')}`, margin, y);
+                        doc.text(`Hora: ${new Date(sale.fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`, 80, y);
+
+                        // Método de pago
+                        let metodoPago = 'No especificado';
+                        if (Array.isArray(sale.metodo_pago) && sale.metodo_pago.length > 0) {
+                            if (sale.metodo_pago[0].metodo) {
+                                metodoPago = sale.metodo_pago.map(p => `${p.metodo.toUpperCase()}: ${formatCurrency(p.monto)}`).join(' + ');
+                            }
+                        } else if (typeof sale.metodo_pago === 'string') {
+                            metodoPago = sale.metodo_pago.toUpperCase();
+                        }
+                        doc.text(`Pago: ${metodoPago}`, 140, y);
+                        y += 8;
+
+                        // Línea separadora del encabezado
+                        doc.setLineWidth(0.3);
+                        doc.line(margin, y, pageWidth - margin, y);
+                        y += 5;
+
+                        // Items de la venta - Formato de tabla estructurada
+                        if (sale.items && sale.items.length > 0) {
+                            // Título de la sección de productos
+                            doc.setFontSize(10);
+                            doc.setFont('helvetica', 'bold');
+                            doc.text('DETALLE DE PRODUCTOS', margin, y);
+                            y += 6;
+
+                            // Encabezados de tabla
+                            doc.setFontSize(8);
+                            doc.setFont('helvetica', 'bold');
+                            doc.text('Producto', margin + 5, y);
+                            doc.text('Cant', 100, y);
+                            doc.text('Precio Unit.', 120, y);
+                            doc.text('Tipo', 160, y);
+                            doc.text('Subtotal', 185, y);
+                            y += 4;
+
+                            // Línea separadora
+                            doc.setLineWidth(0.2);
+                            doc.line(margin + 5, y, pageWidth - margin, y);
+                            y += 3;
+
+                            doc.setFont('helvetica', 'normal');
+
+                            sale.items.forEach(item => {
+                                if (y > 270) {
+                                    doc.addPage();
+                                    y = 30;
+                                    // Repetir encabezados en nueva página
+                                    doc.setFontSize(8);
+                                    doc.setFont('helvetica', 'bold');
+                                    doc.text('Producto', margin + 5, y);
+                                    doc.text('Cant', 100, y);
+                                    doc.text('Precio Unit.', 120, y);
+                                    doc.text('Tipo', 160, y);
+                                    doc.text('Subtotal', 185, y);
+                                    y += 4;
+                                    doc.line(margin + 5, y, pageWidth - margin, y);
+                                    y += 3;
+                                    doc.setFont('helvetica', 'normal');
+                                }
+
+                                const precioOriginal = parseFloat(item.precio_original || item.precio_unitario);
+                                const precioUnitario = parseFloat(item.precio_unitario);
+                                const descuento = parseFloat(item.descuento_porcentaje || 0);
+                                const subtotal = precioUnitario * item.cantidad;
+
+                                // Nombre del producto (truncar si es muy largo)
+                                const productName = item.nombre.length > 20 ? item.nombre.substring(0, 17) + '...' : item.nombre;
+                                doc.text(productName, margin + 5, y);
+
+                                // Cantidad
+                                doc.text(item.cantidad.toString(), 100, y);
+
+                                // Precio unitario
+                                if (descuento > 0) {
+                                    // Mostrar precio original tachado y precio con descuento
+                                    doc.setFontSize(7);
+                                    doc.text(`${formatCurrency(precioOriginal)}`, 120, y - 1);
+                                    doc.setLineWidth(0.1);
+                                    doc.line(120, y, 120 + doc.getTextWidth(formatCurrency(precioOriginal)), y);
+                                    doc.setFontSize(8);
+                                    doc.setFont('helvetica', 'bold');
+                                    doc.text(`${formatCurrency(precioUnitario)}`, 120, y + 2);
+                                    doc.setFont('helvetica', 'normal');
+                                } else {
+                                    doc.text(formatCurrency(precioUnitario), 120, y);
+                                }
+
+                                // Tipo (Regular o % OFF)
+                                if (descuento > 0) {
+                                    doc.setFont('helvetica', 'bold');
+                                    doc.text(`${descuento}% OFF`, 160, y);
+                                    doc.setFont('helvetica', 'normal');
+                                } else {
+                                    doc.setFontSize(7);
+                                    doc.text('Regular', 160, y);
+                                    doc.setFontSize(8);
+                                }
+
+                                // Subtotal
+                                doc.setFont('helvetica', 'bold');
+                                doc.text(formatCurrency(subtotal), 185, y);
+                                doc.setFont('helvetica', 'normal');
+
+                                y += 6;
+                            });
+
+                            // Línea final de la tabla
+                            doc.setLineWidth(0.3);
+                            doc.line(margin + 5, y, pageWidth - margin, y);
+                            y += 8;
+                        }
+                        y += 5;
+
+                        // Total de la factura (formato profesional)
+                        if (y > 250) {
+                            doc.addPage();
+                            y = 30;
+                        }
+
+                        // Espacio antes del total
+                        y += 3;
+
+                        // Línea separadora
+                        doc.setLineWidth(0.5);
+                        doc.line(130, y, pageWidth - margin, y);
+                        y += 10;
+
+                        // Total de la factura
+                        doc.setFontSize(12);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('TOTAL FACTURA:', 130, y);
+                        doc.text(formatCurrency(sale.total), pageWidth - margin, y, { align: 'right' });
+                        y += 12;
+
+                        // Espacio entre facturas
+                        y += 10;
+                    });
+                    y += 5;
+                }
+
+                // ==========================================
+                // SECCIÓN 3: CIERRES DE CAJA
+                // ==========================================
+                if (includeCierres && cierres.length > 0) {
+                    if (y > 150) {
+                        doc.addPage();
+                        y = 30;
+                    }
+
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CIERRES DE CAJA', margin, y);
+                    y += 8;
+                    doc.setLineWidth(0.3);
+                    doc.line(margin, y, pageWidth - margin, y);
+                    y += 10;
+
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+
+                    cierres.forEach(cierre => {
+                        if (y > 250) {
+                            doc.addPage();
+                            y = 30;
+                        }
+
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`Fecha: ${new Date(cierre.fecha).toLocaleDateString('es-AR')}`, margin, y);
+                        y += 6;
+                        doc.setFont('helvetica', 'normal');
+
+                        doc.text(`Dinero inicial: ${formatCurrency(cierre.dinero_inicial)}`, margin + 5, y);
+                        y += 5;
+                        doc.text(`Total ventas: ${formatCurrency(cierre.total_ventas)}`, margin + 5, y);
+                        y += 5;
+                        doc.text(`Total esperado: ${formatCurrency(cierre.total_esperado)}`, margin + 5, y);
+                        y += 5;
+                        doc.text(`Diferencia: ${formatCurrency(cierre.diferencia)}`, margin + 5, y);
+                        y += 5;
+                        doc.text(`Cantidad de ventas: ${cierre.cantidad_ventas}`, margin + 5, y);
+                        y += 8;
+                    });
+                }
+
+                // ==========================================
+                // SECCIÓN 4: PRODUCTOS DISPONIBLES
+                // ==========================================
+                if (includeProductos) {
+                    if (y > 200) {
+                        doc.addPage();
+                        y = 30;
+                    }
+
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('PRODUCTOS DISPONIBLES', margin, y);
+                    y += 8;
+                    doc.setLineWidth(0.3);
+                    doc.line(margin, y, pageWidth - margin, y);
+                    y += 10;
+
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+
+                    products.forEach(product => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 30;
+                        }
+
+                        const hasDiscount = product.descuento_porcentaje && product.descuento_porcentaje > 0;
+                        let productLine = `${product.nombre}`;
+                        if (hasDiscount) {
+                            productLine += ` (${product.descuento_porcentaje}% OFF)`;
+                        }
+
+                        doc.text(productLine, margin, y);
+                        doc.text(`Stock: ${product.stock}`, 120, y);
+                        doc.text(`Precio: ${formatCurrency(product.precio)}`, 160, y);
+                        y += 6;
+                    });
+                    y += 10;
+                }
+
+                // ==========================================
+                // SECCIÓN 5: PROVEEDORES
+                // ==========================================
+                if (includeProveedores && suppliers.length > 0) {
+                    if (y > 200) {
+                        doc.addPage();
+                        y = 30;
+                    }
+
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('PROVEEDORES', margin, y);
+                    y += 8;
+                    doc.setLineWidth(0.3);
+                    doc.line(margin, y, pageWidth - margin, y);
+                    y += 10;
+
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+
+                    suppliers.forEach(supplier => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 30;
+                        }
+
+                        doc.text(`${supplier.nombre_proveedor}`, margin, y);
+                        if (supplier.nombre_contacto) {
+                            doc.text(`Contacto: ${supplier.nombre_contacto}`, margin + 5, y + 5);
+                        }
+                        if (supplier.telefono) {
+                            doc.text(`Teléfono: ${supplier.telefono}`, 120, y);
+                        }
+                        if (supplier.email) {
+                            doc.text(`Email: ${supplier.email}`, 120, y + 5);
+                        }
+                        y += 15;
+                    });
+                }
+
+                // Descargar PDF
+                doc.save('reporte_comercio.pdf');
+
+                // Abrir Gmail
+                const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent('Reporte de Estado del Comercio')}&body=${encodeURIComponent('Adjunto el reporte del estado del comercio.')}`;
+                window.open(gmailUrl, '_blank');
+
+                showAlert('Reporte generado y Gmail abierto. Adjunte el PDF descargado al email.', 'success');
+
+            } catch (error) {
+                console.error('Error generando reporte:', error);
+                showAlert('Error al generar el reporte: ' + error.message, 'error');
+            }
+        }
+
+        // Event listeners para filtros de ventas
+        document.getElementById('filter-sales-btn').addEventListener('click', filterSales);
+        document.getElementById('clear-filter-btn').addEventListener('click', clearSalesFilter);
+        document.getElementById('today-sales-btn').addEventListener('click', showTodaySales);
+
+        // Permitir filtrar con Enter en los campos de fecha
+        document.getElementById('sales-date').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') filterSales();
+        });
+        document.getElementById('sales-start-date').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') filterSales();
+        });
+        document.getElementById('sales-end-date').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') filterSales();
+        });
+
+        // Event listeners para dropdowns de acciones
+        document.getElementById('dataActionSelect').addEventListener('change', function() {
+            const btn = document.getElementById('executeDataActionBtn');
+            btn.disabled = !this.value;
+        });
+
+        document.getElementById('systemActionSelect').addEventListener('change', function() {
+            const btn = document.getElementById('executeSystemActionBtn');
+            btn.disabled = !this.value;
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAuthFromStorage();
+            if (checkDashboardAccess()) {
+                loadLicenseStatus(); // Cargar estado de licencia
+                fetchAndDisplayData().then(() => {
+                    // Inicializar el texto del botón de ordenamiento
+                    updateSortButtonText();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "name": "sistema-pos-electron",
+  "version": "1.0.0",
+  "description": "Sistema POS convertido a Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-basic-auth": "^1.2.1",
+    "node-fetch": "^3.3.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "electron": "^25.9.8",
+    "electron-builder": "^24.0.0",
+    "javascript-obfuscator": "^4.1.0",
+    "nodemon": "^3.0.1"
+  },
+  "build": {
+    "appId": "com.sistemapos.electron",
+    "productName": "Sistema POS Electron",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!build/**/*",
+      "!*.md",
+      "!package-lock.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "author": "Sistema POS",
+  "license": "ISC"
+}

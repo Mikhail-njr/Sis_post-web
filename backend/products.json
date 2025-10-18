@@ -1,0 +1,34 @@
+[
+  {
+    "id": "001",
+    "codigo": "LAP-001",
+    "nombre": "Laptop HP 15.6\"",
+    "precio": 899.99,
+    "stock": 25,
+    "categoria": "Tecnología"
+  },
+  {
+    "id": "002",
+    "codigo": "MON-001", 
+    "nombre": "Monitor Samsung 24\"",
+    "precio": 249.99,
+    "stock": 15,
+    "categoria": "Tecnología"
+  },
+  {
+    "id": "003",
+    "codigo": "TEC-001",
+    "nombre": "Teclado Mecánico RGB",
+    "precio": 89.99,
+    "stock": 30,
+    "categoria": "Periféricos"
+  },
+  {
+    "id": "004",
+    "codigo": "MOU-001",
+    "nombre": "Mouse Inalámbrico",
+    "precio": 39.99,
+    "stock": 45,
+    "categoria": "Periféricos"
+  }
+]
