@@ -178,6 +178,31 @@ function initDatabase() {
             datos_cliente TEXT
         )`);
 
+        // Tabla pedidos a proveedores
+        db.run(`CREATE TABLE IF NOT EXISTS pedidos_proveedores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            numero_pedido TEXT UNIQUE NOT NULL,
+            proveedor_id INTEGER NOT NULL,
+            fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+            fecha_entrega_estimada DATETIME,
+            estado TEXT DEFAULT 'pendiente',
+            total REAL DEFAULT 0,
+            notas TEXT,
+            FOREIGN KEY (proveedor_id) REFERENCES proveedores(id)
+        )`);
+
+        // Tabla items de pedidos a proveedores
+        db.run(`CREATE TABLE IF NOT EXISTS pedido_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pedido_id INTEGER NOT NULL,
+            producto_id INTEGER NOT NULL,
+            cantidad INTEGER NOT NULL,
+            precio_unitario REAL NOT NULL,
+            subtotal REAL NOT NULL,
+            FOREIGN KEY (pedido_id) REFERENCES pedidos_proveedores(id),
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+        )`);
+
         // Agregar columnas faltantes si no existen (para migraciones)
         db.run(`ALTER TABLE venta_items ADD COLUMN precio_original REAL`, (err) => {
             if (err && !err.message.includes('duplicate column')) {
@@ -1927,6 +1952,258 @@ app.post('/api/reset-data-selective', authMiddleware, async (req, res) => {
         res.status(500).json({
             error: 'Error en reset selectivo: ' + error.message
         });
+    }
+});
+
+// >>> RUTAS PARA PEDIDOS A PROVEEDORES
+
+// Obtener todos los pedidos
+app.get('/api/supplier-orders', async (req, res) => {
+    try {
+        const orders = await dbAll(`
+            SELECT
+                pp.*,
+                p.nombre_proveedor,
+                p.nombre_contacto,
+                p.telefono,
+                p.email
+            FROM pedidos_proveedores pp
+            JOIN proveedores p ON pp.proveedor_id = p.id
+            ORDER BY pp.fecha_pedido DESC
+        `);
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Obtener un pedido por ID con sus items
+app.get('/api/supplier-orders/:id', async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        // Obtener pedido
+        const order = await dbAll(`
+            SELECT
+                pp.*,
+                p.nombre_proveedor,
+                p.nombre_contacto,
+                p.telefono,
+                p.email
+            FROM pedidos_proveedores pp
+            JOIN proveedores p ON pp.proveedor_id = p.id
+            WHERE pp.id = ?
+        `, [orderId]);
+
+        if (order.length === 0) {
+            return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        // Obtener items del pedido
+        const items = await dbAll(`
+            SELECT
+                pi.*,
+                pr.nombre as producto_nombre,
+                pr.codigo as producto_codigo
+            FROM pedido_items pi
+            JOIN productos pr ON pi.producto_id = pr.id
+            WHERE pi.pedido_id = ?
+            ORDER BY pi.id
+        `, [orderId]);
+
+        res.json({
+            ...order[0],
+            items: items
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Crear nuevo pedido a proveedor
+app.post('/api/supplier-orders', async (req, res) => {
+    const { proveedor_id, fecha_entrega_estimada, items, notas } = req.body;
+
+    // Validaciones
+    if (!proveedor_id) {
+        return res.status(400).json({ error: 'El ID del proveedor es requerido' });
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: 'El pedido debe incluir al menos un item' });
+    }
+
+    try {
+        // Verificar que el proveedor existe
+        const supplier = await dbAll("SELECT id FROM proveedores WHERE id = ?", [proveedor_id]);
+        if (supplier.length === 0) {
+            return res.status(404).json({ error: 'Proveedor no encontrado' });
+        }
+
+        // Calcular total
+        let total = 0;
+        const processedItems = items.map(item => {
+            const precioUnitario = parseFloat(item.precio_unitario);
+            const cantidad = parseInt(item.cantidad);
+            const subtotal = precioUnitario * cantidad;
+            total += subtotal;
+
+            return {
+                producto_id: item.producto_id,
+                cantidad: cantidad,
+                precio_unitario: precioUnitario,
+                subtotal: subtotal
+            };
+        });
+
+        const orderNumber = `PED-${Date.now()}`;
+
+        // Iniciar transacción
+        await dbRun("BEGIN TRANSACTION");
+
+        try {
+            // Insertar pedido
+            const orderResult = await dbRun(
+                `INSERT INTO pedidos_proveedores
+                 (numero_pedido, proveedor_id, fecha_entrega_estimada, total, notas)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [orderNumber, proveedor_id, fecha_entrega_estimada || null, total, notas || '']
+            );
+
+            // Insertar items del pedido
+            for (const item of processedItems) {
+                await dbRun(
+                    `INSERT INTO pedido_items
+                     (pedido_id, producto_id, cantidad, precio_unitario, subtotal)
+                     VALUES (?, ?, ?, ?, ?)`,
+                    [orderResult.id, item.producto_id, item.cantidad, item.precio_unitario, item.subtotal]
+                );
+            }
+
+            await dbRun("COMMIT");
+
+            // Registrar la operación en el log
+            logOperation(
+                'PEDIDO_CREADO',
+                `Pedido creado: ${orderNumber} - Proveedor ID: ${proveedor_id}`,
+                'Sistema',
+                'pedidos_proveedores',
+                orderResult.id,
+                null,
+                {
+                    numero_pedido: orderNumber,
+                    proveedor_id: proveedor_id,
+                    total: total,
+                    items: processedItems.length
+                }
+            );
+
+            res.status(201).json({
+                success: true,
+                message: 'Pedido creado exitosamente',
+                order_id: orderResult.id,
+                numero_pedido: orderNumber
+            });
+
+        } catch (error) {
+            await dbRun("ROLLBACK");
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Error creando pedido:', error);
+        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
+    }
+});
+
+// Actualizar estado de pedido
+app.put('/api/supplier-orders/:id/status', async (req, res) => {
+    const { estado } = req.body;
+    const orderId = req.params.id;
+
+    const validStates = ['pendiente', 'en_proceso', 'entregado', 'cancelado'];
+    if (!validStates.includes(estado)) {
+        return res.status(400).json({ error: 'Estado inválido' });
+    }
+
+    try {
+        // Verificar que el pedido existe
+        const existingOrder = await dbAll("SELECT * FROM pedidos_proveedores WHERE id = ?", [orderId]);
+        if (existingOrder.length === 0) {
+            return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        // Obtener datos anteriores para el log
+        const oldOrder = await dbAll("SELECT * FROM pedidos_proveedores WHERE id = ?", [orderId]);
+
+        // Actualizar estado
+        const result = await dbRun(
+            "UPDATE pedidos_proveedores SET estado = ? WHERE id = ?",
+            [estado, orderId]
+        );
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        // Registrar la operación en el log
+        logOperation(
+            'PEDIDO_ESTADO_ACTUALIZADO',
+            `Estado del pedido ${existingOrder[0].numero_pedido} cambiado a: ${estado}`,
+            'Sistema',
+            'pedidos_proveedores',
+            orderId,
+            oldOrder[0],
+            { estado: estado }
+        );
+
+        res.json({
+            success: true,
+            message: 'Estado del pedido actualizado exitosamente'
+        });
+
+    } catch (error) {
+        console.error('Error actualizando estado del pedido:', error);
+        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
+    }
+});
+
+// Eliminar pedido
+app.delete('/api/supplier-orders/:id', async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        // Verificar que el pedido existe
+        const existingOrder = await dbAll("SELECT * FROM pedidos_proveedores WHERE id = ?", [orderId]);
+        if (existingOrder.length === 0) {
+            return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        // Iniciar transacción
+        await dbRun("BEGIN TRANSACTION");
+
+        try {
+            // Eliminar items del pedido
+            await dbRun("DELETE FROM pedido_items WHERE pedido_id = ?", [orderId]);
+
+            // Eliminar pedido
+            await dbRun("DELETE FROM pedidos_proveedores WHERE id = ?", [orderId]);
+
+            await dbRun("COMMIT");
+
+            res.json({
+                success: true,
+                message: 'Pedido eliminado exitosamente'
+            });
+
+        } catch (error) {
+            await dbRun("ROLLBACK");
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Error eliminando pedido:', error);
+        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
     }
 });
 

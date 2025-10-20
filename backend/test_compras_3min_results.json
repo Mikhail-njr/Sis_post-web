@@ -1,10 +1,137 @@
 {
-  "startTime": "2025-10-12T14:49:02.743Z",
-  "endTime": "2025-10-12T15:49:32.747Z",
+  "startTime": "2025-10-20T17:54:30.743Z",
+  "endTime": "2025-10-20T18:55:00.752Z",
   "totalSales": 300,
-  "successfulSales": 300,
-  "failedSales": 0,
+  "successfulSales": 61,
+  "failedSales": 239,
   "responseTimes": [
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
     5,
     6,
     6,
@@ -15,6 +142,110 @@
     6,
     6,
     6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
     7,
     7,
     7,
@@ -51,26 +282,6 @@
     7,
     7,
     7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
     8,
     8,
     8,
@@ -83,181 +294,6 @@
     8,
     8,
     8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    8,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
-    9,
     9,
     9,
     9,
@@ -266,3062 +302,2310 @@
     10,
     10,
     10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    11,
-    11,
-    11,
-    11,
-    11,
-    11,
-    11,
-    11,
-    11,
-    12,
-    12,
-    12,
-    12,
-    12,
-    14,
-    14,
-    16,
-    25,
-    25,
-    25,
-    34,
-    37,
-    70,
-    313
+    17,
+    28,
+    31
   ],
-  "errors": [],
+  "errors": [
+    {
+      "saleNumber": 31,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:00:42.983Z",
+      "success": false
+    },
+    {
+      "saleNumber": 32,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:00:54.982Z",
+      "success": false
+    },
+    {
+      "saleNumber": 33,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:01:06.992Z",
+      "success": false
+    },
+    {
+      "saleNumber": 34,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:01:19.004Z",
+      "success": false
+    },
+    {
+      "saleNumber": 35,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:01:31.006Z",
+      "success": false
+    },
+    {
+      "saleNumber": 36,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:01:43.018Z",
+      "success": false
+    },
+    {
+      "saleNumber": 38,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:02:07.045Z",
+      "success": false
+    },
+    {
+      "saleNumber": 40,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:02:31.051Z",
+      "success": false
+    },
+    {
+      "saleNumber": 41,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:02:43.058Z",
+      "success": false
+    },
+    {
+      "saleNumber": 43,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:03:07.079Z",
+      "success": false
+    },
+    {
+      "saleNumber": 44,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:03:19.081Z",
+      "success": false
+    },
+    {
+      "saleNumber": 45,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:03:31.092Z",
+      "success": false
+    },
+    {
+      "saleNumber": 51,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:04:43.123Z",
+      "success": false
+    },
+    {
+      "saleNumber": 52,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:04:55.124Z",
+      "success": false
+    },
+    {
+      "saleNumber": 54,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:05:19.133Z",
+      "success": false
+    },
+    {
+      "saleNumber": 57,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:05:55.154Z",
+      "success": false
+    },
+    {
+      "saleNumber": 58,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:06:07.156Z",
+      "success": false
+    },
+    {
+      "saleNumber": 59,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:06:19.160Z",
+      "success": false
+    },
+    {
+      "saleNumber": 60,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:06:31.168Z",
+      "success": false
+    },
+    {
+      "saleNumber": 62,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:06:55.172Z",
+      "success": false
+    },
+    {
+      "saleNumber": 64,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:07:19.192Z",
+      "success": false
+    },
+    {
+      "saleNumber": 65,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:07:31.205Z",
+      "success": false
+    },
+    {
+      "saleNumber": 66,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:07:43.218Z",
+      "success": false
+    },
+    {
+      "saleNumber": 68,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:08:07.232Z",
+      "success": false
+    },
+    {
+      "saleNumber": 69,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:08:19.235Z",
+      "success": false
+    },
+    {
+      "saleNumber": 70,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T18:08:31.245Z",
+      "success": false
+    },
+    {
+      "saleNumber": 71,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:08:43.256Z",
+      "success": false
+    },
+    {
+      "saleNumber": 72,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:08:55.260Z",
+      "success": false
+    },
+    {
+      "saleNumber": 73,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:09:07.265Z",
+      "success": false
+    },
+    {
+      "saleNumber": 74,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:09:19.271Z",
+      "success": false
+    },
+    {
+      "saleNumber": 76,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:09:43.285Z",
+      "success": false
+    },
+    {
+      "saleNumber": 77,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:09:55.287Z",
+      "success": false
+    },
+    {
+      "saleNumber": 78,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:10:07.294Z",
+      "success": false
+    },
+    {
+      "saleNumber": 79,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:10:19.297Z",
+      "success": false
+    },
+    {
+      "saleNumber": 80,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:10:31.301Z",
+      "success": false
+    },
+    {
+      "saleNumber": 81,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:10:43.310Z",
+      "success": false
+    },
+    {
+      "saleNumber": 82,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:10:55.319Z",
+      "success": false
+    },
+    {
+      "saleNumber": 84,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 10,
+      "timestamp": "2025-10-20T18:11:19.328Z",
+      "success": false
+    },
+    {
+      "saleNumber": 85,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:11:31.331Z",
+      "success": false
+    },
+    {
+      "saleNumber": 86,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:11:43.344Z",
+      "success": false
+    },
+    {
+      "saleNumber": 87,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:11:55.347Z",
+      "success": false
+    },
+    {
+      "saleNumber": 88,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:12:07.350Z",
+      "success": false
+    },
+    {
+      "saleNumber": 90,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:12:31.368Z",
+      "success": false
+    },
+    {
+      "saleNumber": 91,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:12:43.375Z",
+      "success": false
+    },
+    {
+      "saleNumber": 92,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:12:55.374Z",
+      "success": false
+    },
+    {
+      "saleNumber": 95,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:13:31.390Z",
+      "success": false
+    },
+    {
+      "saleNumber": 96,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:13:43.398Z",
+      "success": false
+    },
+    {
+      "saleNumber": 97,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:13:55.399Z",
+      "success": false
+    },
+    {
+      "saleNumber": 98,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:14:07.411Z",
+      "success": false
+    },
+    {
+      "saleNumber": 99,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:14:19.420Z",
+      "success": false
+    },
+    {
+      "saleNumber": 100,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:14:31.424Z",
+      "success": false
+    },
+    {
+      "saleNumber": 101,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:14:43.435Z",
+      "success": false
+    },
+    {
+      "saleNumber": 102,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:14:55.437Z",
+      "success": false
+    },
+    {
+      "saleNumber": 103,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:15:07.447Z",
+      "success": false
+    },
+    {
+      "saleNumber": 105,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:15:31.465Z",
+      "success": false
+    },
+    {
+      "saleNumber": 106,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:15:43.471Z",
+      "success": false
+    },
+    {
+      "saleNumber": 107,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:15:55.475Z",
+      "success": false
+    },
+    {
+      "saleNumber": 108,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:16:07.481Z",
+      "success": false
+    },
+    {
+      "saleNumber": 109,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:16:19.485Z",
+      "success": false
+    },
+    {
+      "saleNumber": 110,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:16:31.487Z",
+      "success": false
+    },
+    {
+      "saleNumber": 111,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:16:43.499Z",
+      "success": false
+    },
+    {
+      "saleNumber": 112,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:16:55.512Z",
+      "success": false
+    },
+    {
+      "saleNumber": 113,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:17:07.516Z",
+      "success": false
+    },
+    {
+      "saleNumber": 114,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:17:19.520Z",
+      "success": false
+    },
+    {
+      "saleNumber": 115,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:17:31.531Z",
+      "success": false
+    },
+    {
+      "saleNumber": 116,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:17:43.539Z",
+      "success": false
+    },
+    {
+      "saleNumber": 117,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:17:55.547Z",
+      "success": false
+    },
+    {
+      "saleNumber": 118,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:18:07.547Z",
+      "success": false
+    },
+    {
+      "saleNumber": 119,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:18:19.548Z",
+      "success": false
+    },
+    {
+      "saleNumber": 121,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:18:43.563Z",
+      "success": false
+    },
+    {
+      "saleNumber": 122,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:18:55.569Z",
+      "success": false
+    },
+    {
+      "saleNumber": 124,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 17,
+      "timestamp": "2025-10-20T18:19:19.590Z",
+      "success": false
+    },
+    {
+      "saleNumber": 125,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:19:31.588Z",
+      "success": false
+    },
+    {
+      "saleNumber": 126,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:19:43.603Z",
+      "success": false
+    },
+    {
+      "saleNumber": 127,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:19:55.610Z",
+      "success": false
+    },
+    {
+      "saleNumber": 128,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:20:07.627Z",
+      "success": false
+    },
+    {
+      "saleNumber": 129,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:20:19.626Z",
+      "success": false
+    },
+    {
+      "saleNumber": 130,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:20:31.640Z",
+      "success": false
+    },
+    {
+      "saleNumber": 131,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:20:43.654Z",
+      "success": false
+    },
+    {
+      "saleNumber": 132,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:20:55.667Z",
+      "success": false
+    },
+    {
+      "saleNumber": 133,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:21:07.674Z",
+      "success": false
+    },
+    {
+      "saleNumber": 134,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:21:19.681Z",
+      "success": false
+    },
+    {
+      "saleNumber": 135,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:21:31.686Z",
+      "success": false
+    },
+    {
+      "saleNumber": 136,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:21:43.686Z",
+      "success": false
+    },
+    {
+      "saleNumber": 137,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:21:55.689Z",
+      "success": false
+    },
+    {
+      "saleNumber": 139,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:22:19.703Z",
+      "success": false
+    },
+    {
+      "saleNumber": 140,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:22:31.703Z",
+      "success": false
+    },
+    {
+      "saleNumber": 141,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:22:43.703Z",
+      "success": false
+    },
+    {
+      "saleNumber": 142,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:22:55.712Z",
+      "success": false
+    },
+    {
+      "saleNumber": 143,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:23:07.725Z",
+      "success": false
+    },
+    {
+      "saleNumber": 144,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:23:19.727Z",
+      "success": false
+    },
+    {
+      "saleNumber": 145,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:23:31.738Z",
+      "success": false
+    },
+    {
+      "saleNumber": 146,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:23:43.740Z",
+      "success": false
+    },
+    {
+      "saleNumber": 147,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:23:55.749Z",
+      "success": false
+    },
+    {
+      "saleNumber": 148,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:24:07.751Z",
+      "success": false
+    },
+    {
+      "saleNumber": 149,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:24:19.759Z",
+      "success": false
+    },
+    {
+      "saleNumber": 150,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:24:31.765Z",
+      "success": false
+    },
+    {
+      "saleNumber": 151,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:24:43.773Z",
+      "success": false
+    },
+    {
+      "saleNumber": 152,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:24:55.787Z",
+      "success": false
+    },
+    {
+      "saleNumber": 153,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:25:07.792Z",
+      "success": false
+    },
+    {
+      "saleNumber": 154,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:25:19.804Z",
+      "success": false
+    },
+    {
+      "saleNumber": 155,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:25:31.808Z",
+      "success": false
+    },
+    {
+      "saleNumber": 156,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:25:43.817Z",
+      "success": false
+    },
+    {
+      "saleNumber": 157,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:25:55.827Z",
+      "success": false
+    },
+    {
+      "saleNumber": 158,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:26:07.832Z",
+      "success": false
+    },
+    {
+      "saleNumber": 159,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:26:19.847Z",
+      "success": false
+    },
+    {
+      "saleNumber": 160,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:26:31.847Z",
+      "success": false
+    },
+    {
+      "saleNumber": 161,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:26:43.860Z",
+      "success": false
+    },
+    {
+      "saleNumber": 162,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:26:55.872Z",
+      "success": false
+    },
+    {
+      "saleNumber": 163,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:27:07.872Z",
+      "success": false
+    },
+    {
+      "saleNumber": 164,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:27:19.885Z",
+      "success": false
+    },
+    {
+      "saleNumber": 165,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:27:31.886Z",
+      "success": false
+    },
+    {
+      "saleNumber": 166,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:27:43.888Z",
+      "success": false
+    },
+    {
+      "saleNumber": 167,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:27:55.896Z",
+      "success": false
+    },
+    {
+      "saleNumber": 169,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:28:19.906Z",
+      "success": false
+    },
+    {
+      "saleNumber": 170,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:28:31.921Z",
+      "success": false
+    },
+    {
+      "saleNumber": 171,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:28:43.926Z",
+      "success": false
+    },
+    {
+      "saleNumber": 172,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:28:55.937Z",
+      "success": false
+    },
+    {
+      "saleNumber": 173,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:29:07.952Z",
+      "success": false
+    },
+    {
+      "saleNumber": 174,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:29:19.959Z",
+      "success": false
+    },
+    {
+      "saleNumber": 175,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:29:31.974Z",
+      "success": false
+    },
+    {
+      "saleNumber": 176,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:29:43.982Z",
+      "success": false
+    },
+    {
+      "saleNumber": 177,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:29:55.999Z",
+      "success": false
+    },
+    {
+      "saleNumber": 178,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:30:08.009Z",
+      "success": false
+    },
+    {
+      "saleNumber": 179,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:30:20.019Z",
+      "success": false
+    },
+    {
+      "saleNumber": 180,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:30:32.030Z",
+      "success": false
+    },
+    {
+      "saleNumber": 181,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:30:44.034Z",
+      "success": false
+    },
+    {
+      "saleNumber": 182,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:30:56.046Z",
+      "success": false
+    },
+    {
+      "saleNumber": 183,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:31:08.061Z",
+      "success": false
+    },
+    {
+      "saleNumber": 185,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:31:32.067Z",
+      "success": false
+    },
+    {
+      "saleNumber": 186,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:31:44.070Z",
+      "success": false
+    },
+    {
+      "saleNumber": 187,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:31:56.083Z",
+      "success": false
+    },
+    {
+      "saleNumber": 188,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:32:08.088Z",
+      "success": false
+    },
+    {
+      "saleNumber": 189,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:32:20.102Z",
+      "success": false
+    },
+    {
+      "saleNumber": 190,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:32:32.110Z",
+      "success": false
+    },
+    {
+      "saleNumber": 191,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:32:44.110Z",
+      "success": false
+    },
+    {
+      "saleNumber": 192,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:32:56.121Z",
+      "success": false
+    },
+    {
+      "saleNumber": 193,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:33:08.126Z",
+      "success": false
+    },
+    {
+      "saleNumber": 194,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:33:20.137Z",
+      "success": false
+    },
+    {
+      "saleNumber": 195,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:33:32.147Z",
+      "success": false
+    },
+    {
+      "saleNumber": 196,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:33:44.158Z",
+      "success": false
+    },
+    {
+      "saleNumber": 197,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:33:56.166Z",
+      "success": false
+    },
+    {
+      "saleNumber": 198,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:34:08.177Z",
+      "success": false
+    },
+    {
+      "saleNumber": 199,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:34:20.181Z",
+      "success": false
+    },
+    {
+      "saleNumber": 200,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:34:32.196Z",
+      "success": false
+    },
+    {
+      "saleNumber": 201,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:34:44.207Z",
+      "success": false
+    },
+    {
+      "saleNumber": 202,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:34:56.222Z",
+      "success": false
+    },
+    {
+      "saleNumber": 203,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:35:08.234Z",
+      "success": false
+    },
+    {
+      "saleNumber": 204,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:35:20.238Z",
+      "success": false
+    },
+    {
+      "saleNumber": 205,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:35:32.244Z",
+      "success": false
+    },
+    {
+      "saleNumber": 206,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:35:44.251Z",
+      "success": false
+    },
+    {
+      "saleNumber": 207,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:35:56.255Z",
+      "success": false
+    },
+    {
+      "saleNumber": 208,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:36:08.264Z",
+      "success": false
+    },
+    {
+      "saleNumber": 209,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:36:20.269Z",
+      "success": false
+    },
+    {
+      "saleNumber": 210,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:36:32.277Z",
+      "success": false
+    },
+    {
+      "saleNumber": 211,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:36:44.288Z",
+      "success": false
+    },
+    {
+      "saleNumber": 212,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:36:56.290Z",
+      "success": false
+    },
+    {
+      "saleNumber": 213,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:37:08.294Z",
+      "success": false
+    },
+    {
+      "saleNumber": 214,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:37:20.303Z",
+      "success": false
+    },
+    {
+      "saleNumber": 215,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:37:32.304Z",
+      "success": false
+    },
+    {
+      "saleNumber": 216,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:37:44.314Z",
+      "success": false
+    },
+    {
+      "saleNumber": 217,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:37:56.321Z",
+      "success": false
+    },
+    {
+      "saleNumber": 218,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:38:08.335Z",
+      "success": false
+    },
+    {
+      "saleNumber": 219,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:38:20.345Z",
+      "success": false
+    },
+    {
+      "saleNumber": 220,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 10,
+      "timestamp": "2025-10-20T18:38:32.358Z",
+      "success": false
+    },
+    {
+      "saleNumber": 221,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:38:44.366Z",
+      "success": false
+    },
+    {
+      "saleNumber": 222,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:38:56.369Z",
+      "success": false
+    },
+    {
+      "saleNumber": 224,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:39:20.386Z",
+      "success": false
+    },
+    {
+      "saleNumber": 225,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:39:32.401Z",
+      "success": false
+    },
+    {
+      "saleNumber": 226,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:39:44.415Z",
+      "success": false
+    },
+    {
+      "saleNumber": 227,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:39:56.429Z",
+      "success": false
+    },
+    {
+      "saleNumber": 228,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:40:08.435Z",
+      "success": false
+    },
+    {
+      "saleNumber": 229,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:40:20.442Z",
+      "success": false
+    },
+    {
+      "saleNumber": 230,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:40:32.452Z",
+      "success": false
+    },
+    {
+      "saleNumber": 231,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:40:44.452Z",
+      "success": false
+    },
+    {
+      "saleNumber": 232,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:40:56.459Z",
+      "success": false
+    },
+    {
+      "saleNumber": 234,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:41:20.463Z",
+      "success": false
+    },
+    {
+      "saleNumber": 235,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:41:32.468Z",
+      "success": false
+    },
+    {
+      "saleNumber": 236,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:41:44.471Z",
+      "success": false
+    },
+    {
+      "saleNumber": 237,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:41:56.484Z",
+      "success": false
+    },
+    {
+      "saleNumber": 238,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:42:08.498Z",
+      "success": false
+    },
+    {
+      "saleNumber": 239,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:42:20.510Z",
+      "success": false
+    },
+    {
+      "saleNumber": 240,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:42:32.522Z",
+      "success": false
+    },
+    {
+      "saleNumber": 241,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:42:44.532Z",
+      "success": false
+    },
+    {
+      "saleNumber": 242,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:42:56.534Z",
+      "success": false
+    },
+    {
+      "saleNumber": 243,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:43:08.546Z",
+      "success": false
+    },
+    {
+      "saleNumber": 244,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:43:20.552Z",
+      "success": false
+    },
+    {
+      "saleNumber": 245,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:43:32.562Z",
+      "success": false
+    },
+    {
+      "saleNumber": 246,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:43:44.567Z",
+      "success": false
+    },
+    {
+      "saleNumber": 247,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:43:56.577Z",
+      "success": false
+    },
+    {
+      "saleNumber": 248,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:44:08.579Z",
+      "success": false
+    },
+    {
+      "saleNumber": 249,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:44:20.587Z",
+      "success": false
+    },
+    {
+      "saleNumber": 251,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:44:44.595Z",
+      "success": false
+    },
+    {
+      "saleNumber": 252,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:44:56.607Z",
+      "success": false
+    },
+    {
+      "saleNumber": 253,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:45:08.621Z",
+      "success": false
+    },
+    {
+      "saleNumber": 254,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:45:20.623Z",
+      "success": false
+    },
+    {
+      "saleNumber": 255,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:45:32.629Z",
+      "success": false
+    },
+    {
+      "saleNumber": 256,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:45:44.637Z",
+      "success": false
+    },
+    {
+      "saleNumber": 257,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Cámara Web HD. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:45:56.643Z",
+      "success": false
+    },
+    {
+      "saleNumber": 258,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:46:08.646Z",
+      "success": false
+    },
+    {
+      "saleNumber": 259,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:46:20.659Z",
+      "success": false
+    },
+    {
+      "saleNumber": 260,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:46:32.663Z",
+      "success": false
+    },
+    {
+      "saleNumber": 261,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:46:44.665Z",
+      "success": false
+    },
+    {
+      "saleNumber": 262,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:46:56.672Z",
+      "success": false
+    },
+    {
+      "saleNumber": 263,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:47:08.680Z",
+      "success": false
+    },
+    {
+      "saleNumber": 264,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:47:20.694Z",
+      "success": false
+    },
+    {
+      "saleNumber": 265,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:47:32.700Z",
+      "success": false
+    },
+    {
+      "saleNumber": 266,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:47:44.709Z",
+      "success": false
+    },
+    {
+      "saleNumber": 267,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:47:56.710Z",
+      "success": false
+    },
+    {
+      "saleNumber": 268,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:48:08.719Z",
+      "success": false
+    },
+    {
+      "saleNumber": 269,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:48:20.721Z",
+      "success": false
+    },
+    {
+      "saleNumber": 270,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:48:32.725Z",
+      "success": false
+    },
+    {
+      "saleNumber": 272,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:48:56.734Z",
+      "success": false
+    },
+    {
+      "saleNumber": 273,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:49:08.742Z",
+      "success": false
+    },
+    {
+      "saleNumber": 274,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:49:20.743Z",
+      "success": false
+    },
+    {
+      "saleNumber": 275,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:49:32.757Z",
+      "success": false
+    },
+    {
+      "saleNumber": 276,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:49:44.760Z",
+      "success": false
+    },
+    {
+      "saleNumber": 278,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:50:08.780Z",
+      "success": false
+    },
+    {
+      "saleNumber": 279,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:50:20.787Z",
+      "success": false
+    },
+    {
+      "saleNumber": 280,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:50:32.797Z",
+      "success": false
+    },
+    {
+      "saleNumber": 281,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:50:44.806Z",
+      "success": false
+    },
+    {
+      "saleNumber": 282,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:50:56.809Z",
+      "success": false
+    },
+    {
+      "saleNumber": 283,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:51:08.809Z",
+      "success": false
+    },
+    {
+      "saleNumber": 284,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:51:20.812Z",
+      "success": false
+    },
+    {
+      "saleNumber": 285,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:51:32.826Z",
+      "success": false
+    },
+    {
+      "saleNumber": 286,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:51:44.829Z",
+      "success": false
+    },
+    {
+      "saleNumber": 287,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24\". Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:51:56.829Z",
+      "success": false
+    },
+    {
+      "saleNumber": 288,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:52:08.843Z",
+      "success": false
+    },
+    {
+      "saleNumber": 289,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:52:20.848Z",
+      "success": false
+    },
+    {
+      "saleNumber": 291,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:52:44.871Z",
+      "success": false
+    },
+    {
+      "saleNumber": 292,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:52:56.884Z",
+      "success": false
+    },
+    {
+      "saleNumber": 293,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:53:08.899Z",
+      "success": false
+    },
+    {
+      "saleNumber": 294,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:53:20.903Z",
+      "success": false
+    },
+    {
+      "saleNumber": 295,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Audífonos Bluetooth. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:53:32.907Z",
+      "success": false
+    },
+    {
+      "saleNumber": 296,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 1",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:53:44.921Z",
+      "success": false
+    },
+    {
+      "saleNumber": 297,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 1",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:53:56.927Z",
+      "success": false
+    },
+    {
+      "saleNumber": 298,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6\". Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:54:08.941Z",
+      "success": false
+    },
+    {
+      "saleNumber": 299,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Disco Duro 1TB. Cantidad solicitada: 2",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:54:20.944Z",
+      "success": false
+    },
+    {
+      "saleNumber": 300,
+      "error": "Error procesando la venta: Stock insuficiente para el producto Memoria RAM 8GB. Cantidad solicitada: 2",
+      "responseTime": 5,
+      "timestamp": "2025-10-20T18:54:32.949Z",
+      "success": false
+    }
+  ],
   "salesData": [
     {
       "saleNumber": 1,
-      "numero_factura": "FAC-1760280554779",
-      "total": 2700,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 34,
-      "timestamp": "2025-10-12T14:49:14.788Z",
+      "numero_factura": "FAC-1760982882774",
+      "total": 739.94,
+      "items": 3,
+      "paymentMethod": "credito",
+      "responseTime": 28,
+      "timestamp": "2025-10-20T17:54:42.781Z",
       "success": true
     },
     {
       "saleNumber": 2,
-      "numero_factura": "FAC-1760280566771",
-      "total": 2340,
+      "numero_factura": "FAC-1760982894772",
+      "total": 2094.965,
       "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 14,
-      "timestamp": "2025-10-12T14:49:26.779Z",
+      "paymentMethod": "efectivo",
+      "responseTime": 10,
+      "timestamp": "2025-10-20T17:54:54.777Z",
       "success": true
     },
     {
       "saleNumber": 3,
-      "numero_factura": "FAC-1760280578770",
-      "total": 1800,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:49:38.777Z",
+      "numero_factura": "FAC-1760982906778",
+      "total": 302.4825,
+      "items": 2,
+      "paymentMethod": "efectivo",
+      "responseTime": 9,
+      "timestamp": "2025-10-20T17:55:06.783Z",
       "success": true
     },
     {
       "saleNumber": 4,
-      "numero_factura": "FAC-1760280590785",
-      "total": 1850,
-      "items": 2,
+      "numero_factura": "FAC-1760982918790",
+      "total": 229.96999999999997,
+      "items": 3,
       "paymentMethod": "debito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T14:49:50.793Z",
+      "responseTime": 31,
+      "timestamp": "2025-10-20T17:55:18.818Z",
       "success": true
     },
     {
       "saleNumber": 5,
-      "numero_factura": "FAC-1760280602798",
-      "total": 5600,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:50:02.805Z",
+      "numero_factura": "FAC-1760982930791",
+      "total": 89.99,
+      "items": 1,
+      "paymentMethod": "debito",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:55:30.796Z",
       "success": true
     },
     {
       "saleNumber": 6,
-      "numero_factura": "FAC-1760280614804",
-      "total": 9500,
+      "numero_factura": "FAC-1760982942796",
+      "total": 299.95,
       "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:50:14.811Z",
+      "paymentMethod": "credito",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:55:42.801Z",
       "success": true
     },
     {
       "saleNumber": 7,
-      "numero_factura": "FAC-1760280626809",
-      "total": 600,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:50:26.814Z",
+      "numero_factura": "FAC-1760982954802",
+      "total": 1942.4625,
+      "items": 3,
+      "paymentMethod": "credito",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:55:54.807Z",
       "success": true
     },
     {
       "saleNumber": 8,
-      "numero_factura": "FAC-1760280638824",
-      "total": 1250,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T14:50:38.830Z",
+      "numero_factura": "FAC-1760982966807",
+      "total": 1829.975,
+      "items": 2,
+      "paymentMethod": "transferencia",
+      "responseTime": 10,
+      "timestamp": "2025-10-20T17:56:06.812Z",
       "success": true
     },
     {
       "saleNumber": 9,
-      "numero_factura": "FAC-1760280650825",
-      "total": 1300,
+      "numero_factura": "FAC-1760982978818",
+      "total": 159.98,
       "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:50:50.830Z",
+      "paymentMethod": "credito",
+      "responseTime": 9,
+      "timestamp": "2025-10-20T17:56:18.823Z",
       "success": true
     },
     {
       "saleNumber": 10,
-      "numero_factura": "FAC-1760280662834",
-      "total": 4350,
-      "items": 2,
+      "numero_factura": "FAC-1760982990823",
+      "total": 389.96000000000004,
+      "items": 3,
       "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:51:02.838Z",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:56:30.827Z",
       "success": true
     },
     {
       "saleNumber": 11,
-      "numero_factura": "FAC-1760280674838",
-      "total": 1900,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:51:14.842Z",
+      "numero_factura": "FAC-1760983002835",
+      "total": 319.975,
+      "items": 3,
+      "paymentMethod": "debito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:56:42.839Z",
       "success": true
     },
     {
       "saleNumber": 12,
-      "numero_factura": "FAC-1760280686842",
-      "total": 1500,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:51:26.847Z",
+      "numero_factura": "FAC-1760983014839",
+      "total": 1882.4675,
+      "items": 3,
+      "paymentMethod": "transferencia",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:56:54.843Z",
       "success": true
     },
     {
       "saleNumber": 13,
-      "numero_factura": "FAC-1760280698854",
-      "total": 1600,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 12,
-      "timestamp": "2025-10-12T14:51:38.858Z",
+      "numero_factura": "FAC-1760983026848",
+      "total": 899.99,
+      "items": 1,
+      "paymentMethod": "transferencia",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:57:06.852Z",
       "success": true
     },
     {
       "saleNumber": 14,
-      "numero_factura": "FAC-1760280710864",
-      "total": 3600,
+      "numero_factura": "FAC-1760983038859",
+      "total": 159.98,
       "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:51:50.869Z",
+      "paymentMethod": "transferencia",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T17:57:18.862Z",
       "success": true
     },
     {
       "saleNumber": 15,
-      "numero_factura": "FAC-1760280722867",
-      "total": 4250,
+      "numero_factura": "FAC-1760983050860",
+      "total": 109.985,
       "items": 2,
       "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:52:02.871Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:57:30.864Z",
       "success": true
     },
     {
       "saleNumber": 16,
-      "numero_factura": "FAC-1760280734871",
-      "total": 810,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:52:14.877Z",
+      "numero_factura": "FAC-1760983062874",
+      "total": 244.95499999999998,
+      "items": 3,
+      "paymentMethod": "efectivo",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:57:42.879Z",
       "success": true
     },
     {
       "saleNumber": 17,
-      "numero_factura": "FAC-1760280746873",
-      "total": 3800,
+      "numero_factura": "FAC-1760983074878",
+      "total": 959.98,
       "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:52:26.878Z",
+      "paymentMethod": "debito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:57:54.882Z",
       "success": true
     },
     {
       "saleNumber": 18,
-      "numero_factura": "FAC-1760280758876",
-      "total": 300,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:52:38.881Z",
+      "numero_factura": "FAC-1760983086880",
+      "total": 244.96499999999997,
+      "items": 3,
+      "paymentMethod": "debito",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:58:06.886Z",
       "success": true
     },
     {
       "saleNumber": 19,
-      "numero_factura": "FAC-1760280770882",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "debito",
+      "numero_factura": "FAC-1760983098887",
+      "total": 239.95999999999998,
+      "items": 2,
+      "paymentMethod": "transferencia",
       "responseTime": 8,
-      "timestamp": "2025-10-12T14:52:50.886Z",
+      "timestamp": "2025-10-20T17:58:18.892Z",
       "success": true
     },
     {
       "saleNumber": 20,
-      "numero_factura": "FAC-1760280782894",
-      "total": 5700,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:53:02.900Z",
+      "numero_factura": "FAC-1760983110895",
+      "total": 999.97,
+      "items": 2,
+      "paymentMethod": "transferencia",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:58:30.899Z",
       "success": true
     },
     {
       "saleNumber": 21,
-      "numero_factura": "FAC-1760280794896",
-      "total": 8280,
-      "items": 3,
-      "paymentMethod": "debito",
+      "numero_factura": "FAC-1760983122903",
+      "total": 104.985,
+      "items": 2,
+      "paymentMethod": "transferencia",
       "responseTime": 9,
-      "timestamp": "2025-10-12T14:53:14.902Z",
+      "timestamp": "2025-10-20T17:58:42.907Z",
       "success": true
     },
     {
       "saleNumber": 22,
-      "numero_factura": "FAC-1760280806900",
-      "total": 1600,
+      "numero_factura": "FAC-1760983134908",
+      "total": 59.99,
       "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:53:26.905Z",
+      "paymentMethod": "transferencia",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:58:54.912Z",
       "success": true
     },
     {
       "saleNumber": 23,
-      "numero_factura": "FAC-1760280818907",
-      "total": 650,
-      "items": 1,
+      "numero_factura": "FAC-1760983146909",
+      "total": 202.4725,
+      "items": 3,
       "paymentMethod": "debito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:53:38.912Z",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T17:59:06.914Z",
       "success": true
     },
     {
       "saleNumber": 24,
-      "numero_factura": "FAC-1760280830914",
-      "total": 850,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:53:50.919Z",
+      "numero_factura": "FAC-1760983158922",
+      "total": 559.97,
+      "items": 2,
+      "paymentMethod": "efectivo",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:59:18.926Z",
       "success": true
     },
     {
       "saleNumber": 25,
-      "numero_factura": "FAC-1760280842922",
-      "total": 2550,
-      "items": 3,
+      "numero_factura": "FAC-1760983170924",
+      "total": 159.98,
+      "items": 1,
       "paymentMethod": "debito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:54:02.928Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:59:30.928Z",
       "success": true
     },
     {
       "saleNumber": 26,
-      "numero_factura": "FAC-1760280854926",
-      "total": 2450,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:54:14.931Z",
+      "numero_factura": "FAC-1760983182936",
+      "total": 49.99,
+      "items": 1,
+      "paymentMethod": "credito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T17:59:42.939Z",
       "success": true
     },
     {
       "saleNumber": 27,
-      "numero_factura": "FAC-1760280866929",
-      "total": 2200,
-      "items": 1,
-      "paymentMethod": "transferencia",
+      "numero_factura": "FAC-1760983194949",
+      "total": 342.4725,
+      "items": 3,
+      "paymentMethod": "debito",
       "responseTime": 9,
-      "timestamp": "2025-10-12T14:54:26.936Z",
+      "timestamp": "2025-10-20T17:59:54.954Z",
       "success": true
     },
     {
       "saleNumber": 28,
-      "numero_factura": "FAC-1760280878931",
-      "total": 4700,
+      "numero_factura": "FAC-1760983206952",
+      "total": 1889.97,
       "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:54:38.936Z",
+      "paymentMethod": "efectivo",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:00:06.955Z",
       "success": true
     },
     {
       "saleNumber": 29,
-      "numero_factura": "FAC-1760280890940",
-      "total": 4820,
+      "numero_factura": "FAC-1760983218965",
+      "total": 599.96,
       "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:54:50.946Z",
+      "paymentMethod": "credito",
+      "responseTime": 8,
+      "timestamp": "2025-10-20T18:00:18.970Z",
       "success": true
     },
     {
       "saleNumber": 30,
-      "numero_factura": "FAC-1760280902953",
-      "total": 4400,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:55:02.958Z",
-      "success": true
-    },
-    {
-      "saleNumber": 31,
-      "numero_factura": "FAC-1760280914964",
-      "total": 6000,
+      "numero_factura": "FAC-1760983230977",
+      "total": 2389.95,
       "items": 3,
       "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:55:14.970Z",
-      "success": true
-    },
-    {
-      "saleNumber": 32,
-      "numero_factura": "FAC-1760280926976",
-      "total": 2500,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:55:26.981Z",
-      "success": true
-    },
-    {
-      "saleNumber": 33,
-      "numero_factura": "FAC-1760280938983",
-      "total": 7500,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:55:38.989Z",
-      "success": true
-    },
-    {
-      "saleNumber": 34,
-      "numero_factura": "FAC-1760280950991",
-      "total": 2500,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:55:50.997Z",
-      "success": true
-    },
-    {
-      "saleNumber": 35,
-      "numero_factura": "FAC-1760280963007",
-      "total": 3500,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:56:03.012Z",
-      "success": true
-    },
-    {
-      "saleNumber": 36,
-      "numero_factura": "FAC-1760280975019",
-      "total": 5380,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:56:15.025Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:00:30.982Z",
       "success": true
     },
     {
       "saleNumber": 37,
-      "numero_factura": "FAC-1760280987034",
-      "total": 2800,
+      "numero_factura": "FAC-1760983315031",
+      "total": 159.98,
       "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:56:27.039Z",
-      "success": true
-    },
-    {
-      "saleNumber": 38,
-      "numero_factura": "FAC-1760280999038",
-      "total": 3250,
-      "items": 3,
       "paymentMethod": "transferencia",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:56:39.044Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:01:55.034Z",
       "success": true
     },
     {
       "saleNumber": 39,
-      "numero_factura": "FAC-1760281011045",
-      "total": 1200,
+      "numero_factura": "FAC-1760983339044",
+      "total": 79.98,
       "items": 1,
       "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:56:51.049Z",
-      "success": true
-    },
-    {
-      "saleNumber": 40,
-      "numero_factura": "FAC-1760281023050",
-      "total": 2400,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:57:03.055Z",
-      "success": true
-    },
-    {
-      "saleNumber": 41,
-      "numero_factura": "FAC-1760281035059",
-      "total": 10250,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:57:15.064Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:02:19.047Z",
       "success": true
     },
     {
       "saleNumber": 42,
-      "numero_factura": "FAC-1760281047064",
-      "total": 4100,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:57:27.069Z",
-      "success": true
-    },
-    {
-      "saleNumber": 43,
-      "numero_factura": "FAC-1760281059075",
-      "total": 650,
+      "numero_factura": "FAC-1760983375069",
+      "total": 899.99,
       "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:57:39.080Z",
-      "success": true
-    },
-    {
-      "saleNumber": 44,
-      "numero_factura": "FAC-1760281071082",
-      "total": 2150,
-      "items": 2,
       "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:57:51.087Z",
-      "success": true
-    },
-    {
-      "saleNumber": 45,
-      "numero_factura": "FAC-1760281083087",
-      "total": 8800,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T14:58:03.094Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:02:55.072Z",
       "success": true
     },
     {
       "saleNumber": 46,
-      "numero_factura": "FAC-1760281095096",
-      "total": 5600,
+      "numero_factura": "FAC-1760983423089",
+      "total": 1799.98,
       "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:58:15.100Z",
+      "paymentMethod": "efectivo",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:03:43.094Z",
       "success": true
     },
     {
       "saleNumber": 47,
-      "numero_factura": "FAC-1760281107098",
-      "total": 5800,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:58:27.104Z",
+      "numero_factura": "FAC-1760983435093",
+      "total": 129.98,
+      "items": 2,
+      "paymentMethod": "transferencia",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:03:55.098Z",
       "success": true
     },
     {
       "saleNumber": 48,
-      "numero_factura": "FAC-1760281119103",
-      "total": 1500,
+      "numero_factura": "FAC-1760983447104",
+      "total": 39.99,
       "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:58:39.108Z",
+      "paymentMethod": "transferencia",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:04:07.108Z",
       "success": true
     },
     {
       "saleNumber": 49,
-      "numero_factura": "FAC-1760281131107",
-      "total": 3700,
-      "items": 1,
+      "numero_factura": "FAC-1760983459117",
+      "total": 1969.96,
+      "items": 3,
       "paymentMethod": "credito",
       "responseTime": 8,
-      "timestamp": "2025-10-12T14:58:51.112Z",
+      "timestamp": "2025-10-20T18:04:19.123Z",
       "success": true
     },
     {
       "saleNumber": 50,
-      "numero_factura": "FAC-1760281143115",
-      "total": 1000,
+      "numero_factura": "FAC-1760983471120",
+      "total": 1799.98,
       "items": 1,
       "paymentMethod": "transferencia",
       "responseTime": 7,
-      "timestamp": "2025-10-12T14:59:03.119Z",
-      "success": true
-    },
-    {
-      "saleNumber": 51,
-      "numero_factura": "FAC-1760281155121",
-      "total": 3050,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:59:15.127Z",
-      "success": true
-    },
-    {
-      "saleNumber": 52,
-      "numero_factura": "FAC-1760281167127",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:59:27.132Z",
+      "timestamp": "2025-10-20T18:04:31.124Z",
       "success": true
     },
     {
       "saleNumber": 53,
-      "numero_factura": "FAC-1760281179142",
-      "total": 4300,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T14:59:39.149Z",
-      "success": true
-    },
-    {
-      "saleNumber": 54,
-      "numero_factura": "FAC-1760281191145",
-      "total": 4800,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T14:59:51.151Z",
+      "numero_factura": "FAC-1760983507130",
+      "total": 289.98,
+      "items": 2,
+      "paymentMethod": "debito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:05:07.134Z",
       "success": true
     },
     {
       "saleNumber": 55,
-      "numero_factura": "FAC-1760281203149",
-      "total": 750,
+      "numero_factura": "FAC-1760983531145",
+      "total": 89.99,
       "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:00:03.154Z",
+      "paymentMethod": "credito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:05:31.149Z",
       "success": true
     },
     {
       "saleNumber": 56,
-      "numero_factura": "FAC-1760281215164",
-      "total": 3400,
+      "numero_factura": "FAC-1760983543147",
+      "total": 169.98,
       "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:00:15.169Z",
-      "success": true
-    },
-    {
-      "saleNumber": 57,
-      "numero_factura": "FAC-1760281227173",
-      "total": 2600,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 14,
-      "timestamp": "2025-10-12T15:00:27.178Z",
-      "success": true
-    },
-    {
-      "saleNumber": 58,
-      "numero_factura": "FAC-1760281239170",
-      "total": 7000,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 12,
-      "timestamp": "2025-10-12T15:00:39.179Z",
-      "success": true
-    },
-    {
-      "saleNumber": 59,
-      "numero_factura": "FAC-1760281251181",
-      "total": 900,
-      "items": 1,
-      "paymentMethod": "transferencia",
+      "paymentMethod": "credito",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:00:51.185Z",
-      "success": true
-    },
-    {
-      "saleNumber": 60,
-      "numero_factura": "FAC-1760281263191",
-      "total": 3900,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:01:03.196Z",
+      "timestamp": "2025-10-20T18:05:43.151Z",
       "success": true
     },
     {
       "saleNumber": 61,
-      "numero_factura": "FAC-1760281275201",
-      "total": 3200,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:01:15.206Z",
-      "success": true
-    },
-    {
-      "saleNumber": 62,
-      "numero_factura": "FAC-1760281287203",
-      "total": 8060,
+      "numero_factura": "FAC-1760983603166",
+      "total": 1969.96,
       "items": 3,
-      "paymentMethod": "debito",
+      "paymentMethod": "transferencia",
       "responseTime": 8,
-      "timestamp": "2025-10-12T15:01:27.208Z",
+      "timestamp": "2025-10-20T18:06:43.171Z",
       "success": true
     },
     {
       "saleNumber": 63,
-      "numero_factura": "FAC-1760281299211",
-      "total": 4000,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:01:39.216Z",
-      "success": true
-    },
-    {
-      "saleNumber": 64,
-      "numero_factura": "FAC-1760281311216",
-      "total": 450,
+      "numero_factura": "FAC-1760983627178",
+      "total": 39.99,
       "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:01:51.221Z",
-      "success": true
-    },
-    {
-      "saleNumber": 65,
-      "numero_factura": "FAC-1760281323229",
-      "total": 4800,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:02:03.233Z",
-      "success": true
-    },
-    {
-      "saleNumber": 66,
-      "numero_factura": "FAC-1760281335233",
-      "total": 3900,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:02:15.237Z",
+      "paymentMethod": "debito",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:07:07.182Z",
       "success": true
     },
     {
       "saleNumber": 67,
-      "numero_factura": "FAC-1760281347243",
-      "total": 2100,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:02:27.248Z",
-      "success": true
-    },
-    {
-      "saleNumber": 68,
-      "numero_factura": "FAC-1760281359249",
-      "total": 7100,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:02:39.255Z",
-      "success": true
-    },
-    {
-      "saleNumber": 69,
-      "numero_factura": "FAC-1760281371259",
-      "total": 1600,
+      "numero_factura": "FAC-1760983675222",
+      "total": 89.99,
       "items": 1,
-      "paymentMethod": "debito",
+      "paymentMethod": "transferencia",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:02:51.263Z",
-      "success": true
-    },
-    {
-      "saleNumber": 70,
-      "numero_factura": "FAC-1760281383270",
-      "total": 12000,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:03:03.275Z",
-      "success": true
-    },
-    {
-      "saleNumber": 71,
-      "numero_factura": "FAC-1760281395272",
-      "total": 4500,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:03:15.276Z",
-      "success": true
-    },
-    {
-      "saleNumber": 72,
-      "numero_factura": "FAC-1760281407281",
-      "total": 4200,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:03:27.285Z",
-      "success": true
-    },
-    {
-      "saleNumber": 73,
-      "numero_factura": "FAC-1760281419295",
-      "total": 3700,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:03:39.299Z",
-      "success": true
-    },
-    {
-      "saleNumber": 74,
-      "numero_factura": "FAC-1760281431302",
-      "total": 4400,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:03:51.307Z",
+      "timestamp": "2025-10-20T18:07:55.226Z",
       "success": true
     },
     {
       "saleNumber": 75,
-      "numero_factura": "FAC-1760281443302",
-      "total": 8400,
+      "numero_factura": "FAC-1760983771276",
+      "total": 79.99,
       "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:04:03.306Z",
-      "success": true
-    },
-    {
-      "saleNumber": 76,
-      "numero_factura": "FAC-1760281455311",
-      "total": 4600,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:04:15.316Z",
-      "success": true
-    },
-    {
-      "saleNumber": 77,
-      "numero_factura": "FAC-1760281467317",
-      "total": 1600,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:04:27.322Z",
-      "success": true
-    },
-    {
-      "saleNumber": 78,
-      "numero_factura": "FAC-1760281479323",
-      "total": 1500,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:04:39.327Z",
-      "success": true
-    },
-    {
-      "saleNumber": 79,
-      "numero_factura": "FAC-1760281491326",
-      "total": 3100,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:04:51.331Z",
-      "success": true
-    },
-    {
-      "saleNumber": 80,
-      "numero_factura": "FAC-1760281503340",
-      "total": 4100,
-      "items": 2,
       "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:05:03.345Z",
-      "success": true
-    },
-    {
-      "saleNumber": 81,
-      "numero_factura": "FAC-1760281515353",
-      "total": 250,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:05:15.357Z",
-      "success": true
-    },
-    {
-      "saleNumber": 82,
-      "numero_factura": "FAC-1760281527367",
-      "total": 6500,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:05:27.373Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:09:31.280Z",
       "success": true
     },
     {
       "saleNumber": 83,
-      "numero_factura": "FAC-1760281539368",
-      "total": 4400,
+      "numero_factura": "FAC-1760983867317",
+      "total": 84.985,
       "items": 2,
       "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:05:39.373Z",
-      "success": true
-    },
-    {
-      "saleNumber": 84,
-      "numero_factura": "FAC-1760281551378",
-      "total": 6650,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:05:51.383Z",
-      "success": true
-    },
-    {
-      "saleNumber": 85,
-      "numero_factura": "FAC-1760281563384",
-      "total": 7450,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:06:03.389Z",
-      "success": true
-    },
-    {
-      "saleNumber": 86,
-      "numero_factura": "FAC-1760281575383",
-      "total": 6600,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:06:15.388Z",
-      "success": true
-    },
-    {
-      "saleNumber": 87,
-      "numero_factura": "FAC-1760281589200",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 70,
-      "timestamp": "2025-10-12T15:06:29.214Z",
-      "success": true
-    },
-    {
-      "saleNumber": 88,
-      "numero_factura": "FAC-1760281602597",
-      "total": 3300,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 25,
-      "timestamp": "2025-10-12T15:06:42.615Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:11:07.321Z",
       "success": true
     },
     {
       "saleNumber": 89,
-      "numero_factura": "FAC-1760281614602",
-      "total": 950,
+      "numero_factura": "FAC-1760983939357",
+      "total": 79.98,
       "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 12,
-      "timestamp": "2025-10-12T15:06:54.607Z",
-      "success": true
-    },
-    {
-      "saleNumber": 90,
-      "numero_factura": "FAC-1760281626604",
-      "total": 2000,
-      "items": 2,
       "paymentMethod": "credito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:07:06.609Z",
-      "success": true
-    },
-    {
-      "saleNumber": 91,
-      "numero_factura": "FAC-1760281638603",
-      "total": 2350,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:07:18.609Z",
-      "success": true
-    },
-    {
-      "saleNumber": 92,
-      "numero_factura": "FAC-1760281650609",
-      "total": 5300,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:07:30.614Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:12:19.361Z",
       "success": true
     },
     {
       "saleNumber": 93,
-      "numero_factura": "FAC-1760281662623",
-      "total": 700,
+      "numero_factura": "FAC-1760983987379",
+      "total": 39.99,
       "items": 1,
       "paymentMethod": "transferencia",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:07:42.627Z",
+      "timestamp": "2025-10-20T18:13:07.383Z",
       "success": true
     },
     {
       "saleNumber": 94,
-      "numero_factura": "FAC-1760281674627",
-      "total": 4400,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:07:54.633Z",
-      "success": true
-    },
-    {
-      "saleNumber": 95,
-      "numero_factura": "FAC-1760281686643",
-      "total": 5400,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:08:06.646Z",
-      "success": true
-    },
-    {
-      "saleNumber": 96,
-      "numero_factura": "FAC-1760281698647",
-      "total": 1850,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:08:18.651Z",
-      "success": true
-    },
-    {
-      "saleNumber": 97,
-      "numero_factura": "FAC-1760281710653",
-      "total": 3600,
+      "numero_factura": "FAC-1760983999381",
+      "total": 44.995,
       "items": 1,
       "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:08:30.657Z",
-      "success": true
-    },
-    {
-      "saleNumber": 98,
-      "numero_factura": "FAC-1760281722654",
-      "total": 8200,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:08:42.658Z",
-      "success": true
-    },
-    {
-      "saleNumber": 99,
-      "numero_factura": "FAC-1760281734660",
-      "total": 6600,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:08:54.665Z",
-      "success": true
-    },
-    {
-      "saleNumber": 100,
-      "numero_factura": "FAC-1760281746660",
-      "total": 2250,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:09:06.664Z",
-      "success": true
-    },
-    {
-      "saleNumber": 101,
-      "numero_factura": "FAC-1760281758672",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 5,
-      "timestamp": "2025-10-12T15:09:18.677Z",
-      "success": true
-    },
-    {
-      "saleNumber": 102,
-      "numero_factura": "FAC-1760281770681",
-      "total": 2200,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:09:30.686Z",
-      "success": true
-    },
-    {
-      "saleNumber": 103,
-      "numero_factura": "FAC-1760281782696",
-      "total": 4300,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:09:42.700Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:13:19.384Z",
       "success": true
     },
     {
       "saleNumber": 104,
-      "numero_factura": "FAC-1760281794704",
-      "total": 5250,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:09:54.709Z",
-      "success": true
-    },
-    {
-      "saleNumber": 105,
-      "numero_factura": "FAC-1760281806719",
-      "total": 4800,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:10:06.724Z",
-      "success": true
-    },
-    {
-      "saleNumber": 106,
-      "numero_factura": "FAC-1760281818724",
-      "total": 2200,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:10:18.730Z",
-      "success": true
-    },
-    {
-      "saleNumber": 107,
-      "numero_factura": "FAC-1760281830732",
-      "total": 2400,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:10:30.737Z",
-      "success": true
-    },
-    {
-      "saleNumber": 108,
-      "numero_factura": "FAC-1760281842733",
-      "total": 1900,
+      "numero_factura": "FAC-1760984119456",
+      "total": 39.99,
       "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:10:42.737Z",
-      "success": true
-    },
-    {
-      "saleNumber": 109,
-      "numero_factura": "FAC-1760281854742",
-      "total": 9200,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:10:54.748Z",
-      "success": true
-    },
-    {
-      "saleNumber": 110,
-      "numero_factura": "FAC-1760281866741",
-      "total": 7200,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:11:06.746Z",
-      "success": true
-    },
-    {
-      "saleNumber": 111,
-      "numero_factura": "FAC-1760281878744",
-      "total": 13350,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:11:18.750Z",
-      "success": true
-    },
-    {
-      "saleNumber": 112,
-      "numero_factura": "FAC-1760281890760",
-      "total": 1900,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:11:30.765Z",
-      "success": true
-    },
-    {
-      "saleNumber": 113,
-      "numero_factura": "FAC-1760281902767",
-      "total": 5600,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:11:42.771Z",
-      "success": true
-    },
-    {
-      "saleNumber": 114,
-      "numero_factura": "FAC-1760281914777",
-      "total": 650,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:11:54.782Z",
-      "success": true
-    },
-    {
-      "saleNumber": 115,
-      "numero_factura": "FAC-1760281926779",
-      "total": 2400,
-      "items": 2,
       "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:12:06.786Z",
-      "success": true
-    },
-    {
-      "saleNumber": 116,
-      "numero_factura": "FAC-1760281938782",
-      "total": 1800,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:12:18.786Z",
-      "success": true
-    },
-    {
-      "saleNumber": 117,
-      "numero_factura": "FAC-1760281950794",
-      "total": 5300,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:12:30.798Z",
-      "success": true
-    },
-    {
-      "saleNumber": 118,
-      "numero_factura": "FAC-1760281962807",
-      "total": 5400,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:12:42.811Z",
-      "success": true
-    },
-    {
-      "saleNumber": 119,
-      "numero_factura": "FAC-1760281974808",
-      "total": 4800,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:12:54.813Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:15:19.461Z",
       "success": true
     },
     {
       "saleNumber": 120,
-      "numero_factura": "FAC-1760281986809",
-      "total": 6700,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:13:06.813Z",
-      "success": true
-    },
-    {
-      "saleNumber": 121,
-      "numero_factura": "FAC-1760281998823",
-      "total": 1400,
+      "numero_factura": "FAC-1760984311548",
+      "total": 84.985,
       "items": 2,
       "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:13:18.827Z",
-      "success": true
-    },
-    {
-      "saleNumber": 122,
-      "numero_factura": "FAC-1760282010830",
-      "total": 1700,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:13:30.834Z",
+      "responseTime": 7,
+      "timestamp": "2025-10-20T18:18:31.552Z",
       "success": true
     },
     {
       "saleNumber": 123,
-      "numero_factura": "FAC-1760282022834",
-      "total": 4500,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:13:42.838Z",
-      "success": true
-    },
-    {
-      "saleNumber": 124,
-      "numero_factura": "FAC-1760282034840",
-      "total": 350,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:13:54.843Z",
-      "success": true
-    },
-    {
-      "saleNumber": 125,
-      "numero_factura": "FAC-1760282046846",
-      "total": 9600,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:14:06.850Z",
-      "success": true
-    },
-    {
-      "saleNumber": 126,
-      "numero_factura": "FAC-1760282058847",
-      "total": 1300,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:14:18.851Z",
-      "success": true
-    },
-    {
-      "saleNumber": 127,
-      "numero_factura": "FAC-1760282070859",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:14:30.863Z",
-      "success": true
-    },
-    {
-      "saleNumber": 128,
-      "numero_factura": "FAC-1760282082859",
-      "total": 3500,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:14:42.863Z",
-      "success": true
-    },
-    {
-      "saleNumber": 129,
-      "numero_factura": "FAC-1760282094869",
-      "total": 2200,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:14:54.873Z",
-      "success": true
-    },
-    {
-      "saleNumber": 130,
-      "numero_factura": "FAC-1760282106884",
-      "total": 3000,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:15:06.889Z",
-      "success": true
-    },
-    {
-      "saleNumber": 131,
-      "numero_factura": "FAC-1760282118898",
-      "total": 2650,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:15:18.902Z",
-      "success": true
-    },
-    {
-      "saleNumber": 132,
-      "numero_factura": "FAC-1760282130917",
-      "total": 2000,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:15:30.922Z",
-      "success": true
-    },
-    {
-      "saleNumber": 133,
-      "numero_factura": "FAC-1760282142928",
-      "total": 7000,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:15:42.934Z",
-      "success": true
-    },
-    {
-      "saleNumber": 134,
-      "numero_factura": "FAC-1760282154937",
-      "total": 1000,
+      "numero_factura": "FAC-1760984347570",
+      "total": 899.99,
       "items": 1,
       "paymentMethod": "transferencia",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:15:54.941Z",
-      "success": true
-    },
-    {
-      "saleNumber": 135,
-      "numero_factura": "FAC-1760282166943",
-      "total": 1900,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:16:06.947Z",
-      "success": true
-    },
-    {
-      "saleNumber": 136,
-      "numero_factura": "FAC-1760282178952",
-      "total": 6800,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:16:18.957Z",
-      "success": true
-    },
-    {
-      "saleNumber": 137,
-      "numero_factura": "FAC-1760282190964",
-      "total": 4100,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:16:30.969Z",
+      "timestamp": "2025-10-20T18:19:07.573Z",
       "success": true
     },
     {
       "saleNumber": 138,
-      "numero_factura": "FAC-1760282202979",
-      "total": 4450,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:16:42.984Z",
-      "success": true
-    },
-    {
-      "saleNumber": 139,
-      "numero_factura": "FAC-1760282214993",
-      "total": 5600,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:16:54.998Z",
-      "success": true
-    },
-    {
-      "saleNumber": 140,
-      "numero_factura": "FAC-1760282227002",
-      "total": 4350,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:17:07.008Z",
-      "success": true
-    },
-    {
-      "saleNumber": 141,
-      "numero_factura": "FAC-1760282239009",
-      "total": 8400,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:17:19.014Z",
-      "success": true
-    },
-    {
-      "saleNumber": 142,
-      "numero_factura": "FAC-1760282251018",
-      "total": 600,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:17:31.022Z",
-      "success": true
-    },
-    {
-      "saleNumber": 143,
-      "numero_factura": "FAC-1760282263025",
-      "total": 8100,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:17:43.030Z",
-      "success": true
-    },
-    {
-      "saleNumber": 144,
-      "numero_factura": "FAC-1760282275027",
-      "total": 1250,
+      "numero_factura": "FAC-1760984527700",
+      "total": 39.99,
       "items": 1,
       "paymentMethod": "debito",
       "responseTime": 6,
-      "timestamp": "2025-10-12T15:17:55.031Z",
-      "success": true
-    },
-    {
-      "saleNumber": 145,
-      "numero_factura": "FAC-1760282287032",
-      "total": 5700,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:18:07.038Z",
-      "success": true
-    },
-    {
-      "saleNumber": 146,
-      "numero_factura": "FAC-1760282299037",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:18:19.041Z",
-      "success": true
-    },
-    {
-      "saleNumber": 147,
-      "numero_factura": "FAC-1760282311047",
-      "total": 1550,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:18:31.052Z",
-      "success": true
-    },
-    {
-      "saleNumber": 148,
-      "numero_factura": "FAC-1760282323049",
-      "total": 4300,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:18:43.053Z",
-      "success": true
-    },
-    {
-      "saleNumber": 149,
-      "numero_factura": "FAC-1760282335054",
-      "total": 4750,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:18:55.060Z",
-      "success": true
-    },
-    {
-      "saleNumber": 150,
-      "numero_factura": "FAC-1760282347066",
-      "total": 3550,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:19:07.071Z",
-      "success": true
-    },
-    {
-      "saleNumber": 151,
-      "numero_factura": "FAC-1760282359069",
-      "total": 4700,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:19:19.074Z",
-      "success": true
-    },
-    {
-      "saleNumber": 152,
-      "numero_factura": "FAC-1760282371075",
-      "total": 3400,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:19:31.080Z",
-      "success": true
-    },
-    {
-      "saleNumber": 153,
-      "numero_factura": "FAC-1760282383085",
-      "total": 6150,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:19:43.094Z",
-      "success": true
-    },
-    {
-      "saleNumber": 154,
-      "numero_factura": "FAC-1760282395093",
-      "total": 10600,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:19:55.097Z",
-      "success": true
-    },
-    {
-      "saleNumber": 155,
-      "numero_factura": "FAC-1760282407099",
-      "total": 650,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:20:07.102Z",
-      "success": true
-    },
-    {
-      "saleNumber": 156,
-      "numero_factura": "FAC-1760282419099",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:20:19.104Z",
-      "success": true
-    },
-    {
-      "saleNumber": 157,
-      "numero_factura": "FAC-1760282431108",
-      "total": 3200,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:20:31.113Z",
-      "success": true
-    },
-    {
-      "saleNumber": 158,
-      "numero_factura": "FAC-1760282443106",
-      "total": 9000,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:20:43.112Z",
-      "success": true
-    },
-    {
-      "saleNumber": 159,
-      "numero_factura": "FAC-1760282455113",
-      "total": 2600,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:20:55.119Z",
-      "success": true
-    },
-    {
-      "saleNumber": 160,
-      "numero_factura": "FAC-1760282467124",
-      "total": 4500,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:21:07.130Z",
-      "success": true
-    },
-    {
-      "saleNumber": 161,
-      "numero_factura": "FAC-1760282479128",
-      "total": 1600,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:21:19.132Z",
-      "success": true
-    },
-    {
-      "saleNumber": 162,
-      "numero_factura": "FAC-1760282491129",
-      "total": 10600,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:21:31.135Z",
-      "success": true
-    },
-    {
-      "saleNumber": 163,
-      "numero_factura": "FAC-1760282503162",
-      "total": 2500,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 25,
-      "timestamp": "2025-10-12T15:21:43.168Z",
-      "success": true
-    },
-    {
-      "saleNumber": 164,
-      "numero_factura": "FAC-1760282515159",
-      "total": 7350,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:21:55.166Z",
-      "success": true
-    },
-    {
-      "saleNumber": 165,
-      "numero_factura": "FAC-1760282527175",
-      "total": 1800,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:22:07.179Z",
-      "success": true
-    },
-    {
-      "saleNumber": 166,
-      "numero_factura": "FAC-1760282539181",
-      "total": 9000,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:22:19.184Z",
-      "success": true
-    },
-    {
-      "saleNumber": 167,
-      "numero_factura": "FAC-1760282551196",
-      "total": 7000,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:22:31.201Z",
+      "timestamp": "2025-10-20T18:22:07.704Z",
       "success": true
     },
     {
       "saleNumber": 168,
-      "numero_factura": "FAC-1760282563202",
-      "total": 12550,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:22:43.206Z",
-      "success": true
-    },
-    {
-      "saleNumber": 169,
-      "numero_factura": "FAC-1760282575214",
-      "total": 7350,
-      "items": 3,
+      "numero_factura": "FAC-1760984887901",
+      "total": 79.98,
+      "items": 1,
       "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:22:55.218Z",
-      "success": true
-    },
-    {
-      "saleNumber": 170,
-      "numero_factura": "FAC-1760282587224",
-      "total": 20,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:23:07.228Z",
-      "success": true
-    },
-    {
-      "saleNumber": 171,
-      "numero_factura": "FAC-1760282599226",
-      "total": 1340,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:23:19.230Z",
-      "success": true
-    },
-    {
-      "saleNumber": 172,
-      "numero_factura": "FAC-1760282611240",
-      "total": 1100,
-      "items": 1,
-      "paymentMethod": "transferencia",
       "responseTime": 6,
-      "timestamp": "2025-10-12T15:23:31.243Z",
-      "success": true
-    },
-    {
-      "saleNumber": 173,
-      "numero_factura": "FAC-1760282623255",
-      "total": 2400,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:23:43.258Z",
-      "success": true
-    },
-    {
-      "saleNumber": 174,
-      "numero_factura": "FAC-1760282635259",
-      "total": 4800,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:23:55.263Z",
-      "success": true
-    },
-    {
-      "saleNumber": 175,
-      "numero_factura": "FAC-1760282647269",
-      "total": 4400,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:24:07.274Z",
-      "success": true
-    },
-    {
-      "saleNumber": 176,
-      "numero_factura": "FAC-1760282659271",
-      "total": 10800,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:24:19.276Z",
-      "success": true
-    },
-    {
-      "saleNumber": 177,
-      "numero_factura": "FAC-1760282671285",
-      "total": 3350,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 16,
-      "timestamp": "2025-10-12T15:24:31.290Z",
-      "success": true
-    },
-    {
-      "saleNumber": 178,
-      "numero_factura": "FAC-1760282683286",
-      "total": 3900,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 12,
-      "timestamp": "2025-10-12T15:24:43.294Z",
-      "success": true
-    },
-    {
-      "saleNumber": 179,
-      "numero_factura": "FAC-1760282695294",
-      "total": 1300,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:24:55.298Z",
-      "success": true
-    },
-    {
-      "saleNumber": 180,
-      "numero_factura": "FAC-1760282707302",
-      "total": 3400,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:25:07.307Z",
-      "success": true
-    },
-    {
-      "saleNumber": 181,
-      "numero_factura": "FAC-1760282719305",
-      "total": 4200,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:25:19.310Z",
-      "success": true
-    },
-    {
-      "saleNumber": 182,
-      "numero_factura": "FAC-1760282731314",
-      "total": 2000,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:25:31.318Z",
-      "success": true
-    },
-    {
-      "saleNumber": 183,
-      "numero_factura": "FAC-1760282743324",
-      "total": 4000,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:25:43.329Z",
+      "timestamp": "2025-10-20T18:28:07.905Z",
       "success": true
     },
     {
       "saleNumber": 184,
-      "numero_factura": "FAC-1760282755325",
-      "total": 3600,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:25:55.330Z",
-      "success": true
-    },
-    {
-      "saleNumber": 185,
-      "numero_factura": "FAC-1760282767340",
-      "total": 950,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:26:07.344Z",
-      "success": true
-    },
-    {
-      "saleNumber": 186,
-      "numero_factura": "FAC-1760282779343",
-      "total": 7350,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:26:19.348Z",
-      "success": true
-    },
-    {
-      "saleNumber": 187,
-      "numero_factura": "FAC-1760282791347",
-      "total": 5400,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:26:31.351Z",
-      "success": true
-    },
-    {
-      "saleNumber": 188,
-      "numero_factura": "FAC-1760282803367",
-      "total": 6400,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 25,
-      "timestamp": "2025-10-12T15:26:43.371Z",
-      "success": true
-    },
-    {
-      "saleNumber": 189,
-      "numero_factura": "FAC-1760282815364",
-      "total": 6100,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:26:55.368Z",
-      "success": true
-    },
-    {
-      "saleNumber": 190,
-      "numero_factura": "FAC-1760282827374",
-      "total": 3000,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:27:07.378Z",
-      "success": true
-    },
-    {
-      "saleNumber": 191,
-      "numero_factura": "FAC-1760282839375",
-      "total": 1600,
+      "numero_factura": "FAC-1760985080060",
+      "total": 39.99,
       "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:27:19.379Z",
-      "success": true
-    },
-    {
-      "saleNumber": 192,
-      "numero_factura": "FAC-1760282851382",
-      "total": 9250,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:27:31.388Z",
-      "success": true
-    },
-    {
-      "saleNumber": 193,
-      "numero_factura": "FAC-1760282863394",
-      "total": 5600,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:27:43.399Z",
-      "success": true
-    },
-    {
-      "saleNumber": 194,
-      "numero_factura": "FAC-1760282875405",
-      "total": 3600,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 6,
-      "timestamp": "2025-10-12T15:27:55.409Z",
-      "success": true
-    },
-    {
-      "saleNumber": 195,
-      "numero_factura": "FAC-1760282887413",
-      "total": 1400,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:28:07.418Z",
-      "success": true
-    },
-    {
-      "saleNumber": 196,
-      "numero_factura": "FAC-1760282899426",
-      "total": 5000,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:28:19.430Z",
-      "success": true
-    },
-    {
-      "saleNumber": 197,
-      "numero_factura": "FAC-1760282911439",
-      "total": 1400,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:28:31.443Z",
-      "success": true
-    },
-    {
-      "saleNumber": 198,
-      "numero_factura": "FAC-1760282923452",
-      "total": 4400,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:28:43.457Z",
-      "success": true
-    },
-    {
-      "saleNumber": 199,
-      "numero_factura": "FAC-1760282935464",
-      "total": 2500,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:28:55.468Z",
-      "success": true
-    },
-    {
-      "saleNumber": 200,
-      "numero_factura": "FAC-1760282947463",
-      "total": 2900,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:29:07.468Z",
-      "success": true
-    },
-    {
-      "saleNumber": 201,
-      "numero_factura": "FAC-1760282959467",
-      "total": 4200,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:29:19.472Z",
-      "success": true
-    },
-    {
-      "saleNumber": 202,
-      "numero_factura": "FAC-1760282971470",
-      "total": 2950,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:29:31.474Z",
-      "success": true
-    },
-    {
-      "saleNumber": 203,
-      "numero_factura": "FAC-1760282983479",
-      "total": 10500,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:29:43.485Z",
-      "success": true
-    },
-    {
-      "saleNumber": 204,
-      "numero_factura": "FAC-1760282995482",
-      "total": 3250,
-      "items": 2,
       "paymentMethod": "efectivo",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:29:55.486Z",
-      "success": true
-    },
-    {
-      "saleNumber": 205,
-      "numero_factura": "FAC-1760283007497",
-      "total": 500,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:30:07.502Z",
-      "success": true
-    },
-    {
-      "saleNumber": 206,
-      "numero_factura": "FAC-1760283019500",
-      "total": 700,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:30:19.505Z",
-      "success": true
-    },
-    {
-      "saleNumber": 207,
-      "numero_factura": "FAC-1760283031505",
-      "total": 4400,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:30:31.509Z",
-      "success": true
-    },
-    {
-      "saleNumber": 208,
-      "numero_factura": "FAC-1760283043516",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:30:43.520Z",
-      "success": true
-    },
-    {
-      "saleNumber": 209,
-      "numero_factura": "FAC-1760283055527",
-      "total": 3600,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:30:55.532Z",
-      "success": true
-    },
-    {
-      "saleNumber": 210,
-      "numero_factura": "FAC-1760283067535",
-      "total": 5100,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:31:07.540Z",
-      "success": true
-    },
-    {
-      "saleNumber": 211,
-      "numero_factura": "FAC-1760283079545",
-      "total": 4300,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:31:19.549Z",
-      "success": true
-    },
-    {
-      "saleNumber": 212,
-      "numero_factura": "FAC-1760283091546",
-      "total": 7800,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:31:31.552Z",
-      "success": true
-    },
-    {
-      "saleNumber": 213,
-      "numero_factura": "FAC-1760283103558",
-      "total": 5000,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:31:43.564Z",
-      "success": true
-    },
-    {
-      "saleNumber": 214,
-      "numero_factura": "FAC-1760283115569",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:31:55.575Z",
-      "success": true
-    },
-    {
-      "saleNumber": 215,
-      "numero_factura": "FAC-1760283127573",
-      "total": 9200,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:32:07.578Z",
-      "success": true
-    },
-    {
-      "saleNumber": 216,
-      "numero_factura": "FAC-1760283139587",
-      "total": 6650,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:32:19.591Z",
-      "success": true
-    },
-    {
-      "saleNumber": 217,
-      "numero_factura": "FAC-1760283151598",
-      "total": 5400,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:32:31.604Z",
-      "success": true
-    },
-    {
-      "saleNumber": 218,
-      "numero_factura": "FAC-1760283163605",
-      "total": 2800,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:32:43.610Z",
-      "success": true
-    },
-    {
-      "saleNumber": 219,
-      "numero_factura": "FAC-1760283175606",
-      "total": 4000,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:32:55.610Z",
-      "success": true
-    },
-    {
-      "saleNumber": 220,
-      "numero_factura": "FAC-1760283187618",
-      "total": 1880,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:33:07.623Z",
-      "success": true
-    },
-    {
-      "saleNumber": 221,
-      "numero_factura": "FAC-1760283199621",
-      "total": 2200,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:33:19.627Z",
-      "success": true
-    },
-    {
-      "saleNumber": 222,
-      "numero_factura": "FAC-1760283211634",
-      "total": 2400,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:33:31.639Z",
+      "timestamp": "2025-10-20T18:31:20.064Z",
       "success": true
     },
     {
       "saleNumber": 223,
-      "numero_factura": "FAC-1760283223636",
-      "total": 900,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:33:43.641Z",
-      "success": true
-    },
-    {
-      "saleNumber": 224,
-      "numero_factura": "FAC-1760283235647",
-      "total": 4200,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:33:55.651Z",
-      "success": true
-    },
-    {
-      "saleNumber": 225,
-      "numero_factura": "FAC-1760283247654",
-      "total": 8700,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:34:07.660Z",
-      "success": true
-    },
-    {
-      "saleNumber": 226,
-      "numero_factura": "FAC-1760283259659",
-      "total": 2200,
+      "numero_factura": "FAC-1760985548372",
+      "total": 39.99,
       "items": 1,
       "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:34:19.663Z",
-      "success": true
-    },
-    {
-      "saleNumber": 227,
-      "numero_factura": "FAC-1760283271670",
-      "total": 1100,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:34:31.674Z",
-      "success": true
-    },
-    {
-      "saleNumber": 228,
-      "numero_factura": "FAC-1760283283677",
-      "total": 4050,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:34:43.682Z",
-      "success": true
-    },
-    {
-      "saleNumber": 229,
-      "numero_factura": "FAC-1760283295690",
-      "total": 1000,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:34:55.694Z",
-      "success": true
-    },
-    {
-      "saleNumber": 230,
-      "numero_factura": "FAC-1760283307704",
-      "total": 7400,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:35:07.709Z",
-      "success": true
-    },
-    {
-      "saleNumber": 231,
-      "numero_factura": "FAC-1760283319709",
-      "total": 2800,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:35:19.714Z",
-      "success": true
-    },
-    {
-      "saleNumber": 232,
-      "numero_factura": "FAC-1760283331712",
-      "total": 2300,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:35:31.717Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:39:08.376Z",
       "success": true
     },
     {
       "saleNumber": 233,
-      "numero_factura": "FAC-1760283343713",
-      "total": 6150,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:35:43.718Z",
-      "success": true
-    },
-    {
-      "saleNumber": 234,
-      "numero_factura": "FAC-1760283355721",
-      "total": 3100,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:35:55.726Z",
-      "success": true
-    },
-    {
-      "saleNumber": 235,
-      "numero_factura": "FAC-1760283367724",
-      "total": 10800,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:36:07.730Z",
-      "success": true
-    },
-    {
-      "saleNumber": 236,
-      "numero_factura": "FAC-1760283379729",
-      "total": 7200,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:36:19.734Z",
-      "success": true
-    },
-    {
-      "saleNumber": 237,
-      "numero_factura": "FAC-1760283391740",
-      "total": 6100,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:36:31.747Z",
-      "success": true
-    },
-    {
-      "saleNumber": 238,
-      "numero_factura": "FAC-1760283403753",
-      "total": 3950,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:36:43.758Z",
-      "success": true
-    },
-    {
-      "saleNumber": 239,
-      "numero_factura": "FAC-1760283415757",
-      "total": 1400,
+      "numero_factura": "FAC-1760985668458",
+      "total": 39.99,
       "items": 1,
       "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:36:55.762Z",
-      "success": true
-    },
-    {
-      "saleNumber": 240,
-      "numero_factura": "FAC-1760283427769",
-      "total": 1500,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:37:07.774Z",
-      "success": true
-    },
-    {
-      "saleNumber": 241,
-      "numero_factura": "FAC-1760283439775",
-      "total": 1600,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:37:19.780Z",
-      "success": true
-    },
-    {
-      "saleNumber": 242,
-      "numero_factura": "FAC-1760283451776",
-      "total": 6000,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:37:31.782Z",
-      "success": true
-    },
-    {
-      "saleNumber": 243,
-      "numero_factura": "FAC-1760283463779",
-      "total": 10700,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:37:43.785Z",
-      "success": true
-    },
-    {
-      "saleNumber": 244,
-      "numero_factura": "FAC-1760283475785",
-      "total": 2800,
-      "items": 1,
-      "paymentMethod": "efectivo",
       "responseTime": 6,
-      "timestamp": "2025-10-12T15:37:55.789Z",
-      "success": true
-    },
-    {
-      "saleNumber": 245,
-      "numero_factura": "FAC-1760283487787",
-      "total": 6600,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:38:07.793Z",
-      "success": true
-    },
-    {
-      "saleNumber": 246,
-      "numero_factura": "FAC-1760283499793",
-      "total": 3300,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:38:19.797Z",
-      "success": true
-    },
-    {
-      "saleNumber": 247,
-      "numero_factura": "FAC-1760283511799",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:38:31.803Z",
-      "success": true
-    },
-    {
-      "saleNumber": 248,
-      "numero_factura": "FAC-1760283523809",
-      "total": 4800,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:38:43.814Z",
-      "success": true
-    },
-    {
-      "saleNumber": 249,
-      "numero_factura": "FAC-1760283535816",
-      "total": 5600,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:38:55.820Z",
+      "timestamp": "2025-10-20T18:41:08.462Z",
       "success": true
     },
     {
       "saleNumber": 250,
-      "numero_factura": "FAC-1760283547816",
-      "total": 1800,
+      "numero_factura": "FAC-1760985872590",
+      "total": 39.99,
       "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:39:07.820Z",
-      "success": true
-    },
-    {
-      "saleNumber": 251,
-      "numero_factura": "FAC-1760283559824",
-      "total": 1540,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:39:19.829Z",
-      "success": true
-    },
-    {
-      "saleNumber": 252,
-      "numero_factura": "FAC-1760283571839",
-      "total": 4900,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:39:31.844Z",
-      "success": true
-    },
-    {
-      "saleNumber": 253,
-      "numero_factura": "FAC-1760283583842",
-      "total": 4600,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:39:43.847Z",
-      "success": true
-    },
-    {
-      "saleNumber": 254,
-      "numero_factura": "FAC-1760283595847",
-      "total": 10600,
-      "items": 3,
       "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:39:55.852Z",
-      "success": true
-    },
-    {
-      "saleNumber": 255,
-      "numero_factura": "FAC-1760283607855",
-      "total": 3250,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 12,
-      "timestamp": "2025-10-12T15:40:07.863Z",
-      "success": true
-    },
-    {
-      "saleNumber": 256,
-      "numero_factura": "FAC-1760283619868",
-      "total": 1730,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:40:19.872Z",
-      "success": true
-    },
-    {
-      "saleNumber": 257,
-      "numero_factura": "FAC-1760283631879",
-      "total": 2800,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:40:31.883Z",
-      "success": true
-    },
-    {
-      "saleNumber": 258,
-      "numero_factura": "FAC-1760283643883",
-      "total": 5900,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:40:43.888Z",
-      "success": true
-    },
-    {
-      "saleNumber": 259,
-      "numero_factura": "FAC-1760283655890",
-      "total": 2900,
-      "items": 2,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:40:55.894Z",
-      "success": true
-    },
-    {
-      "saleNumber": 260,
-      "numero_factura": "FAC-1760283667896",
-      "total": 700,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:41:07.900Z",
-      "success": true
-    },
-    {
-      "saleNumber": 261,
-      "numero_factura": "FAC-1760283679911",
-      "total": 3000,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:41:19.916Z",
-      "success": true
-    },
-    {
-      "saleNumber": 262,
-      "numero_factura": "FAC-1760283691952",
-      "total": 2100,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:41:31.957Z",
-      "success": true
-    },
-    {
-      "saleNumber": 263,
-      "numero_factura": "FAC-1760283704281",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "credito",
-      "responseTime": 313,
-      "timestamp": "2025-10-12T15:41:44.288Z",
-      "success": true
-    },
-    {
-      "saleNumber": 264,
-      "numero_factura": "FAC-1760283715991",
-      "total": 2300,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:41:55.996Z",
-      "success": true
-    },
-    {
-      "saleNumber": 265,
-      "numero_factura": "FAC-1760283728001",
-      "total": 4850,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:42:08.006Z",
-      "success": true
-    },
-    {
-      "saleNumber": 266,
-      "numero_factura": "FAC-1760283740010",
-      "total": 4150,
-      "items": 2,
-      "paymentMethod": "efectivo",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:42:20.016Z",
-      "success": true
-    },
-    {
-      "saleNumber": 267,
-      "numero_factura": "FAC-1760283752020",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "debito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:42:32.028Z",
-      "success": true
-    },
-    {
-      "saleNumber": 268,
-      "numero_factura": "FAC-1760283764033",
-      "total": 6150,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:42:44.039Z",
-      "success": true
-    },
-    {
-      "saleNumber": 269,
-      "numero_factura": "FAC-1760283776041",
-      "total": 4050,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:42:56.046Z",
-      "success": true
-    },
-    {
-      "saleNumber": 270,
-      "numero_factura": "FAC-1760283788047",
-      "total": 4450,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:43:08.052Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:44:32.593Z",
       "success": true
     },
     {
       "saleNumber": 271,
-      "numero_factura": "FAC-1760283800051",
-      "total": 5150,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:43:20.057Z",
-      "success": true
-    },
-    {
-      "saleNumber": 272,
-      "numero_factura": "FAC-1760283812059",
-      "total": 3000,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:43:32.064Z",
-      "success": true
-    },
-    {
-      "saleNumber": 273,
-      "numero_factura": "FAC-1760283824102",
-      "total": 3610,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 37,
-      "timestamp": "2025-10-12T15:43:44.108Z",
-      "success": true
-    },
-    {
-      "saleNumber": 274,
-      "numero_factura": "FAC-1760283836085",
-      "total": 7600,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:43:56.090Z",
-      "success": true
-    },
-    {
-      "saleNumber": 275,
-      "numero_factura": "FAC-1760283848086",
-      "total": 5000,
-      "items": 2,
-      "paymentMethod": "debito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:44:08.092Z",
-      "success": true
-    },
-    {
-      "saleNumber": 276,
-      "numero_factura": "FAC-1760283860095",
-      "total": 2200,
+      "numero_factura": "FAC-1760986124727",
+      "total": 79.98,
       "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:44:20.099Z",
+      "paymentMethod": "efectivo",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:48:44.731Z",
       "success": true
     },
     {
       "saleNumber": 277,
-      "numero_factura": "FAC-1760283872105",
-      "total": 1100,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:44:32.109Z",
-      "success": true
-    },
-    {
-      "saleNumber": 278,
-      "numero_factura": "FAC-1760283884116",
-      "total": 7800,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:44:44.122Z",
-      "success": true
-    },
-    {
-      "saleNumber": 279,
-      "numero_factura": "FAC-1760283896129",
-      "total": 5600,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:44:56.134Z",
-      "success": true
-    },
-    {
-      "saleNumber": 280,
-      "numero_factura": "FAC-1760283908136",
-      "total": 950,
+      "numero_factura": "FAC-1760986196770",
+      "total": 79.98,
       "items": 1,
       "paymentMethod": "transferencia",
       "responseTime": 7,
-      "timestamp": "2025-10-12T15:45:08.141Z",
-      "success": true
-    },
-    {
-      "saleNumber": 281,
-      "numero_factura": "FAC-1760283920146",
-      "total": 4250,
-      "items": 3,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:45:20.152Z",
-      "success": true
-    },
-    {
-      "saleNumber": 282,
-      "numero_factura": "FAC-1760283932157",
-      "total": 3350,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:45:32.161Z",
-      "success": true
-    },
-    {
-      "saleNumber": 283,
-      "numero_factura": "FAC-1760283944173",
-      "total": 2850,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:45:44.177Z",
-      "success": true
-    },
-    {
-      "saleNumber": 284,
-      "numero_factura": "FAC-1760283956207",
-      "total": 1800,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:45:56.213Z",
-      "success": true
-    },
-    {
-      "saleNumber": 285,
-      "numero_factura": "FAC-1760283968208",
-      "total": 1600,
-      "items": 1,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:46:08.212Z",
-      "success": true
-    },
-    {
-      "saleNumber": 286,
-      "numero_factura": "FAC-1760283980218",
-      "total": 3280,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:46:20.223Z",
-      "success": true
-    },
-    {
-      "saleNumber": 287,
-      "numero_factura": "FAC-1760283992223",
-      "total": 1850,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:46:32.227Z",
-      "success": true
-    },
-    {
-      "saleNumber": 288,
-      "numero_factura": "FAC-1760284004235",
-      "total": 2300,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 7,
-      "timestamp": "2025-10-12T15:46:44.239Z",
-      "success": true
-    },
-    {
-      "saleNumber": 289,
-      "numero_factura": "FAC-1760284016249",
-      "total": 4000,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 11,
-      "timestamp": "2025-10-12T15:46:56.258Z",
+      "timestamp": "2025-10-20T18:49:56.774Z",
       "success": true
     },
     {
       "saleNumber": 290,
-      "numero_factura": "FAC-1760284028258",
-      "total": 2600,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:47:08.263Z",
-      "success": true
-    },
-    {
-      "saleNumber": 291,
-      "numero_factura": "FAC-1760284040260",
-      "total": 4200,
-      "items": 3,
+      "numero_factura": "FAC-1760986352853",
+      "total": 79.98,
+      "items": 1,
       "paymentMethod": "credito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:47:20.265Z",
-      "success": true
-    },
-    {
-      "saleNumber": 292,
-      "numero_factura": "FAC-1760284052272",
-      "total": 3500,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:47:32.278Z",
-      "success": true
-    },
-    {
-      "saleNumber": 293,
-      "numero_factura": "FAC-1760284064278",
-      "total": 2400,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:47:44.283Z",
-      "success": true
-    },
-    {
-      "saleNumber": 294,
-      "numero_factura": "FAC-1760284076293",
-      "total": 800,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:47:56.298Z",
-      "success": true
-    },
-    {
-      "saleNumber": 295,
-      "numero_factura": "FAC-1760284088305",
-      "total": 1200,
-      "items": 1,
-      "paymentMethod": "transferencia",
-      "responseTime": 10,
-      "timestamp": "2025-10-12T15:48:08.310Z",
-      "success": true
-    },
-    {
-      "saleNumber": 296,
-      "numero_factura": "FAC-1760284100307",
-      "total": 3800,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:48:20.312Z",
-      "success": true
-    },
-    {
-      "saleNumber": 297,
-      "numero_factura": "FAC-1760284112339",
-      "total": 3850,
-      "items": 3,
-      "paymentMethod": "efectivo",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:48:32.345Z",
-      "success": true
-    },
-    {
-      "saleNumber": 298,
-      "numero_factura": "FAC-1760284124340",
-      "total": 1900,
-      "items": 2,
-      "paymentMethod": "credito",
-      "responseTime": 8,
-      "timestamp": "2025-10-12T15:48:44.344Z",
-      "success": true
-    },
-    {
-      "saleNumber": 299,
-      "numero_factura": "FAC-1760284136349",
-      "total": 3700,
-      "items": 3,
-      "paymentMethod": "transferencia",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:48:56.353Z",
-      "success": true
-    },
-    {
-      "saleNumber": 300,
-      "numero_factura": "FAC-1760284148359",
-      "total": 5200,
-      "items": 3,
-      "paymentMethod": "debito",
-      "responseTime": 9,
-      "timestamp": "2025-10-12T15:49:08.365Z",
+      "responseTime": 6,
+      "timestamp": "2025-10-20T18:52:32.857Z",
       "success": true
     }
   ],
   "statistics": {
-    "successRate": 100,
-    "avgResponseTime": 9.856666666666667,
+    "successRate": 20.333333333333332,
+    "avgResponseTime": 6.06,
     "minResponseTime": 5,
-    "maxResponseTime": 313,
-    "medianResponseTime": 8,
-    "actualThroughput": 297.52033331092747,
+    "maxResponseTime": 31,
+    "medianResponseTime": 6,
+    "actualThroughput": 60.495717779212114,
     "targetThroughput": 300,
-    "totalDuration": 1.0083344444444444
+    "totalDuration": 1.0083358333333334
   },
   "assessment": {
-    "successRateStatus": "EXCELENTE",
+    "successRateStatus": "MALO",
     "responseTimeStatus": "RAPIDO",
-    "throughputStatus": "OBJETIVO_ALCANZADO"
+    "throughputStatus": "OBJETIVO_NO_ALCANZADO"
   }
 }
