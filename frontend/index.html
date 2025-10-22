@@ -449,6 +449,7 @@
                     </div>
                 </div>
 
+
                 <!-- Recibo/Factura -->
                 <div class="receipt" id="receipt">
                     <h3>🧾 Factura Generada</h3>
@@ -487,6 +488,7 @@
         // API_BASE ya está declarado en script.js
 
         // Funciones específicas de index.html
+
         function calcularTotal() {
             return cart.reduce((sum, item) => sum + (parseFloat(item.precio) * item.cantidad), 0);
         }
@@ -541,14 +543,7 @@
         }
 
         function debouncedSearchProducts() {
-            // Clear existing timeout
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-            // Set new timeout for 300ms delay
-            searchTimeout = setTimeout(() => {
-                searchProducts();
-            }, 300);
+            // This function is no longer used - search only on Enter or button click
         }
 
         async function searchProducts(loadMore = false) {
@@ -610,6 +605,12 @@
                 hasMoreProducts = pagination.hasMore;
                 currentOffset += products.length;
 
+                // Verificar que products sea un array
+                if (!Array.isArray(products)) {
+                    console.error('Products is not an array:', products);
+                    products = [];
+                }
+
                 displayResults(products, loadMore);
 
                 // Remover indicador de carga
@@ -640,6 +641,61 @@
             } finally {
                 isLoadingMore = false;
             }
+        }
+
+        function displayResults(products, append = false) {
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            if (!append && products.length === 0) {
+                resultsGrid.innerHTML = '<div class="alert error">❌ No se encontraron productos</div>';
+                return;
+            }
+
+            if (!append) {
+                // Limpiar grid si no es append
+                resultsGrid.innerHTML = '';
+            }
+
+            if (products.length === 0 && append) {
+                return; // No hay productos nuevos para append
+            }
+
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+
+            products.forEach(product => {
+                // Cachear producto para evitar GET adicional
+                productsCache[product.id] = product;
+
+                const hasDiscount = product.descuento_porcentaje && product.descuento_porcentaje > 0;
+                const originalPrice = parseFloat(product.precio);
+                const discountedPrice = parseFloat(product.precio_con_descuento || product.precio);
+
+                const card = document.createElement('div');
+                card.className = `product-card ${hasDiscount ? 'promotion' : ''}`;
+                card.onclick = () => selectProduct(product.id);
+
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <span class="product-code">${product.codigo}</span>
+                        <div class="product-name">${product.nombre}</div>
+                        ${hasDiscount ? `<div style="color: #e74c3c; font-weight: bold; font-size: 0.9em;">🎉 ${product.descuento_porcentaje}% OFF</div>` : ''}
+                    </div>
+                    <div class="product-info">
+                        <div class="price">
+                            <span style="font-size: 0.8em;">💰</span>
+                            ${hasDiscount ? `<span style="text-decoration: line-through; color: #7f8c8d; font-size: 0.9em;">${formatCurrency(originalPrice)}</span> ` : ''}
+                            ${formatCurrency(discountedPrice)}
+                        </div>
+                        <div class="stock" style="${product.stock == 0 ? 'color: red;' : ''}">Stock: ${product.stock}</div>
+                        <div class="category">${product.categoria}</div>
+                    </div>
+                `;
+
+                fragment.appendChild(card);
+            });
+
+            resultsGrid.appendChild(fragment);
         }
 
         function togglePromotionFilter() {
@@ -1164,9 +1220,6 @@
                 };
                 addNewSaleToCache(newSale);
 
-                // Actualizar factura general
-                updateGeneralInvoice();
-
                 cart = [];
                 updateCart();
                 selectedPaymentMethods = {};
@@ -1334,82 +1387,6 @@
             updateRecentInvoicesDisplay();
         }
 
-        function updateGeneralInvoice() {
-            const container = document.getElementById('generalInvoiceContent');
-
-            if (recentInvoicesCache.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d;">No hay ventas procesadas</div>';
-                return;
-            }
-
-            // Crear resumen de todas las ventas
-            const allItems = {};
-            let totalGeneral = 0;
-            let totalVentas = 0;
-
-            recentInvoicesCache.forEach(sale => {
-                totalVentas++;
-                totalGeneral += parseFloat(sale.total || 0);
-
-                if (sale.items) {
-                    sale.items.forEach(item => {
-                        const key = item.nombre;
-                        if (!allItems[key]) {
-                            allItems[key] = {
-                                nombre: item.nombre,
-                                cantidad: 0,
-                                precio_unitario: parseFloat(item.precio_unitario || 0),
-                                subtotal: 0
-                            };
-                        }
-                        allItems[key].cantidad += parseInt(item.cantidad || 0);
-                        allItems[key].subtotal += (parseFloat(item.precio_unitario || 0) * parseInt(item.cantidad || 0));
-                    });
-                }
-            });
-
-            // Generar HTML para la factura general
-            let html = `
-                <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ddd;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <strong>Total de Ventas:</strong>
-                        <span>${totalVentas}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <strong>Monto Total General:</strong>
-                        <span style="color: #27ae60; font-weight: bold;">${formatCurrency(totalGeneral)}</span>
-                    </div>
-                </div>
-                <div style="max-height: 200px; overflow-y: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
-                        <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold;">Producto</th>
-                                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">Cantidad Total</th>
-                                <th style="padding: 8px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            Object.values(allItems).forEach(item => {
-                html += `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${item.nombre}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.cantidad}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatCurrency(item.subtotal)}</td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            container.innerHTML = html;
-        }
 
         function resetSystem() {
             cart = [];
@@ -1606,10 +1583,9 @@
                 }
             });
 
-            document.getElementById('searchInput').addEventListener('input', debouncedSearchProducts);
+            // Search only on Enter key or button click
             document.getElementById('searchInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    if (searchTimeout) clearTimeout(searchTimeout);
                     searchProducts();
                 }
             });
@@ -1643,7 +1619,6 @@
             loadCategories();
             searchProducts();
             // No cargar loadRecentInvoices() automáticamente para evitar prompts de auth
-            updateGeneralInvoice();
         });
 
         // Manejar navegación hacia atrás del navegador

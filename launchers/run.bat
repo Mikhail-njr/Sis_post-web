@@ -117,15 +117,21 @@ echo     - Para obtener URL: ejecuta 'get_ngrok_url.bat'
 echo.
 
 echo ========================================
-echo    EJECUTANDO TEST DE RENDIMIENTO
+echo 🎵 REPRODUCIENDO AUDIO DE FINALIZACIÓN
 echo ========================================
 echo.
-echo Ejecutando test de compras aleatorias (5 por minuto)...
-echo Presiona Ctrl+C para detener el test en cualquier momento
+
+:: Reproducir audio future.mp3 si existe
+if exist "%~dp0..\future.mp3" (
+    echo Reproduciendo future.mp3...
+    start wmplayer "%~dp0..\future.mp3" /play /close
+) else (
+    echo future.mp3 no encontrado. Reproduciendo beep del sistema...
+    echo 
+)
+
 echo.
-
-# cd /d "%~dp0.."
-# node performance_test.js
-
+echo 🎉 ¡Sistema POS listo y funcionando!
+echo.
 pause
 ::exit /b 0

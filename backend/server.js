@@ -319,6 +319,48 @@ function dbAll(query, params = []) {
     });
 }
 
+// Función para ejecutar queries con funciones personalizadas
+function dbAllWithFunctions(query, params = []) {
+    return new Promise((resolve, reject) => {
+        try {
+            // Registrar la función removeAccents en SQLite
+            db.function('removeAccents', removeAccents);
+            db.all(query, params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        } catch (error) {
+            // Si hay error con la función, usar query normal
+            console.warn('Error registering removeAccents function, using normal query:', error.message);
+            db.all(query.replace(/removeAccents\(/g, '').replace(/\)/g, ''), params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        }
+    });
+}
+
+// Función para ejecutar queries con funciones personalizadas
+function dbAllWithFunctions(query, params = []) {
+    return new Promise((resolve, reject) => {
+        try {
+            // Registrar la función removeAccents en SQLite si no existe
+            db.function('removeAccents', removeAccents);
+            db.all(query, params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        } catch (error) {
+            // Si hay error con la función, usar query normal
+            console.warn('Error registering removeAccents function, using normal query:', error.message);
+            db.all(query.replace(/removeAccents\(/g, '').replace(/\)/g, ''), params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        }
+    });
+}
+
 // Función para remover acentos
 function removeAccents(str) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -767,10 +809,18 @@ app.get('/api/products/search', async (req, res) => {
         // Agregar condición de búsqueda si existe q
         if (q && q.trim()) {
             const searchTerm = q.trim();
-            // Usar LIKE con wildcards para búsqueda flexible
-            // Buscar en nombre y código (case-insensitive)
-            conditions.push("(LOWER(p.nombre) LIKE LOWER(?) OR LOWER(p.codigo) LIKE LOWER(?))");
-            params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+            // Función para quitar acentos
+            const removeAccents = (str) => {
+                return str.normalize('NFD')
+                          .replace(/[\u0300-\u036f]/g, '')
+                          .toLowerCase();
+            };
+
+            const normalizedSearch = `%${removeAccents(searchTerm)}%`;
+
+            // Buscar en nombre normalizado y código
+            conditions.push("(replace(replace(replace(replace(replace(LOWER(p.nombre),'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u') LIKE ? OR LOWER(p.codigo) LIKE LOWER(?))");
+            params.push(normalizedSearch, `%${searchTerm}%`);
         }
 
         // Agregar condición de solo promociones si está activado
@@ -1143,7 +1193,8 @@ app.get('/api/stats', async (req, res) => {
         const totalSales = await dbAll("SELECT COUNT(*) as count FROM ventas");
         const totalRevenue = await dbAll("SELECT SUM(total) as total FROM ventas");
 
-        // Obtener productos más vendidos
+        // Obtener productos más vendidos (con límite opcional)
+        const limit = parseInt(req.query.limit) || 10;
         const topProducts = await dbAll(`
             SELECT
                 p.id,
@@ -1154,7 +1205,8 @@ app.get('/api/stats', async (req, res) => {
             JOIN productos p ON vi.producto_id = p.id
             GROUP BY p.id
             ORDER BY total_vendido DESC
-        `);
+            LIMIT ?
+        `, [limit]);
 
         res.json({
             total_products: totalProducts[0].count,

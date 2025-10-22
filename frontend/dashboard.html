@@ -600,7 +600,8 @@
                     <div class="metricas-grid">
                         <div class="metrica-card">
                             <h3>Productos Más Vendidos</h3>
-                            <table id="top-products-table">
+                            <div id="top-products-loading" class="loading">Cargando productos más vendidos...</div>
+                            <table id="top-products-table" style="display:none;">
                                 <thead>
                                     <tr>
                                         <th>Posición</th>
@@ -611,6 +612,11 @@
                                 </thead>
                                 <tbody></tbody>
                             </table>
+                            <div id="load-more-container" style="text-align: center; margin-top: 15px; display: none;">
+                                <button id="load-more-btn" class="btn btn-secondary" onclick="loadMoreTopProducts()" style="font-size: 14px; padding: 8px 16px;">
+                                    📊 Cargar Más Productos
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -709,39 +715,35 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+
+                <!-- Sub-sección de Pedidos a Proveedores -->
+                <div style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Pedidos a Proveedores</h3>
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="openCreateOrderModal()" style="font-size: 14px; padding: 10px 20px;">
+                            ➕ Crear Nuevo Pedido
+                        </button>
+                    </div>
+                    <div class="loading" id="orders-loading">Cargando pedidos...</div>
+                    <table id="pedidos-table" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Número de Pedido</th>
+                                <th>Proveedor</th>
+                                <th>Fecha Pedido</th>
+                                <th>Fecha Entrega Est.</th>
+                                <th>Estado</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Sección de Pedidos a Proveedores -->
-        <div id="pedidos-proveedores-section" class="dashboard-section collapsed">
-            <h2 class="section-header">
-                <span class="section-title">📋 Pedidos a Proveedores</span>
-                <span class="section-icon">▶</span>
-            </h2>
-            <div class="section-content">
-                <div style="margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="openCreateOrderModal()" style="font-size: 14px; padding: 10px 20px;">
-                        ➕ Crear Nuevo Pedido
-                    </button>
-                </div>
-                <div class="loading">Cargando pedidos...</div>
-                <table id="pedidos-table" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Número de Pedido</th>
-                            <th>Proveedor</th>
-                            <th>Fecha Pedido</th>
-                            <th>Fecha Entrega Est.</th>
-                            <th>Estado</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Sección de Registro de Operaciones -->
         <div id="operations-log-section" class="dashboard-section collapsed">
@@ -1220,6 +1222,8 @@
 
         let globalProductosData = []; // Variable global para almacenar datos de productos
         let currentSortMode = 1; // 0: Stock asc, 1: Stock desc, 2: ID asc
+        let globalSuppliersData = []; // Variable global para almacenar datos de proveedores
+        let currentTopProductsLimit = 10; // Límite actual de productos más vendidos mostrados
 
         async function fetchAndDisplayData() {
             const headers = { 'Content-Type': 'application/json' };
@@ -1283,6 +1287,34 @@
                 }
             }
 
+            // Fetch de métricas (productos más vendidos)
+            try {
+                await loadTopProducts();
+            } catch (error) {
+                console.error('Error fetching top products:', error);
+                const metricasSection = document.querySelector('#metricas-section');
+                if (metricasSection) {
+                    const loading = metricasSection.querySelector('#top-products-loading');
+                    if (loading) {
+                        loading.textContent = 'Error al cargar métricas. Asegúrate de que el servidor esté activo.';
+                    }
+                }
+            }
+
+            // Fetch de pedidos a proveedores
+            try {
+                await loadSupplierOrders();
+            } catch (error) {
+                console.error('Error fetching supplier orders:', error);
+                const ordersSection = document.querySelector('#pedidos-proveedores-section');
+                if (ordersSection) {
+                    const loading = ordersSection.querySelector('#orders-loading');
+                    if (loading) {
+                        loading.textContent = 'Error al cargar pedidos. Asegúrate de que el servidor esté activo.';
+                    }
+                }
+            }
+
             // Fetch de registro de operaciones
             try {
                 await loadOperationsLog();
@@ -1292,6 +1324,23 @@
                 if (operationsSection) {
                     operationsSection.innerHTML = '<div class="error">Error al cargar registro de operaciones. Asegúrate de que el servidor esté activo.</div>';
                 }
+            }
+
+            // Fetch de proveedores para el dropdown global
+            try {
+                const suppliersRes = await fetch(`${API_BASE}/suppliers`, { headers });
+                if (suppliersRes.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!suppliersRes.ok) throw new Error('Network response for suppliers was not ok');
+                const suppliers = await suppliersRes.json();
+                globalSuppliersData = suppliers; // Almacenar datos globalmente
+                console.log('✅ Proveedores cargados globalmente:', suppliers.length);
+            } catch (error) {
+                console.error('Error fetching suppliers:', error);
+                // No mostrar error en UI ya que es opcional para el dropdown
             }
         }
 
@@ -1911,9 +1960,19 @@
             }
         }
 
+        // Función para remover acentos
+        function removeAccents(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        // Función para normalizar texto para búsqueda (minúsculas sin acentos)
+        function normalizeText(text) {
+            return removeAccents(text.toLowerCase());
+        }
+
         // Función para buscar productos
         function searchProducts() {
-            const query = document.getElementById('productSearch').value.toLowerCase().trim();
+            const query = document.getElementById('productSearch').value.trim();
             const resultsDiv = document.getElementById('productSearchResults');
 
             if (query.length < 2) {
@@ -1921,9 +1980,10 @@
                 return;
             }
 
+            const normalizedQuery = normalizeText(query);
             const filteredProducts = allProducts.filter(product =>
-                product.nombre.toLowerCase().includes(query) ||
-                product.codigo.toLowerCase().includes(query)
+                normalizeText(product.nombre).includes(normalizedQuery) ||
+                normalizeText(product.codigo).includes(normalizedQuery)
             );
 
             if (filteredProducts.length > 0) {
@@ -3280,21 +3340,46 @@
         // Función para cargar proveedores en el select del pedido
         async function loadSuppliersForOrder() {
             try {
-                const response = await fetch(`${API_BASE}/suppliers`);
+                // Siempre cargar desde API para asegurar datos actualizados
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/suppliers`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al obtener proveedores');
                 const suppliers = await response.json();
+
+                // Actualizar datos globales
+                globalSuppliersData = suppliers;
 
                 const select = document.getElementById('orderSupplierId');
                 select.innerHTML = '<option value="">Seleccionar proveedor...</option>';
 
-                suppliers.forEach(supplier => {
+                if (suppliers && suppliers.length > 0) {
+                    suppliers.forEach(supplier => {
+                        const option = document.createElement('option');
+                        option.value = supplier.id;
+                        option.textContent = supplier.nombre_proveedor;
+                        select.appendChild(option);
+                    });
+                } else {
+                    // Si no hay proveedores, mostrar mensaje
                     const option = document.createElement('option');
-                    option.value = supplier.id;
-                    option.textContent = supplier.nombre_proveedor;
+                    option.value = '';
+                    option.textContent = 'No hay proveedores registrados';
+                    option.disabled = true;
                     select.appendChild(option);
-                });
+                }
             } catch (error) {
                 console.error('Error loading suppliers for order:', error);
-                showAlert('Error al cargar proveedores', 'error');
+                const select = document.getElementById('orderSupplierId');
+                select.innerHTML = '<option value="">Error al cargar proveedores</option>';
+                showAlert('Error al cargar proveedores para el pedido', 'error');
             }
         }
 
@@ -3338,7 +3423,17 @@
         // Función para cargar productos en el select del item
         async function loadProductsForOrder(selectElement) {
             try {
-                const response = await fetch(`${API_BASE}/products`);
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/products`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al obtener productos');
                 const products = await response.json();
 
                 selectElement.innerHTML = '<option value="">Seleccionar producto...</option>';
@@ -3437,9 +3532,13 @@
             try {
                 showAlert('Creando pedido...', 'success');
 
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
                 const response = await fetch(`${API_BASE}/supplier-orders`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({
                         proveedor_id: supplierId,
                         fecha_entrega_estimada: deliveryDate || null,
@@ -3448,6 +3547,11 @@
                     })
                 });
 
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Error al crear el pedido');
@@ -3468,7 +3572,17 @@
         // Función para cargar pedidos a proveedores
         async function loadSupplierOrders() {
             try {
-                const response = await fetch(`${API_BASE}/supplier-orders`);
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/supplier-orders`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al obtener pedidos');
                 const orders = await response.json();
 
                 const tableBody = document.querySelector('#pedidos-table tbody');
@@ -3531,7 +3645,17 @@
         // Función para ver detalles del pedido
         async function viewOrderDetails(orderId) {
             try {
-                const response = await fetch(`${API_BASE}/supplier-orders/${orderId}`);
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+                const response = await fetch(`${API_BASE}/supplier-orders/${orderId}`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Error al obtener detalles del pedido');
                 const order = await response.json();
 
                 let detailsHtml = `
@@ -3622,12 +3746,21 @@
             if (!newStatus) return;
 
             try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
                 const response = await fetch(`${API_BASE}/supplier-orders/${orderId}/status`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ estado: newStatus })
                 });
 
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Error al actualizar estado');
@@ -3677,6 +3810,94 @@
             alert('Se abrió tu cliente de email. Si no se abre automáticamente, puedes contactarnos directamente a: mikhail.njr@gmail.com o +543434721177');
 
             closeSupportModal();
+        }
+
+        // Función para cargar productos más vendidos
+        async function loadTopProducts(limit = 10) {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authCredentials) {
+                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                }
+
+                const response = await fetch(`${API_BASE}/stats?limit=${limit}`, { headers });
+                if (response.status === 401) {
+                    isLoggedIn = false;
+                    updateUIBasedOnAuth();
+                    throw new Error('Autenticación requerida');
+                }
+                if (!response.ok) throw new Error('Network response for stats was not ok');
+
+                const stats = await response.json();
+
+                // Mostrar los productos más vendidos
+                displayTopProducts(stats.top_products);
+
+                // Mostrar/ocultar botón "Cargar Más" según si hay más productos
+                const loadMoreContainer = document.getElementById('load-more-container');
+                const loadMoreBtn = document.getElementById('load-more-btn');
+
+                if (stats.top_products && stats.top_products.length >= limit) {
+                    loadMoreContainer.style.display = 'block';
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.textContent = `📊 Cargar Más Productos (${limit} mostrados)`;
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Error loading top products:', error);
+                const loading = document.getElementById('top-products-loading');
+                if (loading) {
+                    loading.textContent = 'Error al cargar productos más vendidos';
+                }
+            }
+        }
+
+        // Función para mostrar productos más vendidos
+        function displayTopProducts(products) {
+            const table = document.getElementById('top-products-table');
+            const tbody = table.querySelector('tbody');
+            const loading = document.getElementById('top-products-loading');
+
+            if (products && products.length > 0) {
+                table.style.display = 'table';
+                if (loading) loading.style.display = 'none';
+
+                tbody.innerHTML = '';
+                products.forEach((product, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${product.nombre}</td>
+                        <td>${product.codigo}</td>
+                        <td>${product.total_vendido}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                table.style.display = 'none';
+                if (loading) {
+                    loading.textContent = 'No hay productos vendidos aún';
+                    loading.style.display = 'block';
+                }
+            }
+        }
+
+        // Función para cargar más productos
+        function loadMoreTopProducts() {
+            currentTopProductsLimit += 10; // Aumentar límite en 10
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = '⏳ Cargando...';
+
+            loadTopProducts(currentTopProductsLimit).then(() => {
+                // El botón se actualiza automáticamente en loadTopProducts
+            }).catch(error => {
+                console.error('Error loading more products:', error);
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.textContent = '❌ Error - Reintentar';
+            });
         }
 
         // Función para cerrar modal de opciones de reset
@@ -4228,8 +4449,6 @@
                     // Inicializar el texto del botón de ordenamiento
                     updateSortButtonText();
                 });
-                // Cargar pedidos a proveedores
-                loadSupplierOrders();
             }
         });
     </script>
