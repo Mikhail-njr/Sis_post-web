@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Diagnóstico de Cámara</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .diagnostic-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .info { color: #17a2b8; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        #video-test {
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico de Cámara para Escáner de Códigos</h1>
+
+    <div class="diagnostic-section">
+        <h2>1. Información del Dispositivo</h2>
+        <button onclick="showDeviceInfo()">Mostrar Info del Dispositivo</button>
+        <div id="device-info"></div>
+    </div>
+
+    <div class="diagnostic-section">
+        <h2>2. Verificación de Cámaras Disponibles</h2>
+        <button onclick="checkCameras()">Verificar Cámaras</button>
+        <div id="camera-info"></div>
+    </div>
+
+    <div class="diagnostic-section">
+        <h2>3. Prueba Básica de getUserMedia</h2>
+        <button onclick="testBasicGetUserMedia()">Probar getUserMedia Básico</button>
+        <div id="basic-test-result"></div>
+        <video id="video-test" autoplay playsinline muted></video>
+    </div>
+
+    <div class="diagnostic-section">
+        <h2>4. Prueba de Configuraciones de Video</h2>
+        <button onclick="testVideoConfigurations()">Probar Configuraciones</button>
+        <div id="config-test-result"></div>
+    </div>
+
+    <div class="diagnostic-section">
+        <h2>5. Diagnóstico Completo</h2>
+        <button onclick="runFullDiagnostic()">Ejecutar Diagnóstico Completo</button>
+        <div id="full-diagnostic-result"></div>
+    </div>
+
+    <div class="diagnostic-section">
+        <h2>6. Soluciones Recomendadas</h2>
+        <div id="solutions"></div>
+    </div>
+
+    <script>
+        // Función para mostrar información del dispositivo
+        function showDeviceInfo() {
+            const info = document.getElementById('device-info');
+            info.innerHTML = `
+                <h3>Información del Dispositivo:</h3>
+                <ul>
+                    <li><strong>User Agent:</strong> ${navigator.userAgent}</li>
+                    <li><strong>Plataforma:</strong> ${navigator.platform}</li>
+                    <li><strong>Protocolo:</strong> ${window.location.protocol}</li>
+                    <li><strong>Host:</strong> ${window.location.host}</li>
+                    <li><strong>Pantalla:</strong> ${screen.width}x${screen.height}</li>
+                    <li><strong>Viewport:</strong> ${window.innerWidth}x${window.innerHeight}</li>
+                    <li><strong>Touch Points:</strong> ${navigator.maxTouchPoints}</li>
+                    <li><strong>Es Móvil (UserAgent):</strong> ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}</li>
+                    <li><strong>Es Móvil (Touch):</strong> ${('ontouchstart' in window) || (navigator.maxTouchPoints > 0)}</li>
+                    <li><strong>Soporte getUserMedia:</strong> ${!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)}</li>
+                    <li><strong>Soporte EnumerateDevices:</strong> ${!!(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices)}</li>
+                </ul>
+            `;
+        }
+
+        // Función para verificar cámaras disponibles
+        async function checkCameras() {
+            const info = document.getElementById('camera-info');
+            info.innerHTML = '<p>Verificando cámaras...</p>';
+
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+                let html = `<h3>Cámaras Encontradas: ${videoDevices.length}</h3>`;
+                if (videoDevices.length === 0) {
+                    html += '<p class="error">❌ No se encontraron cámaras en el dispositivo</p>';
+                } else {
+                    html += '<ul>';
+                    videoDevices.forEach((device, index) => {
+                        html += `<li>${index + 1}. ${device.label || 'Cámara ' + (index + 1)} (ID: ${device.deviceId})</li>`;
+                    });
+                    html += '</ul>';
+                }
+
+                info.innerHTML = html;
+            } catch (error) {
+                info.innerHTML = `<p class="error">❌ Error verificando cámaras: ${error.message}</p>`;
+            }
+        }
+
+        // Función para probar getUserMedia básico
+        async function testBasicGetUserMedia() {
+            const result = document.getElementById('basic-test-result');
+            const video = document.getElementById('video-test');
+
+            result.innerHTML = '<p>Probando getUserMedia básico...</p>';
+
+            try {
+                // Limpiar video anterior
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+                result.innerHTML = '<p class="success">✅ getUserMedia básico exitoso</p>';
+
+                // Asignar stream al video
+                video.srcObject = stream;
+
+                // Esperar a que esté listo
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        result.innerHTML += `<p class="info">📹 Video listo: ${video.videoWidth}x${video.videoHeight}</p>`;
+                        resolve();
+                    };
+                });
+
+                // Intentar reproducir
+                try {
+                    await video.play();
+                    result.innerHTML += '<p class="success">▶️ Reproducción exitosa</p>';
+                } catch (playError) {
+                    result.innerHTML += `<p class="error">❌ Error reproduciendo: ${playError.message}</p>`;
+                }
+
+                // Detener después de 10 segundos
+                setTimeout(() => {
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                    result.innerHTML += '<p>🛑 Stream detenido</p>';
+                }, 10000);
+
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Error en getUserMedia: ${error.name} - ${error.message}</p>`;
+            }
+        }
+
+        // Función para probar diferentes configuraciones
+        async function testVideoConfigurations() {
+            const result = document.getElementById('config-test-result');
+            result.innerHTML = '<p>Probando configuraciones de video...</p>';
+
+            const configurations = [
+                { name: 'Básica', constraints: { video: true, audio: false } },
+                { name: 'Estándar', constraints: { video: { width: 1280, height: 720 }, audio: false } },
+                { name: 'Móvil', constraints: { video: { facingMode: 'environment' }, audio: false } },
+                { name: 'Baja resolución', constraints: { video: { width: 640, height: 480 }, audio: false } }
+            ];
+
+            let html = '<h3>Resultados de Configuraciones:</h3><ul>';
+
+            for (const config of configurations) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia(config.constraints);
+                    html += `<li class="success">${config.name}: ✅ Éxito</li>`;
+                    stream.getTracks().forEach(track => track.stop());
+                } catch (error) {
+                    html += `<li class="error">${config.name}: ❌ ${error.name}</li>`;
+                }
+            }
+
+            html += '</ul>';
+            result.innerHTML = html;
+        }
+
+        // Función de diagnóstico completo
+        async function runFullDiagnostic() {
+            const result = document.getElementById('full-diagnostic-result');
+            result.innerHTML = '<p>🔍 Ejecutando diagnóstico completo...</p>';
+
+            let html = '<h3>🔍 Diagnóstico Completo de Cámara</h3>';
+
+            // 1. Verificar compatibilidad
+            html += '<h4>1. Compatibilidad</h4>';
+            html += `<ul>
+                <li>getUserMedia: ${!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ? '✅' : '❌'}</li>
+                <li>EnumerateDevices: ${!!(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) ? '✅' : '❌'}</li>
+                <li>Protocolo HTTPS/localhost: ${window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname.includes('ngrok') ? '✅' : '❌'}</li>
+            </ul>`;
+
+            // 2. Verificar dispositivos
+            html += '<h4>2. Dispositivos de Cámara</h4>';
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                html += `<p>Cámaras encontradas: ${videoDevices.length}</p>`;
+                if (videoDevices.length > 0) {
+                    html += '<ul>';
+                    videoDevices.forEach((device, index) => {
+                        html += `<li>${device.label || 'Cámara ' + (index + 1)}</li>`;
+                    });
+                    html += '</ul>';
+                }
+            } catch (error) {
+                html += `<p class="error">❌ Error enumerando dispositivos: ${error.message}</p>`;
+            }
+
+            // 3. Probar acceso básico
+            html += '<h4>3. Acceso a Cámara</h4>';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                html += '<p class="success">✅ Acceso básico exitoso</p>';
+
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    html += `<p>Configuración del track: ${settings.width}x${settings.height}@${settings.frameRate}fps</p>`;
+                }
+
+                stream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                html += `<p class="error">❌ Error de acceso: ${error.name} - ${error.message}</p>`;
+            }
+
+            result.innerHTML = html;
+
+            // Mostrar soluciones
+            showSolutions();
+        }
+
+        // Función para mostrar soluciones
+        function showSolutions() {
+            const solutions = document.getElementById('solutions');
+            solutions.innerHTML = `
+                <h3>💡 Soluciones para Problemas de Cámara</h3>
+
+                <h4>Si la cámara no muestra imagen:</h4>
+                <ol>
+                    <li><strong>Verificar permisos:</strong> Asegúrate de hacer clic en "Permitir" cuando el navegador pida acceso a la cámara</li>
+                    <li><strong>Cerrar otras aplicaciones:</strong> Cierra Zoom, Meet, o cualquier otra app que use la cámara</li>
+                    <li><strong>Recargar la página:</strong> Presiona F5 o Ctrl+R para recargar completamente</li>
+                    <li><strong>Intentar en otro navegador:</strong> Chrome o Edge suelen funcionar mejor</li>
+                    <li><strong>Verificar configuración del navegador:</strong> Ve a Configuración > Privacidad > Cámara > Permitir</li>
+                </ol>
+
+                <h4>Si el error es "NotAllowedError":</h4>
+                <p>Los permisos fueron denegados. Debes hacer clic en "Permitir" en el mensaje del navegador.</p>
+
+                <h4>Si el error es "NotFoundError":</h4>
+                <p>No se encontró cámara. Verifica que tu dispositivo tenga cámara y esté conectada.</p>
+
+                <h4>Si el error es "NotReadableError":</h4>
+                <p>La cámara está siendo usada por otra aplicación. Cierra todas las demás aplicaciones.</p>
+
+                <h4>Para dispositivos móviles:</h4>
+                <ul>
+                    <li>Asegúrate de usar la app del navegador nativo (Chrome, Safari, etc.)</li>
+                    <li>Verifica que la cámara trasera esté disponible</li>
+                    <li>Algunos navegadores móviles requieren HTTPS</li>
+                </ul>
+
+                <h4>Diagnóstico rápido:</h4>
+                <p>Ejecuta las pruebas en orden: 1→2→3→4→5 para identificar exactamente dónde está el problema.</p>
+            `;
+        }
+
+        // Ejecutar información inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            showDeviceInfo();
+        });
+    </script>
+</body>
+</html>

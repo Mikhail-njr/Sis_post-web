@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Dashboard de Indexación Local - Herramientas POS</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --border-radius: 8px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.active {
+            background-color: var(--success);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .command-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .command-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .command-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-icon {
+            font-size: 1.5rem;
+        }
+
+        .btn-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn-desc {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .tools-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .tool-card {
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tool-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .output-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .search-section {
+            margin-top: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .results-area {
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .result-title {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .result-meta {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: none;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        .error {
+            color: var(--danger);
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+        }
+
+        .success {
+            color: var(--success);
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Dashboard de Indexación Local</h1>
+            <div class="status-indicator">
+                <span class="status-dot" id="server-status"></span>
+                <span id="server-status-text">Servidor desconectado</span>
+            </div>
+        </header>
+
+        <div class="stats-grid" id="stats-grid">
+            <!-- Estadísticas se cargarán aquí -->
+        </div>
+
+        <!-- Información sobre Herramientas -->
+        <div class="tools-info">
+            <h3>🛠️ Herramientas Disponibles</h3>
+            <p style="margin-bottom: 15px; color: #666;">Descubre todas las herramientas para gestionar tu proyecto POS</p>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-title">📊 Indexación</div>
+                    <div class="tool-desc">Controla el proceso de indexación de tu proyecto. Indexa, limpia o reindexa según necesites.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-title">🔍 Búsqueda</div>
+                    <div class="tool-desc">Encuentra código similar usando palabras clave. Resultados con score y contexto.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-title">📈 Estadísticas</div>
+                    <div class="tool-desc">Métricas en tiempo real: archivos, palabras, tamaño del proyecto y más.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-title">🔌 API</div>
+                    <div class="tool-desc">Endpoints RESTful para integrar con otras herramientas y automatizar procesos.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>⚙️ Comandos de Indexación</h2>
+                <div class="command-grid">
+                    <button class="command-btn" onclick="runCommand('index')">
+                        <span class="btn-icon">📊</span>
+                        <span class="btn-title">Indexar Codebase</span>
+                        <span class="btn-desc">Indexar todos los archivos del proyecto</span>
+                    </button>
+                    
+                    <button class="command-btn" onclick="runCommand('clear')">
+                        <span class="btn-icon">🗑️</span>
+                        <span class="btn-title">Limpiar Índice</span>
+                        <span class="btn-desc">Eliminar todo el índice actual</span>
+                    </button>
+                    
+                    <button class="command-btn" onclick="runCommand('clear-and-index')">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-title">Limpiar y Reindexar</span>
+                        <span class="btn-desc">Limpiar y luego indexar todo</span>
+                    </button>
+                    
+                    <button class="command-btn" onclick="runCommand('stats')">
+                        <span class="btn-icon">📈</span>
+                        <span class="btn-title">Ver Estadísticas</span>
+                        <span class="btn-desc">Mostrar estadísticas del índice</span>
+                    </button>
+                    
+                    <button class="command-btn" onclick="runCommand('health')">
+                        <span class="btn-icon">🏥</span>
+                        <span class="btn-title">Verificar Salud</span>
+                        <span class="btn-desc">Comprobar estado del servidor</span>
+                    </button>
+                    
+                    <button class="command-btn" onclick="startServer()" style="background: var(--success);">
+                        <span class="btn-icon">🚀</span>
+                        <span class="btn-title">Iniciar Servidor</span>
+                        <span class="btn-desc">Iniciar el servidor de indexación</span>
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">Procesando...</div>
+                <div class="output-area" id="output-area">Esperando comandos...</div>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Búsqueda de Código</h2>
+                <div class="search-section">
+                    <div class="search-form">
+                        <input type="text" class="search-input" id="search-input" placeholder="Ingrese su consulta de búsqueda (ej: function indexFile, API endpoints, etc.)">
+                        <button class="search-btn" onclick="performSearch()">Buscar</button>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="search-progress"></div>
+                    </div>
+                    
+                    <div class="results-area" id="results-area">
+                        <p style="color: #666; text-align: center; padding: 20px;">Ingrese una consulta para buscar código similar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        // Verificar estado del servidor al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            checkServerStatus();
+            loadStats();
+            
+            // Actualizar estadísticas cada 30 segundos
+            setInterval(loadStats, 30000);
+        });
+
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    document.getElementById('server-status').classList.add('active');
+                    document.getElementById('server-status-text').textContent = 'Servidor activo';
+                    document.getElementById('server-status-text').style.color = '#28a745';
+                } else {
+                    throw new Error('Servidor no responde');
+                }
+            } catch (error) {
+                document.getElementById('server-status').classList.remove('active');
+                document.getElementById('server-status-text').textContent = 'Servidor desconectado';
+                document.getElementById('server-status-text').style.color = '#dc3545';
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayStats(data.stats);
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        function displayStats(stats) {
+            const grid = document.getElementById('stats-grid');
+            grid.innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-number">${stats.total_files || 0}</span>
+                    <div class="stat-label">Archivos Indexados</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${formatBytes(stats.total_size || 0)}</span>
+                    <div class="stat-label">Tamaño Total</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${(stats.total_words || 0).toLocaleString()}</span>
+                    <div class="stat-label">Palabras Indexadas</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${(stats.unique_words || 0).toLocaleString()}</span>
+                    <div class="stat-label">Palabras Únicas</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${formatBytes(stats.database_size || 0)}</span>
+                    <div class="stat-label">Tamaño Base de Datos</div>
+                </div>
+            `;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function runCommand(command) {
+            const outputArea = document.getElementById('output-area');
+            const loading = document.getElementById('loading');
+            
+            // Mostrar carga
+            loading.style.display = 'block';
+            outputArea.textContent = 'Procesando comando...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/command`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: command })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Formatear salida
+                const formattedOutput = {
+                    success: result.success,
+                    command: result.command,
+                    timestamp: result.timestamp,
+                    output: result.output,
+                    error: result.error
+                };
+                
+                outputArea.textContent = JSON.stringify(formattedOutput, null, 2);
+                loading.style.display = 'none';
+                
+                // Actualizar estadísticas si se indexó o limpió
+                if (command === 'index' || command === 'clear' || command === 'clear-and-index') {
+                    setTimeout(loadStats, 2000); // Esperar 2 segundos para que se complete
+                }
+                
+            } catch (error) {
+                outputArea.textContent = `Error: ${error.message}`;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function startServer() {
+            const outputArea = document.getElementById('output-area');
+            const loading = document.getElementById('loading');
+            
+            // Mostrar carga
+            loading.style.display = 'block';
+            outputArea.textContent = 'Iniciando servidor...';
+            
+            try {
+                // Intentar iniciar el servidor
+                const response = await fetch(`${API_BASE}/health`);
+                
+                if (response.ok) {
+                    outputArea.textContent = '✅ Servidor ya está activo';
+                    loading.style.display = 'none';
+                    checkServerStatus();
+                } else {
+                    outputArea.textContent = '⚠️ El servidor no está activo. Por favor inicia manualmente con: cd code-analysis && node local-server.js';
+                    loading.style.display = 'none';
+                }
+                
+            } catch (error) {
+                outputArea.textContent = `❌ Error: ${error.message}\n\nPara iniciar el servidor manualmente:\n1. Abre una terminal\n2. Ejecuta: cd code-analysis\n3. Ejecuta: node local-server.js`;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const resultsArea = document.getElementById('results-area');
+            const progress = document.getElementById('search-progress');
+            
+            if (!query) {
+                resultsArea.innerHTML = '<div class="error">Por favor ingrese una consulta de búsqueda</div>';
+                return;
+            }
+
+            // Mostrar progreso
+            progress.style.width = '50%';
+            resultsArea.innerHTML = '<p style="text-align: center; color: #666;">Buscando...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/search/similar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                progress.style.width = '100%';
+                
+                if (data.success && data.results && data.results.length > 0) {
+                    displaySearchResults(data.results);
+                } else {
+                    resultsArea.innerHTML = '<p style="text-align: center; color: #666;">No se encontraron resultados</p>';
+                }
+
+            } catch (error) {
+                resultsArea.innerHTML = `<div class="error">Error en la búsqueda: ${error.message}</div>`;
+            } finally {
+                setTimeout(() => {
+                    progress.style.width = '0%';
+                }, 1000);
+            }
+        }
+
+        function displaySearchResults(results) {
+            const resultsArea = document.getElementById('results-area');
+            resultsArea.innerHTML = `
+                <h3 style="margin-bottom: 15px; color: var(--primary);">
+                    Resultados para: "${document.getElementById('search-input').value}"
+                </h3>
+                ${results.map(result => `
+                    <div class="result-item" onclick="selectResult('${result.file_path}')">
+                        <div class="result-title">${result.file_name}</div>
+                        <div class="result-meta">
+                            Ruta: ${result.file_path} | 
+                            Coincidencias: ${result.matches} | 
+                            Score: ${result.score.toFixed(2)} | 
+                            Complejidad: ${result.complexity_score}
+                        </div>
+                        <div style="font-size: 0.8rem; color: #888; margin-top: 5px; font-family: monospace;">
+                            ${result.preview}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function selectResult(filePath) {
+            // Copiar ruta al portapapeles
+            navigator.clipboard.writeText(filePath).then(() => {
+                alert(`Ruta copiada al portapapeles: ${filePath}`);
+            });
+        }
+    </script>
+</body>
+</html>

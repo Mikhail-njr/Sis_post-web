@@ -1,0 +1,196 @@
+================================================================================
+                    🚀 INSTALADOR SISTEMA POS
+                    Punto de Venta Completo
+================================================================================
+
+FECHA: %DATE%
+HORA: %TIME%
+VERSIÓN: 1.0.0
+
+================================================================================
+📋 ÍNDICE
+================================================================================
+
+1. DESCRIPCIÓN GENERAL
+2. REQUISITOS DEL SISTEMA
+3. INSTALACIÓN RÁPIDA
+4. INSTALACIÓN DETALLADA
+5. PRIMER USO
+6. UTILIDADES INCLUIDAS
+7. SOLUCIÓN DE PROBLEMAS
+8. CONTACTO Y SOPORTE
+
+================================================================================
+1. 📋 DESCRIPCIÓN GENERAL
+================================================================================
+
+Este instalador configura completamente el Sistema POS (Punto de Venta) incluyendo:
+
+✅ COMPONENTES PRINCIPALES:
+   • Node.js (Entorno de ejecución JavaScript)
+   • ngrok (Acceso remoto seguro)
+   • Aplicación Electron (Interfaz nativa)
+   • Base de datos SQLite
+   • Dependencias y librerías
+
+✅ CARACTERÍSTICAS:
+   • Instalación automática guiada
+   • Verificación de requisitos
+   • Configuración completa
+   • Datos de ejemplo incluidos
+   • Utilidades de respaldo y restauración
+
+✅ MODO DE USO:
+   • Aplicación de escritorio independiente
+   • Sin necesidad de navegador web
+   • Funciona con o sin conexión a internet
+
+================================================================================
+2. 🔧 REQUISITOS DEL SISTEMA
+================================================================================
+
+MÍNIMOS:
+• Sistema Operativo: Windows 7 SP1 o superior
+• Procesador: 1 GHz o superior
+• Memoria RAM: 1 GB
+• Espacio en disco: 1 GB libre
+• Conexión a internet (para instalación)
+
+RECOMENDADOS:
+• Sistema Operativo: Windows 10 o superior
+• Procesador: 2 GHz dual-core
+• Memoria RAM: 2 GB
+• Espacio en disco: 2 GB libres
+• Cámara web (para escaneo de códigos)
+
+================================================================================
+3. ⚡ INSTALACIÓN RÁPIDA
+================================================================================
+
+PASO 1: Asegúrese de tener ambos archivos:
+       • instalar.bat (este instalador)
+       • sistema-pos-electron.zip (paquete comprimido)
+
+PASO 2: Haga doble clic en "instalar.bat"
+PASO 3: El instalador descomprimirá automáticamente el sistema
+PASO 4: Seleccione "Instalación Completa"
+PASO 5: Espere a que se complete la instalación
+PASO 6: Use el acceso directo en el escritorio
+
+¡LISTO! El sistema estará funcionando en menos de 10 minutos.
+
+================================================================================
+4. 📝 INSTALACIÓN DETALLADA
+================================================================================
+
+PASO 1: EJECUTAR INSTALADOR
+   • Haga doble clic en "instalar.bat"
+   • Si pide permisos de administrador, acepte
+
+PASO 2: SELECCIONAR TIPO DE INSTALACIÓN
+   • Completa: Instala todo automáticamente (RECOMENDADO)
+   • Rápida: Solo aplicación (requiere Node.js pre-instalado)
+   • Personalizada: Seleccionar componentes individuales
+
+PASO 3: SEGUIR ASISTENTE
+   • El instalador descargará e instalará componentes automáticamente
+   • Proporcione el Auth Token de ngrok cuando se solicite (opcional)
+   • Configure opciones según sus necesidades
+
+PASO 4: COMPLETAR INSTALACIÓN
+   • Se crearán accesos directos automáticamente
+   • Se instalarán datos de ejemplo
+   • Se configurará el sistema completamente
+
+================================================================================
+5. 🎯 PRIMER USO
+================================================================================
+
+INICIAR EL SISTEMA:
+1. Haga doble clic en "Sistema POS" en el escritorio
+2. O busque "Sistema POS" en el menú inicio
+
+ACCEDER AL SISTEMA:
+• Usuario: admin
+• Contraseña: pos123
+
+CONFIGURACIÓN INICIAL:
+1. Vaya al Dashboard (Panel de Control)
+2. Configure sus productos y proveedores
+3. Ajuste precios y configuraciones
+4. Configure promociones si las necesita
+
+================================================================================
+6. 🛠️ UTILIDADES INCLUIDAS
+================================================================================
+
+UBICACIÓN: carpeta "utilidades\"
+
+✅ BACKUP.BAT
+   • Crea respaldos completos de sus datos
+   • Ubicación: Documents\SistemaPOS_Backups\
+   • Uso: Ejecutar cuando tenga datos importantes
+
+✅ RESTAURAR.BAT
+   • Restaura datos desde respaldos anteriores
+   • Lista todos los respaldos disponibles
+   • Crea respaldo automático antes de restaurar
+
+✅ DIAGNOSTICO.BAT
+   • Verifica el estado del sistema
+   • Detecta problemas y ofrece soluciones
+   • Recomendado antes de contactar soporte
+
+================================================================================
+7. 🆘 SOLUCIÓN DE PROBLEMAS
+================================================================================
+
+PROBLEMA: "Node.js no encontrado"
+SOLUCIÓN:
+• Ejecute: instaladores\instalar_nodejs.bat
+• O descargue manualmente desde nodejs.org
+
+PROBLEMA: "ngrok no configurado"
+SOLUCIÓN:
+• Regístrese en ngrok.com
+• Obtenga su Auth Token
+• Ejecute: instaladores\configurar_ngrok.bat
+
+PROBLEMA: "Puerto 3000 ocupado"
+SOLUCIÓN:
+• Cierre otras aplicaciones
+• O configure un puerto diferente en la aplicación
+
+PROBLEMA: "Error de permisos"
+SOLUCIÓN:
+• Ejecute el instalador como administrador
+• Verifique que tenga permisos de escritura
+
+================================================================================
+8. 📞 CONTACTO Y SOPORTE
+================================================================================
+
+SOPORTE TÉCNICO:
+• Email: soporte@sistema-pos.com
+• WhatsApp: +54 9 11 1234-5678
+• Web: https://sistema-pos.com
+
+DOCUMENTACIÓN COMPLETA:
+• Lea el archivo README.md en esta carpeta
+• Incluye manuales detallados y FAQ
+
+HORARIOS DE ATENCIÓN:
+• Lunes a Viernes: 9:00 - 18:00
+• Sábados: 9:00 - 13:00
+• Domingos: Solo emergencias
+
+================================================================================
+
+¡Gracias por elegir Sistema POS!
+
+Su sistema de punto de venta está diseñado para revolucionar
+la gestión de su negocio con tecnología moderna y confiable.
+
+Para comenzar, simplemente ejecute "instalar.bat" y siga las instrucciones.
+
+================================================================================

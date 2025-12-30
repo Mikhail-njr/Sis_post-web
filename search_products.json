@@ -1,0 +1,4 @@
+{
+  "query": "router.get(\"/api/products\" OR app.get(\"/api/products\" OR router.post(\"/api/products\" OR app.post(\"/api/products\"",
+  "limit": 100
+}

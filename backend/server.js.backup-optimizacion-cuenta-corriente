@@ -1,0 +1,79 @@
+// BACKUP DEL ENDPOINT ACTUAL DE CUENTA CORRIENTE
+// Este es el endpoint original antes de la optimización
+// Líneas 2063-2216 del archivo backend/server.js
+
+// >>> ENDPOINT ACTUAL (NO OPTIMIZADO) para calcular y actualizar precios de deudas pendientes
+app.post('/api/debts/update-prices', conditionalAuth, async (req, res) => {
+    try {
+        console.log('🚀 Iniciando actualización de precios de deudas...');
+        
+        // Obtener todas las deudas pendientes
+        const debts = await dbAll("SELECT * FROM deudas WHERE estado = 'pendiente'");
+        
+        if (debts.length === 0) {
+            return res.json({
+                success: true,
+                message: 'No hay deudas pendientes para actualizar',
+                updated_debts: 0
+            });
+        }
+        
+        console.log(`💰 Procesando ${debts.length} deudas...`);
+        
+        let debtsUpdated = 0;
+        
+        // Procesar cada deuda individualmente (INEFICIENTE - múltiples consultas)
+        for (const debt of debts) {
+            // Obtener productos de la deuda
+            const debtProducts = await dbAll("SELECT * FROM deuda_productos WHERE deuda_id = ?", [debt.id]);
+            
+            let nuevoMontoPendiente = 0;
+            
+            // Calcular nuevo monto basado en precios actuales
+            for (const producto of debtProducts) {
+                // Consulta individual por producto (INEFICIENTE)
+                const product = await dbAll("SELECT precio FROM productos WHERE id = ?", [producto.producto_id]);
+                
+                if (product.length > 0) {
+                    const nuevoSubtotal = producto.cantidad * product[0].precio;
+                    nuevoMontoPendiente += nuevoSubtotal;
+                }
+            }
+            
+            // Solo actualizar si el monto cambió
+            if (Math.abs(nuevoMontoPendiente - debt.monto_pendiente) > 0.01) {
+                await dbRun(
+                    "UPDATE deudas SET monto_pendiente = ? WHERE id = ?",
+                    [nuevoMontoPendiente, debt.id]
+                );
+                debtsUpdated++;
+                
+                // Registrar en log de operaciones
+                logOperation(
+                    'DEUDA_PRECIOS_ACTUALIZADOS',
+                    `Deuda actualizada: ${debt.id} - Monto: ${formatCurrency(debt.monto_pendiente)} → ${formatCurrency(nuevoMontoPendiente)}`,
+                    'Sistema',
+                    'deudas',
+                    debt.id,
+                    { monto_anterior: debt.monto_pendiente },
+                    { nuevo_monto_pendiente: nuevoMontoPendiente }
+                );
+            }
+        }
+        
+        console.log(`✅ ${debtsUpdated} deudas actualizadas exitosamente`);
+        
+        res.json({
+            success: true,
+            message: `Precios de deudas actualizados exitosamente`,
+            updated_debts: debtsUpdated,
+            total_debts_processed: debts.length
+        });
+        
+    } catch (error) {
+        console.error('❌ Error actualizando precios de deudas:', error);
+        res.status(500).json({
+            error: 'Error interno del servidor: ' + error.message
+        });
+    }
+});

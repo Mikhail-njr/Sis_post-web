@@ -1,281 +1,126 @@
--- Archivo: lista_productos_organizada_ampliada.sql
--- Productos organizados por categoría con stock = 20
--- Base de datos ampliada para el mercado argentino
+-- ================================================================
+-- BASE DE DATOS DE PRODUCTOS ARGENTINA - EAN REALES + GENÉRICOS
+-- ===============================================================
 
--- Reset database: Delete all records from tables
-DELETE FROM ventas;
+-- 1. Limpieza inicial (Ordenada por dependencias)
 DELETE FROM venta_items;
+DELETE FROM ventas;
 DELETE FROM cierres_caja;
 DELETE FROM productos;
 
--- Pastas
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-001', 'Fideos (tallarín, codito, mostachol, etc.)', 1000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-002', 'Pastas secas en general', 1000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-003', 'Ravioles frescos', 1800, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-004', 'Ñoquis', 1600, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-005', 'Lasaña para armar', 1200, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-006', 'Capeletis', 2000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-007', 'Sorrentinos', 2200, 20, 'Pastas');
+-- 2. Asegurar columna de códigos de barra
+-- Si usas SQLite/Postgres/MySQL, asegurate que esta columna exista:
+-- ALTER TABLE productos ADD COLUMN codigo_barras VARCHAR(20);
 
--- Cereales y Derivados
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-001', 'Arroz blanco', 1750, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-002', 'Arroz integral', 2150, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-003', 'Harina de trigo (000)', 1000, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-004', 'Harina de trigo (0000)', 1100, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-005', 'Harina leudante', 1250, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-006', 'Pan rallado', 800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-007', 'Rebozador', 900, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-008', 'Maíz (en grano o para pochoclo)', 950, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-009', 'Quinoa', 3500, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-010', 'Avena', 1400, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-011', 'Polenta', 800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-012', 'Sémola', 1300, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-013', 'Cebada perlada', 1800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-014', 'Harina integral', 1350, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-015', 'Harina de maíz', 950, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-016', 'Salvado', 1100, 20, 'Cereales y Derivados');
+-- ================================================================
+-- INSERTAR PRODUCTOS CON CÓDIGOS REALES (TOP MARCAS ARGENTINA)
+-- ===============================================================
 
--- Conservas
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-001', 'Puré de tomate / Tomate triturado', 750, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-002', 'Tomate entero / rodajas', 750, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-003', 'Arvejas', 650, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-004', 'Zanahorias', 650, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-005', 'Choclo', 650, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-006', 'Atún / Caballa en lata', 1050, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-007', 'Sardinas en lata', 800, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-008', 'Lentejas en lata', 750, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-009', 'Garbanzos en lata', 750, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-010', 'Porotos en lata', 750, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-011', 'Palmitos', 1200, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-012', 'Aceitunas verdes', 900, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-013', 'Aceitunas negras', 950, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-014', 'Duraznos en almíbar', 1100, 20, 'Conservas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CONS-015', 'Cocktail de frutas', 1000, 20, 'Conservas');
+-- BEBIDAS (Gaseosas, Aguas y Alcohol)
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('BEB-001', 'Agua Mineral Villavicencio Sin Gas 1.5L', 1200, 50, 'Bebidas', '7792900092980'),
+('BEB-002', 'Agua Saborizada Levite Pomelo 1.5L', 1400, 50, 'Bebidas', '7792900001777'),
+('BEB-003', 'Coca Cola Sabor Original 2.25L', 2600, 100, 'Bebidas', '7790895000997'),
+('BEB-004', 'Sprite Lima Limón 2.25L', 2600, 80, 'Bebidas', '7790895000430'),
+('BEB-005', 'Fanta Naranja 2.25L', 2600, 60, 'Bebidas', '7790895000836'),
+('BEB-008', 'Cerveza Quilmes Clásica 473ml (Lata)', 1300, 120, 'Bebidas', '7791290790971'),
+('BEB-009', 'Vino Tinto Benjamin Malbec 750ml', 3500, 40, 'Bebidas', '7790142000787'),
+('BEB-011', 'Fernet Branca 750ml', 9800, 30, 'Bebidas', '7790070411713');
 
--- Aceites y Vinagres
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-001', 'Aceite de girasol', 1750, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-002', 'Aceite de maíz', 1850, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-003', 'Aceite de oliva', 2750, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-004', 'Aceite de soja', 1750, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-005', 'Vinagre', 550, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-006', 'Aceite de oliva extra virgen', 4500, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-007', 'Aceite en spray', 1200, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-008', 'Vinagre de manzana', 800, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-009', 'Vinagre balsámico', 1500, 20, 'Aceites y Vinagres');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('ACEI-010', 'Vinagre de vino tinto', 650, 20, 'Aceites y Vinagres');
+-- ALMACÉN: CEREALES Y HARINAS
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('CER-001', 'Arroz Gallo Oro 1kg (Estuche)', 2800, 40, 'Cereales y Derivados', '7790070318616'),
+('CER-002', 'Arroz Lucchetti Largo Fino 1kg', 1900, 40, 'Cereales y Derivados', '7790070507440'),
+('CER-003', 'Harina de Trigo 000 Cañuelas 1kg', 1100, 60, 'Cereales y Derivados', '7792180005229'),
+('CER-004', 'Harina de Trigo 0000 Blancaflor 1kg', 1500, 60, 'Cereales y Derivados', '7790070506924'),
+('CER-005', 'Harina Leudante Blancaflor 1kg', 1600, 50, 'Cereales y Derivados', '7790070411843'),
+('CER-006', 'Pan Rallado Preferido 500g', 1400, 30, 'Cereales y Derivados', '7790040133406'),
+('CER-011', 'Polenta Prestopronta 500g', 1350, 25, 'Cereales y Derivados', '7790060023664'),
+('CER-034', 'Copos de Maíz Kellogg''s 200g', 2500, 15, 'Cereales y Derivados', '7798113300243');
 
--- Condimentos y Especias
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-001', 'Sal', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-002', 'Pimienta', 450, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-003', 'Orégano', 300, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-004', 'Ají molido', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-005', 'Pimentón', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-006', 'Ajo en polvo', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-007', 'Cebolla en polvo', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-008', 'Caldo en cubos o polvo', 550, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-009', 'Comino', 350, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-010', 'Provenzal', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-011', 'Perejil deshidratado', 300, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-012', 'Laurel', 250, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-013', 'Nuez moscada', 600, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-014', 'Canela en polvo', 450, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-015', 'Curry', 500, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-016', 'Chimichurri', 400, 20, 'Condimentos y Especias');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('COND-017', 'Sazonador para asado', 350, 20, 'Condimentos y Especias');
+-- PASTAS SECAS (Marcas Líderes)
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('PAST-001', 'Fideos Matarazzo Tallarín 500g', 1800, 40, 'Pastas', '7790070336316'),
+('PAST-002', 'Fideos Lucchetti Mostachol 500g', 1400, 40, 'Pastas', '7790070336149'),
+('PAST-008', 'Fideos Spaghetti Matarazzo 500g', 1800, 40, 'Pastas', '7790070336347'),
+('PAST-019', 'Fideos Tirabuzón Don Vicente 500g', 2200, 30, 'Pastas', '7790070318210'),
+('PAST-004', 'Ñoquis de Papa La Salteña (Fresco)', 2800, 15, 'Pastas', '7790070342027');
 
--- Azúcar y Edulcorantes
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-001', 'Azúcar blanca', 1250, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-002', 'Azúcar impalpable', 1500, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-003', 'Edulcorantes (sobre o líquido)', 700, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-004', 'Azúcar mascabo', 1400, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-005', 'Azúcar rubia', 1300, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-006', 'Stevia', 1200, 20, 'Azúcar y Edulcorantes');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('AZUC-007', 'Sucralosa', 800, 20, 'Azúcar y Edulcorantes');
+-- CONSERVAS Y LATAS
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('CONS-001', 'Puré de Tomate Arcor 520g', 950, 60, 'Conservas', '7790580504201'),
+('CONS-003', 'Arvejas La Campagnola Lata', 1100, 40, 'Conservas', '7790070225020'),
+('CONS-005', 'Choclo Cremoso Arcor Lata', 1200, 40, 'Conservas', '7790580980906'),
+('CONS-006', 'Atún La Campagnola al Natural 170g', 3200, 25, 'Conservas', '7790070228137'),
+('CONS-014', 'Duraznos en Almíbar La Campagnola Lata', 3800, 20, 'Conservas', '7790070230215');
 
--- Dulces y Mermeladas
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-001', 'Dulce de leche', 1050, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-002', 'Mermelada (frutilla, durazno, etc.)', 900, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-003', 'Miel', 1400, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-004', 'Dulce de batata', 800, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-005', 'Dulce de membrillo', 850, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-006', 'Mermelada diet', 1100, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-007', 'Nutella', 2800, 20, 'Dulces y Mermeladas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('DULC-008', 'Manjar', 1200, 20, 'Dulces y Mermeladas');
+-- ACEITES, VINAGRES Y CONDIMENTOS
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('ACEI-001', 'Aceite Girasol Natura 1.5L', 2900, 40, 'Aceites y Vinagres', '7790272001005'),
+('ACEI-003', 'Aceite Oliva Cocinero Clásico 500ml', 5500, 20, 'Aceites y Vinagres', '7790070231533'),
+('ACEI-005', 'Vinagre de Alcohol Menoyo 1L', 1100, 30, 'Aceites y Vinagres', '7790100003116'),
+('OTRO-001', 'Mayonesa Hellmanns Clásica Doypack 475g', 2200, 40, 'Otros', '7790060000436'),
+('OTRO-002', 'Mostaza Savora Original 250g', 1600, 30, 'Otros', '7793360000166'),
+('OTRO-003', 'Ketchup Arcor 250g', 1800, 30, 'Otros', '7790580980005'),
+('COND-001', 'Sal Fina Dos Anclas Estuche 500g', 900, 50, 'Condimentos y Especias', '7792900000428'),
+('AZUC-001', 'Azúcar Ledesma Clásica 1kg', 1400, 60, 'Azúcar y Edulcorantes', '7792540260138');
 
--- Infusiones
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-001', 'Yerba mate', 1600, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-002', 'Café molido', 2000, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-003', 'Café instantáneo', 1400, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-004', 'Café en cápsulas', 1150, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-005', 'Té / Mate cocido (saquitos o hebras)', 550, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-006', 'Té verde', 800, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-007', 'Té rojo', 850, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-008', 'Manzanilla', 600, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-009', 'Tilo', 650, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-010', 'Boldo', 700, 20, 'Infusiones');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('INFU-011', 'Café en grano', 2500, 20, 'Infusiones');
+-- INFUSIONES
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('INFU-001', 'Yerba Mate Playadito 500g', 3200, 50, 'Infusiones', '7793704000911'),
+('INFU-012', 'Yerba Mate Taragüi 500g', 3100, 40, 'Infusiones', '7790387013333'),
+('INFU-002', 'Café Molido La Virginia 500g', 6500, 20, 'Infusiones', '7790477052129'),
+('INFU-003', 'Café Instantáneo Nescafé Dolca 100g', 4200, 20, 'Infusiones', '7613036297600'),
+('INFU-005', 'Té Taragüi 25 saquitos', 1100, 30, 'Infusiones', '7790019024165');
 
--- Galletitas y Snacks
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-001', 'Galletitas dulces (de agua, crackers)', 600, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-002', 'Galletitas surtidas / rellenas', 800, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-003', 'Snacks (papas fritas, maní, palitos)', 700, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-004', 'Galletitas tipo Oreo', 1200, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-005', 'Galletitas saladas', 700, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-006', 'Tostadas', 800, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-007', 'Grisines', 650, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-008', 'Maníes salados', 900, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-009', 'Mix de frutos secos', 1800, 20, 'Galletitas y Snacks');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('GALL-010', 'Papas Pringles', 1400, 20, 'Galletitas y Snacks');
+-- DULCES Y GALLETITAS
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('DULC-001', 'Dulce de Leche La Serenísima Colonial 400g', 2800, 30, 'Dulces y Mermeladas', '7790011284819'),
+('DULC-002', 'Mermelada Arcor Durazno 454g', 2100, 25, 'Dulces y Mermeladas', '7790580506311'),
+('GALL-001', 'Galletitas Criollitas Pack 3', 1800, 40, 'Galletitas y Snacks', '7790040304059'),
+('GALL-002', 'Galletitas Bagley Surtido Diversión 400g', 2500, 30, 'Galletitas y Snacks', '7790580660006'),
+('GALL-004', 'Galletitas Oreo 117g', 1900, 50, 'Galletitas y Snacks', '7622300724248'),
+('GALL-005', 'Galletitas Traviata Paquete', 1200, 40, 'Galletitas y Snacks', '7790040502554');
 
--- Lácteos
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-001', 'Leche en polvo', 1200, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-002', 'Leche UAT (larga vida)', 800, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-003', 'Leche fresca', 900, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-004', 'Leche descremada', 850, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-005', 'Leche sin lactosa', 1100, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-006', 'Crema de leche', 950, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-007', 'Manteca', 1200, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-008', 'Margarina', 800, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-009', 'Queso cremoso', 2200, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-010', 'Queso rallado', 1800, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-011', 'Yogur natural', 600, 20, 'Lácteos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LACT-012', 'Yogur con frutas', 700, 20, 'Lácteos');
+-- LÁCTEOS
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('LACT-002', 'Leche La Serenísima Larga Vida Entera 1L', 1600, 100, 'Lácteos', '7790011163602'),
+('LACT-004', 'Leche La Serenísima Larga Vida Descremada 1L', 1600, 80, 'Lácteos', '7790011163619'),
+('LACT-007', 'Manteca La Serenísima 200g', 2800, 30, 'Lácteos', '7790011024088'),
+('LACT-009', 'Queso Cremoso La Paulina (Trozo 500g aprox)', 4500, 20, 'Lácteos', '7790398003859'),
+('LACT-011', 'Yogur Bebible Yogurísimo Frutilla 1L', 2200, 25, 'Lácteos', '7791070000740');
 
--- Postres y Repostería
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-001', 'Premezclas para tortas', 900, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-002', 'Flanes en polvo', 400, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-003', 'Gelatinas en polvo', 350, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-004', 'Cacao en polvo', 600, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-005', 'Polvo para flan', 450, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-006', 'Esencia de vainilla', 350, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-007', 'Colorante alimentario', 250, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-008', 'Chips de chocolate', 1200, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-009', 'Coco rallado', 800, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-010', 'Almendras', 2500, 20, 'Postres y Repostería');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('POST-011', 'Nueces', 3000, 20, 'Postres y Repostería');
+-- LIMPIEZA E HIGIENE
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('LIMP-001', 'Detergente Magistral Limón 750ml', 2800, 30, 'Productos de Limpieza e Higiene', '7793100111569'),
+('LIMP-004', 'Lavandina Ayudín Clásica 1L', 1400, 40, 'Productos de Limpieza e Higiene', '7791293034225'),
+('LIMP-005', 'Papel Higiénico Higienol 4 rollos 30m', 2500, 30, 'Productos de Limpieza e Higiene', '7790250054597');
 
--- Otros
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-001', 'Mayonesa', 900, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-002', 'Mostaza', 500, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-003', 'Ketchup', 800, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-004', 'Salsas (soja, picantes, etc.)', 600, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-005', 'Tapas para empanadas y tartas', 700, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-006', 'Levadura / Leudantes', 500, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-007', 'Alfajores', 300, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-008', 'Chocolates', 800, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-009', 'Salsa golf', 950, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-010', 'Aceto balsámico', 1200, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-011', 'Salsa barbacoa', 800, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-012', 'Salsa cesar', 1100, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-013', 'Salsa de ajo', 750, 20, 'Otros');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('OTRO-014', 'Salsa picante', 600, 20, 'Otros');
+-- ================================================================
+-- PRODUCTOS GENÉRICOS / PESABLES (CÓDIGOS INTERNOS "20...")
+-- Se asignan códigos fijos que empiezan con 20 para que los puedas
+-- imprimir en etiquetas o tener en una lista rápida en caja.
+-- ===============================================================
 
--- Carnes y Embutidos
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-001', 'Carne picada', 2800, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-002', 'Asado', 3500, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-003', 'Matambre', 4200, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-004', 'Bife de chorizo', 4800, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-005', 'Pollo entero', 2200, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-006', 'Pechuga de pollo', 3200, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-007', 'Chorizo parrillero', 2800, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-008', 'Morcilla', 2200, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-009', 'Jamón cocido', 3500, 20, 'Carnes y Embutidos');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CARN-010', 'Salchichas', 1800, 20, 'Carnes y Embutidos');
+-- CARNICERÍA
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('CARN-001', 'Carne Picada Especial x kg', 6500, 0, 'Carnes y Embutidos', '2000010000010'),
+('CARN-002', 'Asado de Tira x kg', 8500, 0, 'Carnes y Embutidos', '2000010000020'),
+('CARN-005', 'Pollo Entero Fresco x kg', 2800, 0, 'Carnes y Embutidos', '2000010000030'),
+('CARN-006', 'Pechuga de Pollo x kg', 5500, 0, 'Carnes y Embutidos', '2000010000040'),
+('CARN-009', 'Jamón Cocido Feteado x 100g', 1500, 0, 'Carnes y Embutidos', '2000010000050'),
+('LACT-010', 'Queso Tybo Feteado x 100g', 1800, 0, 'Lácteos', '2000010000060');
 
--- Verduras y Frutas
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-001', 'Papa', 800, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-002', 'Cebolla', 600, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-003', 'Tomate', 1200, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-004', 'Lechuga', 750, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-005', 'Zanahoria', 650, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-006', 'Zapallo', 500, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('VERD-007', 'Morrón rojo', 1100, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-001', 'Banana', 900, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-002', 'Manzana', 1200, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-003', 'Naranja', 800, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-004', 'Limón', 600, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-005', 'Pera', 1300, 20, 'Verduras y Frutas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('FRUT-006', 'Uva', 1800, 20, 'Verduras y Frutas');
+-- VERDULERÍA
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('VERD-001', 'Papa Negra x kg', 1200, 0, 'Verduras y Frutas', '2000020000010'),
+('VERD-002', 'Cebolla x kg', 1000, 0, 'Verduras y Frutas', '2000020000020'),
+('VERD-003', 'Tomate Redondo x kg', 2500, 0, 'Verduras y Frutas', '2000020000030'),
+('VERD-004', 'Lechuga Criolla x kg', 1800, 0, 'Verduras y Frutas', '2000020000040'),
+('FRUT-001', 'Banana Ecuador x kg', 1900, 0, 'Verduras y Frutas', '2000020000050'),
+('FRUT-002', 'Manzana Roja x kg', 2200, 0, 'Verduras y Frutas', '2000020000060');
 
--- Bebidas
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-001', 'Agua mineral sin gas', 350, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-002', 'Agua mineral con gas', 350, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-003', 'Coca Cola', 800, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-004', 'Sprite', 800, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-005', 'Fanta', 800, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-006', 'Jugo de naranja', 1200, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-007', 'Jugo de manzana', 1200, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-008', 'Cerveza Quilmes', 450, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-009', 'Vino tinto', 1800, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-010', 'Vino blanco', 1800, 20, 'Bebidas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('BEB-011', 'Fernet Branca', 2200, 20, 'Bebidas');
-
--- Productos de Limpieza e Higiene
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-001', 'Detergente', 1200, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-002', 'Jabón en polvo', 1500, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-003', 'Suavizante', 800, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-004', 'Lavandina', 450, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-005', 'Papel higiénico', 1100, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-006', 'Servilletas', 600, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-007', 'Bolsas de residuos', 900, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-008', 'Esponjas', 400, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-009', 'Limpiador multiuso', 750, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('LIMP-010', 'Desinfectante', 850, 20, 'Productos de Limpieza e Higiene');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-008', 'Fideos spaghetti', 950, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-009', 'Penne rigate', 1100, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-010', 'Fideos al huevo', 1200, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-011', 'Pasta orgánica', 2000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-012', 'Fideos saborizados', 1300, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-013', 'Lasaña precocida', 1800, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-014', 'Ravioles de verdura', 2200, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-015', 'Ñoquis de papa', 1400, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-016', 'Capellettis de pollo', 1600, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-017', 'Fideos sin gluten', 2500, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-018', 'Fideos integrales', 1800, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-019', 'Fusilli', 1100, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-020', 'Canelones rellenos', 2300, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-021', 'Tortellini de jamón', 2600, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-022', 'Pappardelle', 2100, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-023', 'Tagliatelle', 2000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-024', 'Fideos moñito', 1000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-025', 'Ravioles de ricota', 2400, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-026', 'Fideos cintas', 1150, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-027', 'Fideos cabello de ángel', 900, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-028', 'Pasta de arroz', 2700, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-029', 'Fideos tricolor', 1300, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-030', 'Fideos corte especial', 1200, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-031', 'Pasta rellena artesanal', 3000, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-032', 'Fideos para sopa', 850, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-033', 'Fideos con espinaca', 1400, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-034', 'Fideos con remolacha', 1500, 20, 'Pastas');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('PAST-035', 'Sorrentinos de jamón y queso', 2800, 20, 'Pastas');
-
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-017', 'Arroz jazmín', 1900, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-018', 'Arroz parboil', 1800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-019', 'Arroz yamani', 2400, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-020', 'Harina de centeno integral', 1600, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-021', 'Harina premezcla sin TACC', 1700, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-022', 'Harina de mandioca', 1500, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-023', 'Avena instantánea', 1650, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-024', 'Polenta saborizada', 900, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-025', 'Granola', 2800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-026', 'Barritas de cereales', 1200, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-027', 'Harina de garbanzo', 1800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-028', 'Trigo burgol', 850, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-029', 'Mijo', 1400, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-030', 'Sorgo en grano', 1100, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-031', 'Avena extra fina', 1500, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-032', 'Harina orgánica', 2200, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-033', 'Pan lactal integral', 1900, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-034', 'Copos de maíz', 1300, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-035', 'Copos de arroz', 1200, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-036', 'Harina de arroz', 1600, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-037', 'Salvado de trigo', 1000, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-038', 'Pan rallado sin gluten', 1300, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-039', 'Harina leudante nacional', 1250, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-040', 'Cereal de quinoa', 3500, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-041', 'Polenta lista', 1000, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-042', 'Fideos de arroz', 2800, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-043', 'Rebozador sin gluten', 1400, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-044', 'Cereal para desayuno', 1600, 20, 'Cereales y Derivados');
-INSERT INTO productos (codigo, nombre, precio, stock, categoria) VALUES ('CER-045', 'Harina para panes artesanales', 1800, 20, 'Cereales y Derivados');
+-- PANADERÍA
+INSERT INTO productos (codigo, nombre, precio, stock, categoria, codigo_barras) VALUES 
+('CER-000', 'Pan Francés x kg', 2200, 0, 'Cereales y Derivados', '2000030000010'),
+('OTRO-007', 'Facturas Surtidas (docena)', 4800, 0, 'Otros', '2000030000020');

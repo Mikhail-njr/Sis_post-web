@@ -163,6 +163,7 @@
             font-size: 0.9rem;
         }
     </style>
+    <script src="script.js"></script>
 </head>
 <body>
     <div class="activation-container">
@@ -215,6 +216,19 @@
     </div>
 
     <script>
+        // Verificar autenticación al cargar la página de activación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAuthFromStorage();
+            if (!isLoggedIn) {
+                // Ocultar el formulario de activación hasta que se inicie sesión
+                document.querySelector('.activation-container').style.display = 'none';
+                showLoginModal('Debes iniciar sesión para acceder a la activación de licencias:', () => {
+                    // Mostrar el formulario después del login exitoso
+                    document.querySelector('.activation-container').style.display = 'block';
+                });
+            }
+        });
+
         // Función de activación
         document.getElementById('activationForm').addEventListener('submit', async (e) => {
             e.preventDefault();

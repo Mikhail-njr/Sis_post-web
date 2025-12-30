@@ -4,16 +4,18 @@
     "codigo": "LAP-001",
     "nombre": "Laptop HP 15.6\"",
     "precio": 899.99,
-    "stock": 25,
-    "categoria": "Tecnología"
+    "stock": 30,
+    "categoria": "Tecnología",
+    "fecha_vencimiento": "2025-11-23"
   },
   {
     "id": "002",
-    "codigo": "MON-001", 
+    "codigo": "MON-001",
     "nombre": "Monitor Samsung 24\"",
     "precio": 249.99,
-    "stock": 15,
-    "categoria": "Tecnología"
+    "stock": 30,
+    "categoria": "Tecnología",
+    "fecha_vencimiento": "2025-11-23"
   },
   {
     "id": "003",
@@ -21,14 +23,52 @@
     "nombre": "Teclado Mecánico RGB",
     "precio": 89.99,
     "stock": 30,
-    "categoria": "Periféricos"
+    "categoria": "Periféricos",
+    "fecha_vencimiento": "2025-11-23"
   },
   {
     "id": "004",
     "codigo": "MOU-001",
     "nombre": "Mouse Inalámbrico",
     "precio": 39.99,
-    "stock": 45,
-    "categoria": "Periféricos"
+    "stock": 30,
+    "categoria": "Periféricos",
+    "fecha_vencimiento": "2025-11-23"
+  },
+  {
+    "id": "005",
+    "codigo": "PRI-001",
+    "nombre": "Impresora Multifunción",
+    "precio": 199.99,
+    "stock": 30,
+    "categoria": "Periféricos",
+    "fecha_vencimiento": "2025-11-23"
+  },
+  {
+    "id": "006",
+    "codigo": "ROU-001",
+    "nombre": "Router WiFi 6",
+    "precio": 149.99,
+    "stock": 30,
+    "categoria": "Redes",
+    "fecha_vencimiento": "2025-11-23"
+  },
+  {
+    "id": "007",
+    "codigo": "CAM-001",
+    "nombre": "Webcam HD 1080p",
+    "precio": 79.99,
+    "stock": 30,
+    "categoria": "Periféricos",
+    "fecha_vencimiento": "2025-11-23"
+  },
+  {
+    "id": "008",
+    "codigo": "HEA-001",
+    "nombre": "Auriculares Gaming RGB",
+    "precio": 129.99,
+    "stock": 30,
+    "categoria": "Audio",
+    "fecha_vencimiento": "2025-11-23"
   }
 ]

@@ -1,0 +1,55 @@
+{
+  // OPTIMIZACIONES DE RENDIMIENTO - INDEXACIÓN MÁS RÁPIDA
+  "search.followSymlinks": false,
+  "search.useIgnoreFiles": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.git": true,
+    "**/.vscode": true,
+    "**/excluded": true,
+    "**/logs": true,
+    "**/coverage": true,
+    "**/tmp": true
+  },
+
+  // OPTIMIZACIONES DE MEMORIA
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority"
+  },
+
+  // DESHABILITAR EXTENSIONES QUE CONSUMEN RECURSOS
+  "extensions.autoUpdate": false,
+  "git.enabled": false,
+  "git.autorefresh": false,
+
+  // OPTIMIZACIONES DE ARCHIVOS
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/excluded/**": true
+  },
+
+  // CONFIGURACIONES DE EDITOR OPTIMIZADAS
+  "editor.minimap.enabled": false,
+  "editor.occurrencesHighlight": "off",
+  "editor.renderWhitespace": "none",
+  "editor.renderControlCharacters": false,
+  "editor.hideCursorInOverviewRuler": true,
+  "editor.overviewRulerBorder": false,
+
+  // DESHABILITAR CARACTERÍSTICAS NO ESENCIALES DURANTE INDEXACIÓN
+  "breadcrumbs.enabled": false,
+  "editor.codeLens": false,
+  "editor.folding": false,
+  "editor.links": false
+}

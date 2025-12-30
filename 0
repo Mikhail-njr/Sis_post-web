@@ -1,0 +1,3 @@
+Con INNER JOIN: [
+  { id: 29, nombre: 'Ana', saldo_pendiente: 8000, cantidad_deudas: 1 }
+]

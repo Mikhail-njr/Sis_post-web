@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Actualización de Precios de Deudas - Frontend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .controls input, .controls select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .success {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .metric {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .log {
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-item {
+            margin: 5px 0;
+            padding: 5px;
+            background-color: white;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Prueba de Actualización de Precios de Deudas</h1>
+        
+        <div class="controls">
+            <input type="number" id="limitInput" placeholder="Límite por página (1000)" value="1000" min="1" max="5000">
+            <input type="number" id="delayInput" placeholder="Retardo entre páginas (ms)" value="100" min="0" max="5000">
+            <button class="btn" id="startBtn">🚀 Iniciar Actualización</button>
+            <button class="btn btn-danger" id="stopBtn" disabled>⏹️ Detener</button>
+            <button class="btn" id="testBtn">🧪 Probar Endpoint</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>Estado:</strong> Listo para iniciar
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div id="progressText">Progreso: 0%</div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="totalProcessed">0</div>
+                <div class="metric-label">Deudas Procesadas</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="totalUpdated">0</div>
+                <div class="metric-label">Deudas Actualizadas</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="totalLines">0</div>
+                <div class="metric-label">Líneas Procesadas</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="totalTime">0ms</div>
+                <div class="metric-label">Tiempo Total</div>
+            </div>
+        </div>
+
+        <div class="results">
+            <h3>Resultados de la Última Página</h3>
+            <div id="lastResult" class="result-item">Esperando resultados...</div>
+        </div>
+
+        <div class="log">
+            <h4>Registro de Operaciones</h4>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let isRunning = false;
+        let stopRequested = false;
+        let currentPage = 1;
+        let totalProcessed = 0;
+        let totalUpdated = 0;
+        let totalLines = 0;
+        let totalTime = 0;
+
+        const statusEl = document.getElementById('status');
+        const progressBarEl = document.getElementById('progressBar');
+        const progressTextEl = document.getElementById('progressText');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const testBtn = document.getElementById('testBtn');
+        const limitInput = document.getElementById('limitInput');
+        const delayInput = document.getElementById('delayInput');
+        const totalProcessedEl = document.getElementById('totalProcessed');
+        const totalUpdatedEl = document.getElementById('totalUpdated');
+        const totalLinesEl = document.getElementById('totalLines');
+        const totalTimeEl = document.getElementById('totalTime');
+        const lastResultEl = document.getElementById('lastResult');
+        const logEl = document.getElementById('log');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            logItem.innerHTML = `[${timestamp}] ${message}`;
+            if (type === 'success') logItem.style.borderLeft = '4px solid #28a745';
+            if (type === 'error') logItem.style.borderLeft = '4px solid #dc3545';
+            logEl.prepend(logItem);
+        }
+
+        function updateStatus(message) {
+            statusEl.innerHTML = `<strong>Estado:</strong> ${message}
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div id="progressText">Progreso: ${Math.round((totalProcessed / (totalProcessed + 1)) * 100)}%</div>`;
+        }
+
+        function updateProgress() {
+            totalProcessedEl.textContent = totalProcessed;
+            totalUpdatedEl.textContent = totalUpdated;
+            totalLinesEl.textContent = totalLines;
+            totalTimeEl.textContent = `${totalTime}ms`;
+        }
+
+        async function testEndpoint() {
+            try {
+                log('Probando endpoint...', 'info');
+                const response = await fetch('/api/debts/update-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ page: 1, limit: 10 })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                log('Endpoint accesible - Respuesta exitosa', 'success');
+                log(`Página 1: ${result.processed || result.updated_debts || 0} deudas procesadas`, 'success');
+                lastResultEl.textContent = JSON.stringify(result, null, 2);
+                lastResultEl.className = 'result-item success';
+            } catch (error) {
+                log(`Error al probar endpoint: ${error.message}`, 'error');
+                lastResultEl.textContent = `Error: ${error.message}`;
+                lastResultEl.className = 'result-item error';
+            }
+        }
+
+        async function updateDebtsPricesPaginated() {
+            isRunning = true;
+            stopRequested = false;
+            currentPage = 1;
+            totalProcessed = 0;
+            totalUpdated = 0;
+            totalLines = 0;
+            totalTime = 0;
+
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            testBtn.disabled = true;
+
+            try {
+                log('🚀 Iniciando actualización paginada de precios de deudas...', 'info');
+                updateStatus('Iniciando proceso...');
+
+                while (!stopRequested) {
+                    const limit = parseInt(limitInput.value) || 1000;
+                    const delay = parseInt(delayInput.value) || 100;
+
+                    log(`📄 Procesando página ${currentPage} (límite: ${limit})...`, 'info');
+                    updateStatus(`Procesando página ${currentPage}...`);
+
+                    const pageStartTime = Date.now();
+
+                    try {
+                        const response = await fetch('/api/debts/update-prices', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ page: currentPage, limit: limit })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        const result = await response.json();
+                        const pageTime = Date.now() - pageStartTime;
+
+                        // Acumular métricas
+                        totalProcessed += result.processed || result.updated_debts || 0;
+                        totalUpdated += result.updated || 0;
+                        totalLines += result.total_lines_processed || 0;
+                        totalTime += result.execution_time_ms || pageTime;
+
+                        // Actualizar UI
+                        updateProgress();
+                        updateStatus(`Página ${currentPage} completada - ${result.processed || result.updated_debts || 0} deudas procesadas`);
+                        
+                        // Actualizar progreso visual
+                        const progress = Math.min(100, Math.round((totalProcessed / Math.max(1, totalProcessed + (result.has_more ? limit : 0))) * 100));
+                        progressBarEl.style.width = `${progress}%`;
+                        progressTextEl.textContent = `Progreso: ${progress}%`;
+
+                        // Mostrar resultado de la página
+                        lastResultEl.textContent = `Página ${currentPage}: ${result.processed || result.updated_debts || 0} procesadas, ${result.updated || 0} actualizadas, ${result.execution_time_ms || pageTime}ms`;
+                        lastResultEl.className = 'result-item success';
+
+                        log(`✅ Página ${currentPage}: ${result.processed || result.updated_debts || 0} procesadas, ${result.updated || 0} actualizadas (${result.execution_time_ms || pageTime}ms)`, 'success');
+
+                        // Verificar si hay más páginas
+                        if (!result.has_more) {
+                            log('✅ Proceso completado - No hay más páginas', 'success');
+                            break;
+                        }
+
+                        currentPage++;
+                        
+                        // Pequeña pausa para no sobrecargar el servidor
+                        if (delay > 0) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+
+                    } catch (error) {
+                        log(`❌ Error en página ${currentPage}: ${error.message}`, 'error');
+                        lastResultEl.textContent = `Error en página ${currentPage}: ${error.message}`;
+                        lastResultEl.className = 'result-item error';
+                        break;
+                    }
+                }
+
+            } finally {
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                testBtn.disabled = false;
+
+                if (stopRequested) {
+                    log('⏹️ Proceso detenido manualmente', 'info');
+                    updateStatus('Proceso detenido manualmente');
+                } else {
+                    log(`✅ Actualización completada: ${totalProcessed} deudas procesadas, ${totalUpdated} actualizadas`, 'success');
+                    updateStatus(`Completado: ${totalProcessed} deudas procesadas, ${totalUpdated} actualizadas`);
+                }
+            }
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                updateDebtsPricesPaginated();
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (isRunning) {
+                stopRequested = true;
+                stopBtn.disabled = true;
+            }
+        });
+
+        testBtn.addEventListener('click', testEndpoint);
+
+        // Inicializar
+        log('Sistema listo. Puedes probar el endpoint o iniciar la actualización.', 'info');
+    </script>
+</body>
+</html>

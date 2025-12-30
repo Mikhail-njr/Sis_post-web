@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Mejoras en Proveedores</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-pass { background: #d4edda; border-color: #c3e6cb; }
+        .test-fail { background: #f8d7da; border-color: #f5c6cb; }
+        .test-running { background: #fff3cd; border-color: #ffeaa7; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Mejoras en Proveedores</h1>
+
+    <div id="test-results"></div>
+
+    <button onclick="runAllTests()" class="btn-primary">Ejecutar Todos los Tests</button>
+    <button onclick="clearResults()" class="btn-secondary">Limpiar Resultados</button>
+
+    <!-- Incluir el script principal -->
+    <script src="shared/api-client.js"></script>
+    <script src="frontend/script.js"></script>
+
+    <script>
+        let testResults = [];
+
+        function addTestResult(testName, passed, message, details = '') {
+            testResults.push({ testName, passed, message, details });
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            const container = document.getElementById('test-results');
+            container.innerHTML = testResults.map(test => `
+                <div class="test-section ${test.passed ? 'test-pass' : 'test-fail'}">
+                    <h3>${test.passed ? '✅' : '❌'} ${test.testName}</h3>
+                    <p>${test.message}</p>
+                    ${test.details ? `<pre>${test.details}</pre>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function clearResults() {
+            testResults = [];
+            updateResultsDisplay();
+        }
+
+        // Test 1: Validación de estructura de caché
+        function testCacheValidation() {
+            try {
+                // Datos válidos
+                const validSuppliers = [
+                    { id: 1, nombre_proveedor: 'Test Supplier', nombre_contacto: 'John Doe' }
+                ];
+                const validOrders = [
+                    { id: 1, numero_pedido: 'ORD-001', nombre_proveedor: 'Test Supplier' }
+                ];
+
+                // Datos inválidos
+                const invalidSuppliers = [
+                    { nombre_proveedor: 'Test Supplier' } // Falta id
+                ];
+
+                const validSuppliersResult = LoadingSystem.cache.validateDataStructure('suppliers', validSuppliers);
+                const validOrdersResult = LoadingSystem.cache.validateDataStructure('supplierOrders', validOrders);
+                const invalidSuppliersResult = LoadingSystem.cache.validateDataStructure('suppliers', invalidSuppliers);
+
+                const passed = validSuppliersResult && validOrdersResult && !invalidSuppliersResult;
+                const message = passed ?
+                    'Validación de estructura de caché funciona correctamente' :
+                    'Error en validación de estructura de caché';
+
+                const details = `
+Datos válidos proveedores: ${validSuppliersResult}
+Datos válidos pedidos: ${validOrdersResult}
+Datos inválidos proveedores: ${invalidSuppliersResult}
+                `;
+
+                addTestResult('Validación de Estructura de Caché', passed, message, details);
+
+            } catch (error) {
+                addTestResult('Validación de Estructura de Caché', false, `Error: ${error.message}`, error.stack);
+            }
+        }
+
+        // Test 2: Sistema de cola de renderizado
+        function testRenderQueue() {
+            try {
+                let renderCalled = false;
+                const testFunction = () => {
+                    renderCalled = true;
+                    console.log('🎯 Función de renderizado ejecutada');
+                };
+
+                // Agregar a cola
+                RenderQueue.add('test-section', testFunction);
+
+                // Simular que los contenedores están listos después de un tiempo
+                setTimeout(() => {
+                    // Crear contenedores simulados
+                    const testContainer = document.createElement('div');
+                    testContainer.id = 'test-section';
+                    const testTable = document.createElement('table');
+                    testTable.id = 'test-section-table';
+                    testContainer.appendChild(testTable);
+                    document.body.appendChild(testContainer);
+
+                    console.log('✅ Contenedores simulados creados');
+
+                    // Verificar después de otro tiempo si la función se ejecutó
+                    setTimeout(() => {
+                        const passed = renderCalled;
+                        const message = passed ?
+                            'Sistema de cola de renderizado funciona correctamente' :
+                            'La función de renderizado no se ejecutó';
+
+                        addTestResult('Sistema de Cola de Renderizado', passed, message);
+                    }, 1000);
+                }, 1000);
+
+            } catch (error) {
+                addTestResult('Sistema de Cola de Renderizado', false, `Error: ${error.message}`, error.stack);
+            }
+        }
+
+        // Test 3: Funciones mejoradas existen
+        function testFunctionsExist() {
+            try {
+                const functions = [
+                    { name: 'fetchSuppliers', exists: typeof fetchSuppliers === 'function' },
+                    { name: 'retryLoadSuppliers', exists: typeof retryLoadSuppliers === 'function' },
+                    { name: 'displaySuppliersTable', exists: typeof displaySuppliersTable === 'function' },
+                    { name: 'RenderQueue', exists: typeof RenderQueue === 'object' },
+                    { name: 'LoadingSystem', exists: typeof LoadingSystem === 'object' }
+                ];
+
+                const allExist = functions.every(f => f.exists);
+                const message = allExist ?
+                    'Todas las funciones mejoradas existen' :
+                    'Algunas funciones mejoradas no existen';
+
+                const details = functions.map(f =>
+                    `${f.name}: ${f.exists ? '✅' : '❌'}`
+                ).join('\n');
+
+                addTestResult('Existencia de Funciones Mejoradas', allExist, message, details);
+
+            } catch (error) {
+                addTestResult('Existencia de Funciones Mejoradas', false, `Error: ${error.message}`, error.stack);
+            }
+        }
+
+        // Test 4: Mejoras en displaySuppliersTable
+        function testDisplaySuppliersTable() {
+            try {
+                // Crear contenedores de prueba
+                const testSection = document.createElement('div');
+                testSection.id = 'proveedores-section';
+                const testTable = document.createElement('table');
+                testTable.id = 'proveedores-table';
+                const testTbody = document.createElement('tbody');
+                testTable.appendChild(testTbody);
+                testSection.appendChild(testTable);
+                document.body.appendChild(testSection);
+
+                // Probar con datos de prueba
+                const testSuppliers = [
+                    {
+                        id: 1,
+                        nombre_proveedor: 'Proveedor de Prueba',
+                        nombre_contacto: 'Juan Pérez',
+                        telefono: '123-456-789',
+                        email: 'juan@test.com',
+                        productos_servicios: 'Productos varios',
+                        condiciones_pago: '30 días',
+                        estatus: 'Activo'
+                    }
+                ];
+
+                displaySuppliersTable(testSuppliers);
+
+                // Verificar que se renderizó correctamente
+                setTimeout(() => {
+                    const tbody = testTable.querySelector('tbody');
+                    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                    const passed = rows.length > 0;
+
+                    const message = passed ?
+                        'displaySuppliersTable renderizó correctamente' :
+                        'displaySuppliersTable no renderizó correctamente';
+
+                    const details = `Filas renderizadas: ${rows.length}`;
+
+                    addTestResult('Renderizado de Tabla de Proveedores', passed, message, details);
+
+                    // Limpiar
+                    document.body.removeChild(testSection);
+                }, 100);
+
+            } catch (error) {
+                addTestResult('Renderizado de Tabla de Proveedores', false, `Error: ${error.message}`, error.stack);
+            }
+        }
+
+        // Ejecutar todos los tests
+        function runAllTests() {
+            clearResults();
+
+            // Ejecutar tests en secuencia
+            testFunctionsExist();
+            testCacheValidation();
+            testRenderQueue();
+            testDisplaySuppliersTable();
+        }
+
+        // Ejecutar tests automáticamente al cargar
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000); // Esperar a que se cargue el script
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{
+  "name": "pos-code-analysis",
+  "displayName": "Sistema POS - Code Analysis",
+  "description": "Análisis inteligente de código para el Sistema POS usando Qdrant",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:codeAnalysis.analyzeCurrentFile",
+    "onCommand:codeAnalysis.searchSimilar",
+    "onCommand:codeAnalysis.showSuggestions",
+    "onCommand:codeAnalysis.indexWorkspace"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeAnalysis.analyzeCurrentFile",
+        "title": "🔍 Analizar Archivo Actual"
+      },
+      {
+        "command": "codeAnalysis.searchSimilar",
+        "title": "🔍 Buscar Código Similar"
+      },
+      {
+        "command": "codeAnalysis.showSuggestions",
+        "title": "💡 Mostrar Sugerencias"
+      },
+      {
+        "command": "codeAnalysis.indexWorkspace",
+        "title": "📊 Indexar Workspace"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codeAnalysis.analyzeCurrentFile",
+          "when": "editorTextFocus",
+          "group": "7_modification@1"
+        },
+        {
+          "command": "codeAnalysis.searchSimilar",
+          "when": "editorHasSelection",
+          "group": "7_modification@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeAnalysis.analyzeCurrentFile"
+        },
+        {
+          "command": "codeAnalysis.searchSimilar"
+        },
+        {
+          "command": "codeAnalysis.showSuggestions"
+        },
+        {
+          "command": "codeAnalysis.indexWorkspace"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Code Analysis",
+      "properties": {
+        "codeAnalysis.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:3001/api",
+          "description": "URL del servidor de análisis de código"
+        },
+        "codeAnalysis.enableAutoAnalysis": {
+          "type": "boolean",
+          "default": false,
+          "description": "Habilitar análisis automático al guardar archivos"
+        },
+        "codeAnalysis.showNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Mostrar notificaciones de análisis"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node build.js",
+    "watch": "node build.js --watch",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-repo/sistema-pos-code-analysis"
+  },
+  "publisher": "sistema-pos",
+  "license": "MIT"
+}

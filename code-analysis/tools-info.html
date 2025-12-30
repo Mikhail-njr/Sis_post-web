@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛠️ Herramientas de Indexación - Guía Completa</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --border-radius: 8px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            border-left: 5px solid var(--primary);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card.command {
+            border-left-color: var(--primary);
+        }
+
+        .tool-card.search {
+            border-left-color: var(--info);
+        }
+
+        .tool-card.stats {
+            border-left-color: var(--success);
+        }
+
+        .tool-card.api {
+            border-left-color: var(--warning);
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .tool-desc {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .tool-features li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .tool-features li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .terminal-output {
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #30363d;
+            margin: 10px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .badge.command {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .badge.api {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .badge.file {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #e9ecef;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛠️ Herramientas de Indexación</h1>
+            <p class="subtitle">Guía completa de todas las herramientas disponibles para gestionar tu proyecto POS</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>Servidor activo en http://localhost:3001</span>
+            </div>
+        </header>
+
+        <div class="quick-links">
+            <a href="indexer-dashboard.html" class="btn btn-primary">🚀 Dashboard Principal</a>
+            <a href="SOLUCION_INDEXACION_LOCAL.md" class="btn btn-outline">📚 Documentación Técnica</a>
+            <a href="start-dashboard.bat" class="btn btn-success">⚡ Inicio Rápido</a>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Comandos de Indexación -->
+            <div class="tool-card command">
+                <span class="tool-icon">📊</span>
+                <div class="tool-title">Comandos de Indexación</div>
+                <div class="tool-desc">Controla el proceso de indexación de tu proyecto POS</div>
+                <ul class="tool-features">
+                    <li>Indexar todo el codebase automáticamente</li>
+                    <li>Limpiar índices antiguos y optimizar base de datos</li>
+                    <li>Reindexar completamente el proyecto</li>
+                    <li>Monitorear el progreso en tiempo real</li>
+                </ul>
+                <div class="tool-actions">
+                    <span class="badge command">CLI</span>
+                    <span class="badge file">local-indexer.js</span>
+                    <span class="badge api">POST /api/command</span>
+                </div>
+            </div>
+
+            <!-- Búsqueda de Código -->
+            <div class="tool-card search">
+                <span class="tool-icon">🔍</span>
+                <div class="tool-title">Búsqueda de Código</div>
+                <div class="tool-desc">Encuentra código similar y relacionado en tu proyecto</div>
+                <ul class="tool-features">
+                    <li>Búsqueda semántica inteligente</li>
+                    <li>Resultados con score de relevancia</li>
+                    <li>Información detallada de coincidencias</li>
+                    <li>Vista previa de código en contexto</li>
+                </ul>
+                <div class="tool-actions">
+                    <span class="badge api">POST /api/search/similar</span>
+                    <span class="badge command">Web Interface</span>
+                </div>
+            </div>
+
+            <!-- Estadísticas y Monitoreo -->
+            <div class="tool-card stats">
+                <span class="tool-icon">📈</span>
+                <div class="tool-title">Estadísticas y Monitoreo</div>
+                <div class="tool-desc">Métricas en tiempo real de tu proyecto y sistema de indexación</div>
+                <ul class="tool-features">
+                    <li>Archivos indexados y palabras procesadas</li>
+                    <li>Tamaño del proyecto y base de datos</li>
+                    <li>Complejidad del código</li>
+                    <li>Estado del servidor y salud del sistema</li>
+                </ul>
+                <div class="tool-actions">
+                    <span class="badge.api">GET /api/stats</span>
+                    <span class="badge.api">GET /api/health</span>
+                    <span class="badge.command">Dashboard</span>
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="tool-card api">
+                <span class="tool-icon">🔌</span>
+                <div class="tool-title">API Endpoints</div>
+                <div class="tool-desc">Interfaz programática para integrar con otras herramientas</div>
+                <ul class="tool-features">
+                    <li>Endpoints RESTful para todas las operaciones</li>
+                    <li>Respuestas JSON estructuradas</li>
+                    <li>Integración con VS Code y otras IDEs</li>
+                    <li>Automatización de procesos</li>
+                </ul>
+                <div class="tool-actions">
+                    <span class="badge.api">REST API</span>
+                    <span class="badge.file">local-server.js</span>
+                    <span class="badge.command">Node.js</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Comandos Disponibles</h2>
+            <div class="code-block">
+# Comandos CLI Directos
+node local-indexer.js --index          # Indexar codebase completo
+node local-indexer.js --clear          # Limpiar índice completo
+node local-indexer.js --clear --index  # Limpiar y reindexar
+
+# Comandos desde el Dashboard
+POST /api/command
+{
+  "command": "index"           # Indexar codebase
+  "command": "clear"           # Limpiar índice  
+  "command": "clear-and-index" # Limpiar y reindexar
+  "command": "stats"           # Ver estadísticas
+  "command": "health"          # Verificar salud
+}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🌐 API Endpoints</h2>
+            <div class="code-block">
+# Endpoints principales
+GET  /api                      # Información del API
+GET  /api/health               # Estado del servidor
+GET  /api/stats                # Estadísticas del proyecto
+POST /api/command              # Ejecutar comandos
+POST /api/search/similar       # Buscar código similar
+POST /api/analyze/complexity   # Analizar complejidad
+POST /api/index/codebase       # Indexar codebase
+POST /api/index/file           # Indexar archivo individual
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💻 Archivos del Sistema</h2>
+            <div class="code-block">
+code-analysis/
+├── indexer-dashboard.html     # Interfaz web principal
+├── tools-info.html           # Esta guía (tú estás aquí)
+├── command-runner.js         # Ejecución segura de comandos
+├── start-dashboard.bat       # Script de inicio automático
+├── local-server.js          # Servidor API
+├── local-indexer.js         # Motor de indexación
+├── DASHBOARD_README.md      # Documentación del dashboard
+└── SOLUCION_INDEXACION_LOCAL.md  # Documentación técnica
+
+# Archivos de soporte
+├── services/                 # Servicios de análisis
+├── models/                   # Modelos de datos
+├── scripts/                  # Scripts de utilidad
+└── code-index.db            # Base de datos SQLite
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Ejemplos de Uso</h2>
+            
+            <h3>Desde la Terminal</h3>
+            <div class="terminal-output">
+$ cd code-analysis
+$ node local-indexer.js --index
+✅ Base de datos conectada
+🚀 Iniciando indexación del codebase...
+📁 Directorio base: ../
+📊 Encontrados 179 archivos para indexar
+✅ Archivos indexados: 179
+📊 Total de palabras indexadas: 248697
+            </div>
+
+            <h3>Desde el Dashboard</h3>
+            <div class="code-block">
+# Abrir en navegador
+http://localhost:3001/api
+code-analysis/indexer-dashboard.html
+
+# Interacción visual con:
+- Botones de comandos
+- Campo de búsqueda
+- Estadísticas en tiempo real
+- Resultados interactivos
+            </div>
+
+            <h3>Desde API</h3>
+            <div class="code-block">
+# Buscar código similar
+curl -X POST http://localhost:3001/api/search/similar \
+  -H "Content-Type: application/json" \
+  -d '{"query": "function indexFile"}'
+
+# Obtener estadísticas
+curl http://localhost:3001/api/stats
+
+# Ejecutar comandos
+curl -X POST http://localhost:3001/api/command \
+  -H "Content-Type: application/json" \
+  -d '{"command": "stats"}'
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Integración con VS Code</h2>
+            <div class="code-block">
+# Configuración en settings.json
+{
+  "codeAnalysis.apiUrl": "http://localhost:3001/api",
+  "codeAnalysis.enableAutoAnalysis": true
+}
+
+# Funcionalidades disponibles:
+- Búsqueda de código desde el editor
+- Análisis de complejidad en tiempo real
+- Sugerencias de refactorización
+- Navegación inteligente entre archivos
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Estadísticas Actuales</h2>
+            <div class="code-block">
+# Proyecto POS actualmente indexado:
+- Archivos: 179
+- Palabras: 248,697
+- Palabras únicas: 33,822
+- Tamaño: 3.8 MB
+- Base de datos: 24 MB
+- Complejidad: Media-Alta (470 puntos en server.js)
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>❓ Preguntas Frecuentes</h2>
+            
+            <h3>¿Cómo sé si el servidor está activo?</h3>
+            <p>Verifica el indicador de estado en la esquina superior derecha del dashboard o visita http://localhost:3001/api</p>
+
+            <h3>¿Qué archivos se indexan automáticamente?</h3>
+            <p>JavaScript, JSON, HTML, CSS, SQL, Markdown y más. Se excluyen node_modules, .git, logs y carpetas de exclusión.</p>
+
+            <h3>¿Puedo usar esto en otros proyectos?</h3>
+            <p>Sí, simplemente cambia el directorio base en los comandos o configura el dashboard para apuntar a otra ruta.</p>
+
+            <h3>¿Cómo integro esto con mi flujo de trabajo?</h3>
+            <p>Usa el script start-dashboard.bat para iniciar todo automáticamente o integra los endpoints API en tus scripts de desarrollo.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: white; border-radius: var(--border-radius); box-shadow: var(--shadow);">
+            <h2>🚀 Comienza Ahora</h2>
+            <p style="margin-bottom: 20px; color: #666;">Elige tu camino para gestionar la indexación de tu proyecto POS</p>
+            <div class="quick-links" style="justify-content: center;">
+                <a href="indexer-dashboard.html" class="btn btn-primary" style="padding: 15px 30px; font-size: 1.1rem;">Ir al Dashboard</a>
+                <a href="start-dashboard.bat" class="btn btn-success" style="padding: 15px 30px; font-size: 1.1rem;">Iniciar Sistema</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar estado del servidor
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:3001/api/health');
+                const statusDot = document.querySelector('.status-dot');
+                if (response.ok) {
+                    statusDot.style.backgroundColor = '#28a745';
+                    statusDot.parentElement.innerHTML = '<span class="status-dot"></span><span>Servidor activo en http://localhost:3001</span>';
+                } else {
+                    throw new Error('Servidor no responde');
+                }
+            } catch (error) {
+                const statusDot = document.querySelector('.status-dot');
+                statusDot.style.backgroundColor = '#dc3545';
+                statusDot.parentElement.innerHTML = '<span class="status-dot"></span><span>Servidor desconectado</span>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkServerStatus);
+    </script>
+</body>
+</html>

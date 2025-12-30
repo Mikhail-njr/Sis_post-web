@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant-pos
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__STORAGE__OPTIMIZERS__DEFAULT_SEGMENT_NUMBER=8
+      - QDRANT__STORAGE__OPTIMIZERS__MEMMAP_THRESHOLD=100000
+      - QDRANT__STORAGE__OPTIMIZERS__FLUSH_INTERVAL_SEC=10
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 12G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  qdrant_storage:

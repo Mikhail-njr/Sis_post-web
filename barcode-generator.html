@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos de Barras - Sistema POS</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .barcode-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .barcode-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .barcode-item h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .barcode-item .price {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .barcode-item .code {
+            color: #666;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .barcode-canvas {
+            max-width: 100%;
+            height: 100px;
+            margin: 15px 0;
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .print-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .print-btn:hover {
+            background: #218838;
+        }
+        @media print {
+            body { background: white; }
+            .barcode-container { grid-template-columns: repeat(2, 1fr); }
+            .instructions { display: none; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Generador de Códigos de Barras</h1>
+        <p>Sistema POS - Productos para pruebas de escaneo</p>
+    </div>
+
+    <div class="instructions">
+        <h3>📱 Instrucciones para escanear:</h3>
+        <ol>
+            <li>Abre la aplicación de escaneo de códigos en tu celular</li>
+            <li>Apunta la cámara a los códigos de barras que aparecen abajo</li>
+            <li>Los códigos se agregarán automáticamente al carrito del sistema POS</li>
+            <li>Puedes imprimir esta página para tener códigos físicos</li>
+        </ol>
+        <p><strong>Nota:</strong> Asegúrate de que el servidor del sistema POS esté ejecutándose en tu computadora.</p>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir Códigos de Barras</button>
+
+    <div class="barcode-container">
+        <!-- Los códigos de barras se generarán aquí con JavaScript -->
+    </div>
+
+    <script>
+        // Productos seleccionados para generar códigos de barras
+        const productos = [
+            { nombre: 'Agua Mineral Villavicencio 1.5L', precio: '$1.200', codigo: '7792900092980' },
+            { nombre: 'Coca Cola 2.25L', precio: '$2.600', codigo: '7790895000997' },
+            { nombre: 'Leche La Serenísima 1L', precio: '$1.600', codigo: '7790011163602' },
+            { nombre: 'Arroz Gallo Oro 1kg', precio: '$2.800', codigo: '7790070318616' },
+            { nombre: 'Fideos Matarazzo 500g', precio: '$1.800', codigo: '7790070336316' },
+            { nombre: 'Aceite Girasol Natura 1.5L', precio: '$2.900', codigo: '7790272001005' },
+            { nombre: 'Yerba Mate Playadito 500g', precio: '$3.200', codigo: '7793704000911' },
+            { nombre: 'Galletitas Oreo 117g', precio: '$1.900', codigo: '7622300724248' },
+            { nombre: 'Carne Picada x kg', precio: '$6.500', codigo: '2000010000010' },
+            { nombre: 'Papa Negra x kg', precio: '$1.200', codigo: '2000020000010' },
+            { nombre: 'Pan Francés x kg', precio: '$2.200', codigo: '2000030000010' },
+            { nombre: 'Banana Ecuador x kg', precio: '$1.900', codigo: '2000020000050' }
+        ];
+
+        // Función para generar los códigos de barras
+        function generarCodigos() {
+            const container = document.querySelector('.barcode-container');
+
+            productos.forEach(producto => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'barcode-item';
+
+                itemDiv.innerHTML = `
+                    <h3>${producto.nombre}</h3>
+                    <div class="price">${producto.precio}</div>
+                    <div class="code">${producto.codigo}</div>
+                    <svg class="barcode-canvas" id="barcode-${producto.codigo}"></svg>
+                `;
+
+                container.appendChild(itemDiv);
+
+                // Generar el código de barras usando JsBarcode
+                try {
+                    JsBarcode(`#barcode-${producto.codigo}`, producto.codigo, {
+                        format: "EAN13",
+                        width: 2,
+                        height: 80,
+                        displayValue: true,
+                        fontSize: 14,
+                        margin: 10
+                    });
+                } catch (error) {
+                    console.error(`Error generando código de barras para ${producto.nombre}:`, error);
+                    // Para códigos que no son EAN13 válidos, intentar CODE128
+                    try {
+                        JsBarcode(`#barcode-${producto.codigo}`, producto.codigo, {
+                            format: "CODE128",
+                            width: 2,
+                            height: 80,
+                            displayValue: true,
+                            fontSize: 14,
+                            margin: 10
+                        });
+                    } catch (fallbackError) {
+                        console.error(`Error en fallback para ${producto.nombre}:`, fallbackError);
+                        document.getElementById(`barcode-${producto.codigo}`).innerHTML = '<p style="color: red;">Error generando código</p>';
+                    }
+                }
+            });
+        }
+
+        // Generar códigos cuando la página cargue
+        window.addEventListener('load', generarCodigos);
+    </script>
+</body>
+</html>
