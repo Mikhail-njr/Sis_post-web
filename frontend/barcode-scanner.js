@@ -1241,7 +1241,7 @@ async function initZXing() {
     // Verificar si ZXing está disponible en el scope global
     if (typeof window.ZXing === 'undefined') {
         addDebugMessage('error', '❌ ZXing no está disponible. El script no se cargó correctamente.');
-        updateScannerStatus('❌ Error: ZXing no se pudo cargar', 'error');
+        // updateScannerStatus('❌ Error: ZXing no se pudo cargar', 'error');
         return false;
     }
 
@@ -2327,7 +2327,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Verificar si ZXing está disponible
     if (typeof ZXing === 'undefined') {
-        updateScannerStatus('❌ Error: ZXing no se pudo cargar', 'error');
+        // updateScannerStatus('❌ Error: ZXing no se pudo cargar', 'error');
         addDebugMessage('error', 'ZXing no está disponible');
         return;
     }
@@ -2417,8 +2417,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Inicializar estado
-    updateScannerStatus('🔍 Haz clic en "Iniciar Escaneo" para comenzar', 'scanning');
+    // Inicializar estado - iniciar escaneo automáticamente
+    // updateScannerStatus('🔍 Haz clic en "Iniciar Escaneo" para comenzar', 'scanning');
+    // Iniciar escaneo automáticamente al cargar la página
+    setTimeout(() => {
+        startScanning();
+    }, 1000);
 });
 
 // Función para diagnosticar problemas del video
@@ -2699,8 +2703,12 @@ function enableManualFallback() {
             // Remover botón de retry
             retryBtn.remove();
 
-            // Resetear estado del escáner
-            updateScannerStatus('🔍 Haz clic en "Iniciar Escaneo" para comenzar', 'scanning');
+            // Resetear estado del escáner - iniciar automáticamente
+            // updateScannerStatus('🔍 Haz clic en "Iniciar Escaneo" para comenzar', 'scanning');
+            // Iniciar escaneo automáticamente después de reintentar
+            setTimeout(() => {
+                startScanning();
+            }, 500);
         };
         controlsDiv.appendChild(retryBtn);
     }

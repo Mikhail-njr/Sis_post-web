@@ -1112,259 +1112,6 @@
                         });
                     });
                     orderObserver.observe(orderModal, { attributes: true });
-
-                    // Función para mostrar/ocultar el formulario de creación de productos en línea
-                    function showInlineProductCreation() {
-                        const inlineForm = document.getElementById('inlineProductCreation');
-                        const isVisible = inlineForm.style.display === 'block';
-                        
-                        if (isVisible) {
-                            // Ocultar formulario
-                            inlineForm.style.display = 'none';
-                            // Limpiar formulario
-                            document.getElementById('newProductCategoria').value = '';
-                            document.getElementById('newProductNombre').value = '';
-                            document.getElementById('newProductPrecio').value = '';
-                            document.getElementById('newProductStock').value = '0';
-                        } else {
-                            // Mostrar formulario
-                            inlineForm.style.display = 'block';
-                            // Enfocar el primer campo
-                            document.getElementById('newProductCategoria').focus();
-                        }
-                    }
-
-                    // Función para crear producto directamente desde el modal de pedidos
-                    async function createProductInline() {
-                        // Obtener valores del formulario
-                        const categoria = document.getElementById('newProductCategoria').value.trim();
-                        const nombre = document.getElementById('newProductNombre').value.trim();
-                        const precio = parseFloat(document.getElementById('newProductPrecio').value);
-                        const stock = parseInt(document.getElementById('newProductStock').value) || 0;
-
-                        // Validaciones
-                        if (!categoria) {
-                            showAlert('Debe seleccionar o ingresar una categoría', 'error');
-                            document.getElementById('newProductCategoria').focus();
-                            return;
-                        }
-
-                        if (!nombre) {
-                            showAlert('Debe ingresar el nombre del producto', 'error');
-                            document.getElementById('newProductNombre').focus();
-                            return;
-                        }
-
-                        if (isNaN(precio) || precio < 0) {
-                            showAlert('Debe ingresar un precio válido mayor o igual a cero', 'error');
-                            document.getElementById('newProductPrecio').focus();
-                            return;
-                        }
-
-                        // Generar código automáticamente basado en categoría
-                        const categoriaCode = categoria.split(' - ')[0] || categoria.split(' ')[0] || 'PROD';
-                        
-                        try {
-                            // Obtener productos existentes para generar código único
-                            const headers = { 'Content-Type': 'application/json' };
-                            if (authCredentials) {
-                                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-                            }
-                            
-                            const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
-                            if (response.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            if (!response.ok) throw new Error('Error al obtener productos para generar código');
-                            
-                            const products = await response.json();
-                            
-                            // Encontrar el último número usado para esta categoría
-                            let maxNumber = 0;
-                            products.forEach(product => {
-                                if (product.codigo && product.codigo.startsWith(categoriaCode + '-')) {
-                                    const numberPart = product.codigo.split('-')[1];
-                                    const number = parseInt(numberPart, 10);
-                                    if (!isNaN(number) && number > maxNumber) {
-                                        maxNumber = number;
-                                    }
-                                }
-                            });
-
-                            // Generar el siguiente número
-                            const nextNumber = maxNumber + 1;
-                            const codigo = `${categoriaCode}-${String(nextNumber).padStart(3, '0')}`;
-
-                            // Crear el producto
-                            const productData = {
-                                codigo: codigo,
-                                nombre: nombre,
-                                descripcion: '',
-                                precio: precio,
-                                stock: stock,
-                                categoria: categoria,
-                                codigo_barras: ''
-                            };
-
-                            const createResponse = await fetch(`${window.ApiClient.API_BASE}/products`, {
-                                method: 'POST',
-                                headers: headers,
-                                body: JSON.stringify(productData)
-                            });
-
-                            if (createResponse.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            
-                            if (!createResponse.ok) {
-                                const errorData = await createResponse.json();
-                                throw new Error(errorData.error || 'Error al crear el producto');
-                            }
-
-                            const result = await createResponse.json();
-                            
-                            // Éxito: ocultar formulario y agregar producto al último item del pedido
-                            showAlert(`✅ Producto "${nombre}" creado exitosamente con código ${codigo}`, 'success');
-                            
-                            // Ocultar formulario
-                            document.getElementById('inlineProductCreation').style.display = 'none';
-                            
-                            // Limpiar formulario
-                            document.getElementById('newProductCategoria').value = '';
-                            document.getElementById('newProductNombre').value = '';
-                            document.getElementById('newProductPrecio').value = '';
-                            document.getElementById('newProductStock').value = '0';
-
-                            // Agregar el producto creado al último item del pedido
-                            addProductToLastOrderItem(result.id, nombre, precio);
-
-                            // Actualizar los selects de productos en todos los items
-                            await updateOrderProductsSelects();
-
-                        } catch (error) {
-                            console.error('Error creating product:', error);
-                            showAlert('Error al crear el producto: ' + error.message, 'error');
-                        }
-                    }
-
-                    // Función para agregar el producto creado al último item del pedido
-                    function addProductToLastOrderItem(productId, productName, productPrice) {
-                        const itemsContainer = document.getElementById('orderItemsContainer');
-                        const items = itemsContainer.querySelectorAll('.order-item');
-                        
-                        if (items.length === 0) {
-                            // Si no hay items, crear uno nuevo
-                            addOrderItem();
-                            setTimeout(() => {
-                                const newItem = itemsContainer.lastElementChild;
-                                const productSelect = newItem.querySelector('.order-product-select');
-                                const quantityInput = newItem.querySelector('.order-quantity');
-                                const priceInput = newItem.querySelector('.order-price');
-                                
-                                // Crear y seleccionar la opción del nuevo producto
-                                const option = document.createElement('option');
-                                option.value = productId;
-                                option.textContent = `${productName} (${productData.codigo})`;
-                                option.dataset.price = productPrice;
-                                productSelect.appendChild(option);
-                                productSelect.value = productId;
-                                
-                                // Establecer precio y cantidad
-                                priceInput.value = productPrice.toFixed(2);
-                                quantityInput.value = '1';
-                                
-                                // Calcular subtotal
-                                calculateOrderItemTotal(quantityInput);
-                            }, 500);
-                        } else {
-                            // Si hay items, usar el último
-                            const lastItem = items[items.length - 1];
-                            const productSelect = lastItem.querySelector('.order-product-select');
-                            const quantityInput = lastItem.querySelector('.order-quantity');
-                            const priceInput = lastItem.querySelector('.order-price');
-                            
-                            // Crear y seleccionar la opción del nuevo producto
-                            const option = document.createElement('option');
-                            option.value = productId;
-                            option.textContent = productName;
-                            option.dataset.price = productPrice;
-                            productSelect.appendChild(option);
-                            productSelect.value = productId;
-                            
-                            // Establecer precio y cantidad
-                            priceInput.value = productPrice.toFixed(2);
-                            quantityInput.value = '1';
-                            
-                            // Calcular subtotal
-                            calculateOrderItemTotal(quantityInput);
-                        }
-                    }
-
-                    // Función para actualizar los selects de productos en todos los items del pedido
-                    async function updateOrderProductsSelects() {
-                        try {
-                            const headers = { 'Content-Type': 'application/json' };
-                            if (authCredentials) {
-                                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-                            }
-                            
-                            const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
-                            if (response.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            if (!response.ok) throw new Error('Error al obtener productos');
-                            
-                            const products = await response.json();
-                            
-                            // Actualizar todos los selects de productos en los items del pedido
-                            const items = document.querySelectorAll('.order-item');
-                            items.forEach(item => {
-                                const select = item.querySelector('.order-product-select');
-                                const currentValue = select.value;
-                                
-                                // Guardar la opción seleccionada actualmente
-                                const currentOption = select.querySelector(`option[value="${currentValue}"]`);
-                                const currentText = currentOption ? currentOption.textContent : '';
-                                
-                                // Limpiar y volver a llenar el select
-                                select.innerHTML = '<option value="">Seleccionar producto...</option>';
-                                
-                                products.forEach(product => {
-                                    const option = document.createElement('option');
-                                    option.value = product.id;
-                                    option.textContent = `${product.nombre} (${product.codigo})`;
-                                    option.dataset.price = product.precio;
-                                    select.appendChild(option);
-                                });
-                                
-                                // Intentar restaurar la selección anterior si el producto sigue existiendo
-                                if (currentValue) {
-                                    const optionToSelect = select.querySelector(`option[value="${currentValue}"]`);
-                                    if (optionToSelect) {
-                                        select.value = currentValue;
-                                    }
-                                }
-                            });
-                            
-                        } catch (error) {
-                            console.error('Error updating product selects:', error);
-                        }
-                    }
-
-                    // Función para mostrar alertas (ya existente en el sistema)
-                    function showAlert(message, type) {
-                        let alert = document.createElement('div');
-                        alert.className = `alert ${type}`;
-                        alert.textContent = message;
-                        document.body.appendChild(alert);
-                        setTimeout(() => alert.remove(), 3000);
-                    }
                 </script>
             </div>
         </div>
@@ -2087,7 +1834,7 @@
                 <form id="addProductForm">
                     <div class="form-group">
                         <label for="addCategoria">Categoría:</label>
-                        <input type="text" id="addCategoria" name="categoria" list="categoriaList" placeholder="Seleccionar o escribir nueva categoría" required onchange="generateProductCode()">
+                        <input type="text" id="addCategoria" list="categoriaList" placeholder="Seleccionar o escribir nueva categoría" required onchange="generateProductCode()">
                         <datalist id="categoriaList">
                             <option value="COND - Condimentos">
                             <option value="BEB - Bebidas">
@@ -2105,35 +1852,35 @@
 
                     <div class="form-group">
                         <label for="addCodigo">Código generado:</label>
-                        <input type="text" id="addCodigo" name="codigo" required placeholder="Se generará automáticamente" readonly onchange="checkCodeAvailability()">
+                        <input type="text" id="addCodigo" required placeholder="Se generará automáticamente" readonly onchange="checkCodeAvailability()">
                         <small style="color: #666; font-size: 12px;">Código único generado automáticamente</small>
                         <div id="codeAvailability" style="margin-top: 5px; font-size: 12px; font-weight: bold;"></div>
                     </div>
 
                     <div class="form-group">
                         <label for="addNombre">Nombre:</label>
-                        <input type="text" id="addNombre" name="nombre" required placeholder="Nombre del producto">
+                        <input type="text" id="addNombre" required placeholder="Nombre del producto">
                     </div>
 
                     <div class="form-group">
                         <label for="addDescripcion">Descripción:</label>
-                        <input type="text" id="addDescripcion" name="descripcion" placeholder="Descripción opcional">
+                        <input type="text" id="addDescripcion" placeholder="Descripción opcional">
                     </div>
 
                     <div class="form-group">
                         <label for="addPrecio">Precio:</label>
-                        <input type="number" id="addPrecio" name="precio" step="0.01" min="0" required placeholder="0.00">
+                        <input type="number" id="addPrecio" step="0.01" min="0" required placeholder="0.00">
                     </div>
 
                     <div class="form-group">
                         <label for="addStock">Stock:</label>
-                        <input type="number" id="addStock" name="stock" min="0" required placeholder="0">
+                        <input type="number" id="addStock" min="0" required placeholder="0">
                     </div>
 
                     <div class="form-group">
                         <label for="addBarcode">Código de Barras:</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="addBarcode" name="codigo_barras" placeholder="Código de barras opcional" maxlength="50" style="flex: 1;">
+                            <input type="text" id="addBarcode" placeholder="Código de barras opcional" maxlength="50" style="flex: 1;">
                             <button type="button" id="addBarcodeScanner" class="btn btn-secondary" style="padding: 10px; font-size: 14px;" onclick="openBarcodeScannerForAddProduct()">
                                 📱 Escanear
                             </button>
@@ -2536,6 +2283,10 @@
                     <label style="display: block; margin-bottom: 10px;">
                         <input type="checkbox" id="includeLotes" style="margin-right: 10px;">
                         📅 <strong>Lotes</strong> - Control de lotes y vencimientos
+                    </label>
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeCuentasCorrientes" style="margin-right: 10px;">
+                        👥 <strong>Cuentas Corrientes</strong> - Estado de deudas de clientes
                     </label>
                 </div>
 
@@ -3269,7 +3020,7 @@
                 precio: parseFloat(document.getElementById('addPrecio').value),
                 stock: parseInt(document.getElementById('addStock').value),
                 categoria: document.getElementById('addCategoria').value.trim(),
-                codigo_barras: document.getElementById('addBarcode').value.trim()
+                barcode: document.getElementById('addBarcode').value.trim()
             };
 
             // Validaciones básicas
@@ -3324,8 +3075,8 @@
         // Event listeners para el formulario de edición
         document.getElementById('editProductForm').addEventListener('submit', saveProductChanges);
 
-        // Event listeners para el formulario de agregar proveedor
-        document.getElementById('addSupplierForm').addEventListener('submit', createSupplier);
+        // Event listeners para el formulario de agregar producto
+        document.getElementById('addProductForm').addEventListener('submit', createProduct);
 
         // Event listeners para el formulario de crear promoción
         document.getElementById('createPromotionForm').addEventListener('submit', createPromotion);
@@ -3360,10 +3111,6 @@
                     // Cargar clientes cuando se expande la sección de clientes
                     if (section.id === 'clientes-section') {
                         loadClientes();
-                    }
-                    // Cargar proveedores cuando se expande la sección de proveedores
-                    if (section.id === 'proveedores-section') {
-                        fetchSuppliers();
                     }
                 }
             });
@@ -7054,6 +6801,7 @@
             document.getElementById('includeProductos').checked = true;
             document.getElementById('includeProveedores').checked = true;
             document.getElementById('includeLotes').checked = true;
+            document.getElementById('includeCuentasCorrientes').checked = true;
         }
 
         // Función para deseleccionar todas las secciones
@@ -7063,6 +6811,7 @@
             document.getElementById('includeProductos').checked = false;
             document.getElementById('includeProveedores').checked = false;
             document.getElementById('includeLotes').checked = false;
+            document.getElementById('includeCuentasCorrientes').checked = false;
         }
 
         // >>> FUNCIONES PARA GESTIÓN DE LOTES
@@ -7580,6 +7329,7 @@
             const includeProductos = document.getElementById('includeProductos').checked;
             const includeProveedores = document.getElementById('includeProveedores').checked;
             const includeLotes = document.getElementById('includeLotes').checked;
+            const includeCuentasCorrientes = document.getElementById('includeCuentasCorrientes').checked;
 
             // Cerrar modal
             closeReportOptionsModal();

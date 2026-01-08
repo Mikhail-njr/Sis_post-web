@@ -114,7 +114,18 @@ function protectWriteOperations(req, res, next) {
 app.use('/api/products', protectWriteOperations);
 app.use('/api/sales', conditionalAuth);
 app.use('/api/categories', protectWriteOperations);
-app.use('/api/customers', protectWriteOperations);
+// Registrar endpoint de clientes (eliminado para evitar error 500 - endpoint ya está implementado en este mismo archivo)
+
+
+// Proteger solo operaciones de escritura para clientes (con excepción de ngrok)
+app.use('/api/customers', (req, res, next) => {
+    if (req.method === 'GET') {
+        // Permitir lecturas sin autenticación
+        return next();
+    }
+    // Para POST, PUT, DELETE requerir autenticación (con excepción de ngrok)
+    return conditionalAuth(req, res, next);
+});
 
 // Middleware para medir tiempo de respuesta y logging optimizado
 app.use((req, res, next) => {

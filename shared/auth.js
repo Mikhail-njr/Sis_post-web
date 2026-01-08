@@ -111,7 +111,7 @@ function showLoginModal(onSuccess = null, onCancel = null) {
                         color: #555;
                         font-weight: 500;
                     ">Contraseña:</label>
-                    <input type="password" id="auth-password" required style="
+                    <input type="password" id="auth-password" autocomplete="current-password" required style="
                         width: 100%;
                         padding: 0.75rem;
                         border: 2px solid #ddd;
