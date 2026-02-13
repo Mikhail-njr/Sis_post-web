@@ -1,0 +1,903 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #000000;
+    color: #fdfcfc;
+    padding: 20px;
+}
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #000000;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    padding: 30px;
+}
+h1 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+}
+h2 {
+    color: #ffffff;
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #030303;
+    color: #000000;
+}
+th {
+    background-color: #ffffff;
+    font-weight: bold;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+tr:hover {
+    background-color: #ffffff;
+}
+.loading, .error {
+    text-align: center;
+    padding: 20px;
+    color: #f5f3f2;
+}
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+.product-row {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.product-row:hover {
+    background-color: #555 !important;
+}
+.product-row.selected {
+    background-color: #666 !important;
+    border-left: 4px solid #17a2b8;
+}
+.edit-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.edit-modal.show {
+    display: flex;
+}
+.edit-form {
+    background: #2d2d2d;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    max-width: 1200px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+/* Estilos específicos para el modal de Deudas del Cliente */
+.client-debts-form {
+    max-width: 1300px;
+    width: 96%;
+    max-height: 92vh;
+    padding: 28px 32px;
+}
+.client-debts-table th,
+.client-debts-table td {
+    padding: 12px 14px !important;
+    font-size: 14px;
+    vertical-align: middle;
+}
+.client-debts-table thead th {
+    background: #454545 !important;
+    border-bottom: 1px solid #666 !important;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: white;
+}
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #ffffff;
+    color: #000000;
+}
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #17a2b8;
+    background: #ffffff;
+}
+.form-group select option {
+    color: #000000;
+}
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+.btn-primary {
+    background: #17a2b8;
+    color: white;
+}
+.btn-primary:hover {
+    background: #138496;
+}
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background: #545b62;
+}
+.edit-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+}
+.edit-button:hover {
+    background: #218838;
+}
+
+/* Clases para estilos de botones y elementos comunes */
+.btn-spacing {
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.btn-spacing-small {
+    font-size: 14px;
+    padding: 8px 16px;
+}
+
+.btn-spacing-large {
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.margin-left-10 {
+    margin-left: 10px;
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+}
+
+.margin-bottom-20 {
+    margin-bottom: 20px;
+}
+
+.margin-bottom-15 {
+    margin-bottom: 15px;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.font-size-12 {
+    font-size: 12px;
+}
+
+.font-size-14 {
+    font-size: 14px;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.color-gray {
+    color: #666;
+}
+
+.color-red {
+    color: #ffffff;
+}
+
+.color-green {
+    color: #28a745;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-15 {
+    gap: 15px;
+}
+
+.padding-10 {
+    padding: 10px;
+}
+
+.padding-15 {
+    padding: 15px;
+}
+
+.padding-20 {
+    padding: 20px;
+}
+
+.border-radius-6 {
+    border-radius: 6px;
+}
+
+.border-radius-8 {
+    border-radius: 8px;
+}
+
+.border-2px-solid-ddd {
+    border: 2px solid #030303;
+}
+
+.background-f8f9fa {
+    background: #3d3d3d;
+}
+
+.background-white {
+    background: #2d2d2d;
+}
+
+.background-red {
+    background: #dc3545;
+}
+
+
+/* Invoice Collapse/Expand Styles */
+.invoice-card.collapsed .invoice-items,
+.invoice-card.collapsed .invoice-total {
+    display: none;
+}
+.invoice-card.collapsed {
+    padding: 15px;
+}
+.invoice-card.collapsed .invoice-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.collapse-icon {
+    float: right;
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+    transition: transform 0.3s;
+}
+.collapse-icon:hover {
+    color: #333;
+}
+.invoice-card.collapsed .collapse-icon {
+    transform: rotate(180deg);
+}
+
+/* Dashboard Section Collapse/Expand Styles */
+.dashboard-section.collapsed .section-content {
+    display: none;
+}
+.dashboard-section.collapsed {
+    margin: 10px 0 20px 0;
+    background: linear-gradient(135deg, #3d3d3d 0%, #4a4a4a 100%);
+    border: 1px solid #666;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.3s cubic-bezier(.51,.07,.58,1);
+}
+.dashboard-section.collapsed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Highlight expanded sections */
+.dashboard-section:not(.collapsed) {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+    border: 1px solid #666;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    padding: 10px;
+    margin: 10px 0;
+}
+.section-header {
+    cursor: pointer;
+    position: relative;
+    padding: 15px 20px;
+    margin: 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.section-title {
+    flex: 1;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.dashboard-section:not(.collapsed) .section-title {
+    color: #ffffff;
+    text-shadow: none;
+}
+.dashboard-section.collapsed .section-header {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(3px);
+}
+.dashboard-section.collapsed .section-header:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+.section-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.section-icon:hover {
+    color: #17a2b8;
+    transform: translateY(-50%) scale(1.2);
+    text-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
+}
+.dashboard-section:not(.collapsed) .section-icon {
+    color: #28a745;
+    text-shadow: none;
+}
+.dashboard-section:not(.collapsed) .section-icon:hover {
+    color: #1e7e34;
+    transform: translateY(-50%) scale(1.1);
+}
+.dashboard-section.collapsed .section-icon {
+    transform: translateY(-50%) rotate(180deg);
+}
+.dashboard-section.collapsed .section-icon:hover {
+    transform: translateY(-50%) rotate(180deg) scale(1.2);
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.alert.success {
+    background: #2d4a2d;
+    color: #90ee90;
+    border: 1px solid #4a4a4a;
+}
+
+.alert.error {
+    background: #4a2d2d;
+    color: #ff9999;
+    border: 1px solid #4a4a4a;
+}
+
+/* Switch Toggle Styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #17a2b8;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #17a2b8;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Estilos para badges de estado de pedidos */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-process {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-delivered {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-entregado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Estilos para notificaciones de vencimiento */
+.expiration-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+    min-width: 300px;
+}
+
+.expiration-alert {
+    background: #3d3d3d;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+    border-left: 4px solid #ffc107;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.expiration-alert.expired {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, #4a2d2d 0%, #5a3d3d 100%);
+}
+
+.expiration-alert.warning {
+    border-left-color: #ffc107;
+    background: linear-gradient(135deg, #4a4a2d 0%, #5a5a3d 100%);
+}
+
+.expiration-alert.success {
+    border-left-color: #28a745;
+    background: linear-gradient(135deg, #2d4a2d 0%, #3d5a3d 100%);
+}
+
+.expiration-alert-header {
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.expiration-alert-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.expiration-alert-content {
+    flex: 1;
+}
+
+.expiration-alert-title {
+    font-weight: bold;
+    margin: 0 0 5px 0;
+    color: white;
+}
+
+.expiration-alert-message {
+    margin: 0;
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.expiration-alert-close {
+    font-size: 18px;
+    color: #cccccc;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.expiration-alert-close:hover {
+    color: #ffffff;
+}
+
+.expiration-alert-details {
+    display: none;
+    padding: 0 20px 15px 20px;
+    border-top: 1px solid #555;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.expiration-alert-details.show {
+    display: block;
+}
+
+.expiration-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #555;
+}
+
+.expiration-item:last-child {
+    border-bottom: none;
+}
+
+.expiration-item-title {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.expiration-item-info {
+    font-size: 12px;
+    color: #cccccc;
+    margin: 2px 0;
+}
+
+.expiration-item-days {
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.expiration-item-days.urgent {
+    background: #dc3545;
+    color: white;
+}
+
+.expiration-item-days.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.expiration-item-days.normal {
+    background: #28a745;
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.expiration-alert.expired .expiration-alert-header {
+    animation: pulse 2s infinite;
+}
+
+/* Estilos para estados de lotes */
+.lote-vigente {
+    background: #2d4a2d;
+    color: #90ee90;
+}
+
+.lote-proximo-vencer {
+    background: #4a4a2d;
+    color: #ffff99;
+}
+
+.lote-vencido {
+    background: #4a2d2d;
+    color: #ff9999;
+}
+
+.dias-vencimiento {
+    font-weight: bold;
+}
+
+.dias-vencimiento.urgente {
+    color: #ff6666;
+}
+
+.dias-vencimiento.advertencia {
+    color: #ffff66;
+}
+
+.dias-vencimiento.normal {
+    color: #66ff66;
+}
+
+.promotion-details {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.promotion-details h5 {
+    color: #ffffff;
+}
+
+.promotion-details small {
+    color: #cccccc;
+}
+
+.promotion-products div[style*="background: white"] {
+    background: #3d3d3d !important;
+    color: #ffffff !important;
+}
+
+.promotion-products strong {
+    color: #ffffff;
+}
+
+.promotion-products small {
+    color: #ffffff;
+}
+
+.promotion-products label {
+    color: #ffffff;
+}
+
+.promotion-products input {
+    background: #2d2d2d !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+}
+
+.promotion-products input:focus {
+    border-color: #17a2b8 !important;
+}
+
+/* Estilos específicos para la sección de métricas con tema oscuro */
+#metricas-section .metrica-card h3 {
+    color: #ffffff;
+}
+
+#metricas-section table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#metricas-section th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#metricas-section td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#metricas-section tr:hover {
+    background-color: #4a4a4a;
+}
+
+#metricas-section .metrica-card {
+    background: #2d2d2d;
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+/* Estilos específicos para la sección de productos con tema oscuro */
+#productos-section table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#productos-section th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#productos-section td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#productos-section tr:hover {
+    background-color: #4a4a4a;
+}
+
+#productos-section .product-row.selected {
+    background-color: #666 !important;
+    border-left: 4px solid #17a2b8;
+}
+
+/* Estilos específicos para la sección de lotes con tema oscuro */
+#lotes-section table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#lotes-section th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#lotes-section td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#lotes-section tr:hover {
+    background-color: #4a4a4a;
+}
+
+/* Estilos específicos para la sección de proveedores con tema oscuro */
+#proveedores-section table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#proveedores-section th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#proveedores-section td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#proveedores-section tr:hover {
+    background-color: #4a4a4a;
+}
+
+/* También para la tabla de pedidos dentro de proveedores */
+#proveedores-section #pedidos-table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#proveedores-section #pedidos-table th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#proveedores-section #pedidos-table td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#proveedores-section #pedidos-table tr:hover {
+    background-color: #4a4a4a;
+}
+
+/* Estilos específicos para la sección de historial de cierres con tema oscuro */
+#historial-cierres-section table {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+#historial-cierres-section th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-bottom: 1px solid #666;
+}
+
+#historial-cierres-section td {
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+#historial-cierres-section tr:hover {
+    background-color: #4a4a4a;
+}

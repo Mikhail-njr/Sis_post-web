@@ -564,7 +564,7 @@
                 <span id="selected-customer-info" style="display: none; margin-left: 10px; font-size: 0.9em; color: #667eea;"></span>
                 <div class="header-actions">
                     <button id="activateBtn" onclick="window.location.href='/activate'" style="padding: 10px 20px; background: #ffc107; color: #000; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">
-                        ⭐ Activar Premium
+                        ⭐ Activar Plus
                     </button>
                     <button id="soundBtn" onclick="toggleSound()" ondblclick="testBeeps()" title="Clic: Activar/Desactivar | Doble clic: Probar sonidos" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
                         🔊 Beeps OFF
@@ -646,7 +646,7 @@
                         <option value="">Todas las categorías</option>
                     </select>
                     <button onclick="searchProducts()">Buscar</button>
-                    <button id="barcodeScanBtn" onclick="document.getElementById('usb-scanner-input').focus()" style="background: #17a2b8; color: white;">📱 Escanear Código</button>
+                    <button id="barcodeScanBtn" onclick="toggleUSBScanner()" style="background: #17a2b8; color: white;">📱 Activar Escáner</button>
                     <button onclick="window.location.href='barcode-scanner.html'" style="background: #17a2b8; color: white;">📱 Escáner Avanzado</button>
                     <button id="promotionFilterBtn" onclick="togglePromotionFilter()" style="background: #ff6b6b; color: white;">🎉 Solo Promociones</button>
                 </div>
@@ -2638,11 +2638,11 @@
 
                     if (data.days_remaining <= 5) {
                         // 5 días o menos: botón naranja con alerta
-                        activateBtn.textContent = `⚠️ Quedan ${daysText}!`;
+                        activateBtn.textContent = `⚠️ Plus expira en ${daysText}!`;
                         activateBtn.style.background = '#fd7e14';
                     } else {
                         // Más de 5 días: botón verde normal
-                        activateBtn.textContent = `✅ Premium (${daysText})`;
+                        activateBtn.textContent = `✅ Plus activo (${daysText})`;
                         activateBtn.style.background = '#28a745';
                     }
                     activateBtn.onclick = () => window.location.href='/activate';
@@ -2852,6 +2852,35 @@
         });
 
 
+        // Variable global para rastrear el estado del escáner
+        let scannerEnabled = false;
+
+        // Función para activar/desactivar el escáner USB
+        function toggleUSBScanner() {
+            const barcodeScanBtn = document.getElementById('barcodeScanBtn');
+            const usbInput = document.getElementById('usb-scanner-input');
+            
+            if (scannerEnabled) {
+                // Desactivar el escáner
+                scannerEnabled = false;
+                barcodeScanBtn.textContent = '📱 Activar Escáner';
+                barcodeScanBtn.style.background = '#6c757d';
+                if (usbInput) {
+                    usbInput.blur(); // Quitar el foco del campo invisible
+                }
+                updateUSBScannerStatus('Escáner Desactivado', 'inactive');
+            } else {
+                // Activar el escáner
+                scannerEnabled = true;
+                barcodeScanBtn.textContent = '📱 Desactivar Escáner';
+                barcodeScanBtn.style.background = '#28a745';
+                if (usbInput) {
+                    usbInput.focus(); // Enfocar el campo invisible
+                }
+                updateUSBScannerStatus('Escáner Activado', 'active');
+            }
+        }
+
         // Función para inicializar detección de escáner USB
         function initUSBScannerDetection() {
             // Crear un campo invisible para capturar entrada del escáner
@@ -2866,8 +2895,8 @@
             usbInput.style.zIndex = '-1';
             document.body.appendChild(usbInput);
 
-            // Enfocar el campo invisible inicialmente
-            usbInput.focus();
+            // No enfocar el campo invisible inicialmente
+            // usbInput.focus(); // Comentar esta línea
 
             // Listener para capturar entrada del escáner
             usbInput.addEventListener('keydown', function(e) {
@@ -2907,17 +2936,19 @@
 
             // Mantener el foco en el campo USB cuando se pierde
             document.addEventListener('click', function() {
-                // Solo reenfocar si no estamos en campos de entrada importantes
-                const activeElement = document.activeElement;
-                const isImportantInput = activeElement && (
-                    activeElement.tagName === 'INPUT' ||
-                    activeElement.tagName === 'SELECT' ||
-                    activeElement.tagName === 'TEXTAREA' ||
-                    activeElement.contentEditable === 'true'
-                );
+                // Solo reenfocar si el escáner está activado
+                if (scannerEnabled) {
+                    const activeElement = document.activeElement;
+                    const isImportantInput = activeElement && (
+                        activeElement.tagName === 'INPUT' ||
+                        activeElement.tagName === 'SELECT' ||
+                        activeElement.tagName === 'TEXTAREA' ||
+                        activeElement.contentEditable === 'true'
+                    );
 
-                if (!isImportantInput) {
-                    setTimeout(() => usbInput.focus(), 100);
+                    if (!isImportantInput) {
+                        setTimeout(() => usbInput.focus(), 100);
+                    }
                 }
             });
 

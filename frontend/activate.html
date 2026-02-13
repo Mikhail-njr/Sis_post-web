@@ -163,6 +163,7 @@
             font-size: 0.9rem;
         }
     </style>
+    <script src="../shared/auth.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -173,8 +174,7 @@
         <form id="activationForm">
             <div class="form-group">
                 <label for="licenseKey">Clave de Activación (6 dígitos):</label>
-                <input type="text" id="licenseKey" name="licenseKey" required
-                       placeholder="Ingrese su clave de activación" maxlength="6" pattern="[0-9]{6}">
+                <input type="text" id="licenseKey" name="licenseKey" required placeholder="Ingrese su clave de activación" maxlength="6" pattern="[0-9]{6}">
             </div>
 
             <div class="button-group">

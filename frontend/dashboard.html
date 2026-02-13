@@ -4,916 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control del Sistema POS</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #000000;
-            color: #fdfcfc;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #000000;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            padding: 30px;
-        }
-        h1 {
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #444;
-            padding-bottom: 10px;
-        }
-        h2 {
-            color: #ffffff;
-            margin-top: 40px;
-            margin-bottom: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background: #ffffff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #030303;
-            color: #000000;
-        }
-        th {
-            background-color: #ffffff;
-            font-weight: bold;
-            color: #000000;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        tr:hover {
-            background-color: #ffffff;
-        }
-        .loading, .error {
-            text-align: center;
-            padding: 20px;
-            color: #f5f3f2;
-        }
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .product-row {
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .product-row:hover {
-            background-color: #555 !important;
-        }
-        .product-row.selected {
-            background-color: #666 !important;
-            border-left: 4px solid #17a2b8;
-        }
-        .edit-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .edit-modal.show {
-            display: flex;
-        }
-        .edit-form {
-            background: #2d2d2d;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 1200px;
-            width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        /* Estilos específicos para el modal de Deudas del Cliente */
-        .client-debts-form {
-            max-width: 1300px;
-            width: 96%;
-            max-height: 92vh;
-            padding: 28px 32px;
-        }
-        .client-debts-table th,
-        .client-debts-table td {
-            padding: 12px 14px !important;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-        .client-debts-table thead th {
-            background: #454545 !important;
-            border-bottom: 1px solid #666 !important;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: white;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #555;
-            border-radius: 6px;
-            font-size: 14px;
-            background: #ffffff;
-            color: #000000;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #17a2b8;
-            background: #ffffff;
-        }
-        .form-group select option {
-            color: #000000;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 30px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
-        .btn-primary {
-            background: #17a2b8;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #138496;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-        .edit-button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        .edit-button:hover {
-            background: #218838;
-        }
+    <link rel="stylesheet" href="dashboard.css">
 
-        /* Clases para estilos de botones y elementos comunes */
-        .btn-spacing {
-            font-size: 14px;
-            padding: 10px 20px;
-        }
-
-        .btn-spacing-small {
-            font-size: 14px;
-            padding: 8px 16px;
-        }
-
-        .btn-spacing-large {
-            font-size: 14px;
-            padding: 10px 20px;
-        }
-
-        .margin-left-10 {
-            margin-left: 10px;
-        }
-
-        .margin-top-5 {
-            margin-top: 5px;
-        }
-
-        .margin-bottom-20 {
-            margin-bottom: 20px;
-        }
-
-        .margin-bottom-15 {
-            margin-bottom: 15px;
-        }
-
-        .margin-bottom-10 {
-            margin-bottom: 10px;
-        }
-
-        .font-size-12 {
-            font-size: 12px;
-        }
-
-        .font-size-14 {
-            font-size: 14px;
-        }
-
-        .font-weight-bold {
-            font-weight: bold;
-        }
-
-        .color-gray {
-            color: #666;
-        }
-
-        .color-red {
-            color: #ffffff;
-        }
-
-        .color-green {
-            color: #28a745;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .display-flex {
-            display: flex;
-        }
-
-        .align-items-center {
-            align-items: center;
-        }
-
-        .justify-content-center {
-            justify-content: center;
-        }
-
-        .gap-10 {
-            gap: 10px;
-        }
-
-        .gap-15 {
-            gap: 15px;
-        }
-
-        .padding-10 {
-            padding: 10px;
-        }
-
-        .padding-15 {
-            padding: 15px;
-        }
-
-        .padding-20 {
-            padding: 20px;
-        }
-
-        .border-radius-6 {
-            border-radius: 6px;
-        }
-
-        .border-radius-8 {
-            border-radius: 8px;
-        }
-
-        .border-2px-solid-ddd {
-            border: 2px solid #030303;
-        }
-
-        .background-f8f9fa {
-            background: #3d3d3d;
-        }
-
-        .background-white {
-            background: #2d2d2d;
-        }
-
-        .background-red {
-            background: #dc3545;
-        }
-
-
-        /* Invoice Collapse/Expand Styles */
-        .invoice-card.collapsed .invoice-items,
-        .invoice-card.collapsed .invoice-total {
-            display: none;
-        }
-        .invoice-card.collapsed {
-            padding: 15px;
-        }
-        .invoice-card.collapsed .invoice-header {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        .collapse-icon {
-            float: right;
-            cursor: pointer;
-            font-size: 18px;
-            color: #666;
-            transition: transform 0.3s;
-        }
-        .collapse-icon:hover {
-            color: #333;
-        }
-        .invoice-card.collapsed .collapse-icon {
-            transform: rotate(180deg);
-        }
-
-        /* Dashboard Section Collapse/Expand Styles */
-        .dashboard-section.collapsed .section-content {
-            display: none;
-        }
-        .dashboard-section.collapsed {
-            margin: 10px 0 20px 0;
-            background: linear-gradient(135deg, #3d3d3d 0%, #4a4a4a 100%);
-            border: 1px solid #666;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            transition: all 0.3s cubic-bezier(.51,.07,.58,1);
-        }
-        .dashboard-section.collapsed:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Highlight expanded sections */
-        .dashboard-section:not(.collapsed) {
-            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
-            border: 1px solid #666;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .section-header {
-            cursor: pointer;
-            position: relative;
-            padding: 15px 20px;
-            margin: 0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .section-title {
-            flex: 1;
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        .dashboard-section:not(.collapsed) .section-title {
-            color: #ffffff;
-            text-shadow: none;
-        }
-        .dashboard-section.collapsed .section-header {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(3px);
-        }
-        .dashboard-section.collapsed .section-header:hover {
-            background: rgba(0, 0, 0, 0.4);
-        }
-        .section-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 18px;
-            color: white;
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        .section-icon:hover {
-            color: #17a2b8;
-            transform: translateY(-50%) scale(1.2);
-            text-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
-        }
-        .dashboard-section:not(.collapsed) .section-icon {
-            color: #28a745;
-            text-shadow: none;
-        }
-        .dashboard-section:not(.collapsed) .section-icon:hover {
-            color: #1e7e34;
-            transform: translateY(-50%) scale(1.1);
-        }
-        .dashboard-section.collapsed .section-icon {
-            transform: translateY(-50%) rotate(180deg);
-        }
-        .dashboard-section.collapsed .section-icon:hover {
-            transform: translateY(-50%) rotate(180deg) scale(1.2);
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .alert.success {
-            background: #2d4a2d;
-            color: #90ee90;
-            border: 1px solid #4a4a4a;
-        }
-
-        .alert.error {
-            background: #4a2d2d;
-            color: #ff9999;
-            border: 1px solid #4a4a4a;
-        }
-
-        /* Switch Toggle Styles */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #17a2b8;
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #17a2b8;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .slider.round {
-            border-radius: 24px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        /* Estilos para badges de estado de pedidos */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-process {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .status-delivered {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-entregado {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-cancelled {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Estilos para notificaciones de vencimiento */
-        .expiration-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            max-width: 400px;
-            min-width: 300px;
-        }
-
-        .expiration-alert {
-            background: #3d3d3d;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            margin-bottom: 10px;
-            border-left: 4px solid #ffc107;
-            animation: slideInRight 0.5s ease-out;
-        }
-
-        .expiration-alert.expired {
-            border-left-color: #dc3545;
-            background: linear-gradient(135deg, #4a2d2d 0%, #5a3d3d 100%);
-        }
-
-        .expiration-alert.warning {
-            border-left-color: #ffc107;
-            background: linear-gradient(135deg, #4a4a2d 0%, #5a5a3d 100%);
-        }
-
-        .expiration-alert.success {
-            border-left-color: #28a745;
-            background: linear-gradient(135deg, #2d4a2d 0%, #3d5a3d 100%);
-        }
-
-        .expiration-alert-header {
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .expiration-alert-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-
-        .expiration-alert-content {
-            flex: 1;
-        }
-
-        .expiration-alert-title {
-            font-weight: bold;
-            margin: 0 0 5px 0;
-            color: white;
-        }
-
-        .expiration-alert-message {
-            margin: 0;
-            font-size: 14px;
-            color: #cccccc;
-        }
-
-        .expiration-alert-close {
-            font-size: 18px;
-            color: #cccccc;
-            cursor: pointer;
-            padding: 0 5px;
-        }
-
-        .expiration-alert-close:hover {
-            color: #ffffff;
-        }
-
-        .expiration-alert-details {
-            display: none;
-            padding: 0 20px 15px 20px;
-            border-top: 1px solid #555;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .expiration-alert-details.show {
-            display: block;
-        }
-
-        .expiration-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #555;
-        }
-
-        .expiration-item:last-child {
-            border-bottom: none;
-        }
-
-        .expiration-item-title {
-            font-weight: bold;
-            color: white;
-            margin-bottom: 5px;
-        }
-
-        .expiration-item-info {
-            font-size: 12px;
-            color: #cccccc;
-            margin: 2px 0;
-        }
-
-        .expiration-item-days {
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .expiration-item-days.urgent {
-            background: #dc3545;
-            color: white;
-        }
-
-        .expiration-item-days.warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .expiration-item-days.normal {
-            background: #28a745;
-            color: white;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .expiration-alert.expired .expiration-alert-header {
-            animation: pulse 2s infinite;
-        }
-
-        /* Estilos para estados de lotes */
-        .lote-vigente {
-            background: #2d4a2d;
-            color: #90ee90;
-        }
-
-        .lote-proximo-vencer {
-            background: #4a4a2d;
-            color: #ffff99;
-        }
-
-        .lote-vencido {
-            background: #4a2d2d;
-            color: #ff9999;
-        }
-
-        .dias-vencimiento {
-            font-weight: bold;
-        }
-
-        .dias-vencimiento.urgente {
-            color: #ff6666;
-        }
-
-        .dias-vencimiento.advertencia {
-            color: #ffff66;
-        }
-
-        .dias-vencimiento.normal {
-            color: #66ff66;
-        }
-
-        .promotion-details {
-            background: #2d2d2d;
-            color: #e0e0e0;
-        }
-
-        .promotion-details h5 {
-            color: #ffffff;
-        }
-
-        .promotion-details small {
-            color: #cccccc;
-        }
-
-        .promotion-products div[style*="background: white"] {
-            background: #3d3d3d !important;
-            color: #ffffff !important;
-        }
-
-        .promotion-products strong {
-            color: #ffffff;
-        }
-
-        .promotion-products small {
-            color: #ffffff;
-        }
-
-        .promotion-products label {
-            color: #ffffff;
-        }
-
-        .promotion-products input {
-            background: #2d2d2d !important;
-            color: #ffffff !important;
-            border: 1px solid #555 !important;
-        }
-
-        .promotion-products input:focus {
-            border-color: #17a2b8 !important;
-        }
-
-        /* Estilos específicos para la sección de métricas con tema oscuro */
-        #metricas-section .metrica-card h3 {
-            color: #ffffff;
-        }
-
-        #metricas-section table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #metricas-section th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #metricas-section td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #metricas-section tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        #metricas-section .metrica-card {
-            background: #2d2d2d;
-            border: 1px solid #666;
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        /* Estilos específicos para la sección de productos con tema oscuro */
-        #productos-section table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #productos-section th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #productos-section td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #productos-section tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        #productos-section .product-row.selected {
-            background-color: #666 !important;
-            border-left: 4px solid #17a2b8;
-        }
-
-        /* Estilos específicos para la sección de lotes con tema oscuro */
-        #lotes-section table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #lotes-section th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #lotes-section td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #lotes-section tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        /* Estilos específicos para la sección de proveedores con tema oscuro */
-        #proveedores-section table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #proveedores-section th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #proveedores-section td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #proveedores-section tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        /* También para la tabla de pedidos dentro de proveedores */
-        #proveedores-section #pedidos-table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #proveedores-section #pedidos-table th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #proveedores-section #pedidos-table td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #proveedores-section #pedidos-table tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        /* Estilos específicos para la sección de historial de cierres con tema oscuro */
-        #historial-cierres-section table {
-            background: #2d2d2d;
-            color: #ffffff;
-            border: 1px solid #555;
-        }
-
-        #historial-cierres-section th {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-bottom: 1px solid #666;
-        }
-
-        #historial-cierres-section td {
-            color: #ffffff;
-            border-bottom: 1px solid #555;
-        }
-
-        #historial-cierres-section tr:hover {
-            background-color: #4a4a4a;
-        }
-
-    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../shared/auth.js"></script>
     <script src="../shared/api-client.js"></script>
     <script src="openConfirmDeliveryModal.js"></script>
+    <script src="cierre-caja-functions.js"></script>
+    <script>
+        // Event listener para el botón de cierre de caja
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeRegisterBtn = document.getElementById('closeRegisterBtn');
+            if (closeRegisterBtn) {
+                closeRegisterBtn.addEventListener('click', function() {
+                    console.log('🔘 Botón Cierre de Caja clickeado');
+                    if (typeof window.openCierreModal === 'function') {
+                        window.openCierreModal();
+                    } else {
+                        console.error('❌ Función openCierreModal no disponible');
+                        // Intentar cargar el script dinámicamente
+                        const script = document.createElement('script');
+                        script.src = 'cierre-caja-functions.js';
+                        script.onload = function() {
+                            console.log('✅ Script cargado, intentando abrir modal');
+                            window.openCierreModal();
+                        };
+                        script.onerror = function() {
+                            console.error('❌ Error cargando cierre-caja-functions.js');
+                        };
+                        document.head.appendChild(script);
+                    }
+                });
+                console.log('✅ Event listener registrado para closeRegisterBtn');
+            } else {
+                console.error('❌ Elemento closeRegisterBtn no encontrado');
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -952,7 +79,6 @@
                 <!-- Operaciones del Día -->
                 <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px; border: 1px solid #bbdefb;">
                     <span style="font-weight: bold; color: #1976d2; font-size: 14px;">🧮 Operaciones:</span>
-                    <input type="number" id="dineroInicial" step="0.01" min="0" placeholder="500,00" style="padding: 8px; border: 2px solid #030303; border-radius: 6px;">
                     <button id="closeRegisterBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #1976d2; color: white;">
                         Cierre de Caja
                     </button>
@@ -1112,259 +238,6 @@
                         });
                     });
                     orderObserver.observe(orderModal, { attributes: true });
-
-                    // Función para mostrar/ocultar el formulario de creación de productos en línea
-                    function showInlineProductCreation() {
-                        const inlineForm = document.getElementById('inlineProductCreation');
-                        const isVisible = inlineForm.style.display === 'block';
-                        
-                        if (isVisible) {
-                            // Ocultar formulario
-                            inlineForm.style.display = 'none';
-                            // Limpiar formulario
-                            document.getElementById('newProductCategoria').value = '';
-                            document.getElementById('newProductNombre').value = '';
-                            document.getElementById('newProductPrecio').value = '';
-                            document.getElementById('newProductStock').value = '0';
-                        } else {
-                            // Mostrar formulario
-                            inlineForm.style.display = 'block';
-                            // Enfocar el primer campo
-                            document.getElementById('newProductCategoria').focus();
-                        }
-                    }
-
-                    // Función para crear producto directamente desde el modal de pedidos
-                    async function createProductInline() {
-                        // Obtener valores del formulario
-                        const categoria = document.getElementById('newProductCategoria').value.trim();
-                        const nombre = document.getElementById('newProductNombre').value.trim();
-                        const precio = parseFloat(document.getElementById('newProductPrecio').value);
-                        const stock = parseInt(document.getElementById('newProductStock').value) || 0;
-
-                        // Validaciones
-                        if (!categoria) {
-                            showAlert('Debe seleccionar o ingresar una categoría', 'error');
-                            document.getElementById('newProductCategoria').focus();
-                            return;
-                        }
-
-                        if (!nombre) {
-                            showAlert('Debe ingresar el nombre del producto', 'error');
-                            document.getElementById('newProductNombre').focus();
-                            return;
-                        }
-
-                        if (isNaN(precio) || precio < 0) {
-                            showAlert('Debe ingresar un precio válido mayor o igual a cero', 'error');
-                            document.getElementById('newProductPrecio').focus();
-                            return;
-                        }
-
-                        // Generar código automáticamente basado en categoría
-                        const categoriaCode = categoria.split(' - ')[0] || categoria.split(' ')[0] || 'PROD';
-                        
-                        try {
-                            // Obtener productos existentes para generar código único
-                            const headers = { 'Content-Type': 'application/json' };
-                            if (authCredentials) {
-                                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-                            }
-                            
-                            const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
-                            if (response.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            if (!response.ok) throw new Error('Error al obtener productos para generar código');
-                            
-                            const products = await response.json();
-                            
-                            // Encontrar el último número usado para esta categoría
-                            let maxNumber = 0;
-                            products.forEach(product => {
-                                if (product.codigo && product.codigo.startsWith(categoriaCode + '-')) {
-                                    const numberPart = product.codigo.split('-')[1];
-                                    const number = parseInt(numberPart, 10);
-                                    if (!isNaN(number) && number > maxNumber) {
-                                        maxNumber = number;
-                                    }
-                                }
-                            });
-
-                            // Generar el siguiente número
-                            const nextNumber = maxNumber + 1;
-                            const codigo = `${categoriaCode}-${String(nextNumber).padStart(3, '0')}`;
-
-                            // Crear el producto
-                            const productData = {
-                                codigo: codigo,
-                                nombre: nombre,
-                                descripcion: '',
-                                precio: precio,
-                                stock: stock,
-                                categoria: categoria,
-                                codigo_barras: ''
-                            };
-
-                            const createResponse = await fetch(`${window.ApiClient.API_BASE}/products`, {
-                                method: 'POST',
-                                headers: headers,
-                                body: JSON.stringify(productData)
-                            });
-
-                            if (createResponse.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            
-                            if (!createResponse.ok) {
-                                const errorData = await createResponse.json();
-                                throw new Error(errorData.error || 'Error al crear el producto');
-                            }
-
-                            const result = await createResponse.json();
-                            
-                            // Éxito: ocultar formulario y agregar producto al último item del pedido
-                            showAlert(`✅ Producto "${nombre}" creado exitosamente con código ${codigo}`, 'success');
-                            
-                            // Ocultar formulario
-                            document.getElementById('inlineProductCreation').style.display = 'none';
-                            
-                            // Limpiar formulario
-                            document.getElementById('newProductCategoria').value = '';
-                            document.getElementById('newProductNombre').value = '';
-                            document.getElementById('newProductPrecio').value = '';
-                            document.getElementById('newProductStock').value = '0';
-
-                            // Agregar el producto creado al último item del pedido
-                            addProductToLastOrderItem(result.id, nombre, precio);
-
-                            // Actualizar los selects de productos en todos los items
-                            await updateOrderProductsSelects();
-
-                        } catch (error) {
-                            console.error('Error creating product:', error);
-                            showAlert('Error al crear el producto: ' + error.message, 'error');
-                        }
-                    }
-
-                    // Función para agregar el producto creado al último item del pedido
-                    function addProductToLastOrderItem(productId, productName, productPrice) {
-                        const itemsContainer = document.getElementById('orderItemsContainer');
-                        const items = itemsContainer.querySelectorAll('.order-item');
-                        
-                        if (items.length === 0) {
-                            // Si no hay items, crear uno nuevo
-                            addOrderItem();
-                            setTimeout(() => {
-                                const newItem = itemsContainer.lastElementChild;
-                                const productSelect = newItem.querySelector('.order-product-select');
-                                const quantityInput = newItem.querySelector('.order-quantity');
-                                const priceInput = newItem.querySelector('.order-price');
-                                
-                                // Crear y seleccionar la opción del nuevo producto
-                                const option = document.createElement('option');
-                                option.value = productId;
-                                option.textContent = `${productName} (${productData.codigo})`;
-                                option.dataset.price = productPrice;
-                                productSelect.appendChild(option);
-                                productSelect.value = productId;
-                                
-                                // Establecer precio y cantidad
-                                priceInput.value = productPrice.toFixed(2);
-                                quantityInput.value = '1';
-                                
-                                // Calcular subtotal
-                                calculateOrderItemTotal(quantityInput);
-                            }, 500);
-                        } else {
-                            // Si hay items, usar el último
-                            const lastItem = items[items.length - 1];
-                            const productSelect = lastItem.querySelector('.order-product-select');
-                            const quantityInput = lastItem.querySelector('.order-quantity');
-                            const priceInput = lastItem.querySelector('.order-price');
-                            
-                            // Crear y seleccionar la opción del nuevo producto
-                            const option = document.createElement('option');
-                            option.value = productId;
-                            option.textContent = productName;
-                            option.dataset.price = productPrice;
-                            productSelect.appendChild(option);
-                            productSelect.value = productId;
-                            
-                            // Establecer precio y cantidad
-                            priceInput.value = productPrice.toFixed(2);
-                            quantityInput.value = '1';
-                            
-                            // Calcular subtotal
-                            calculateOrderItemTotal(quantityInput);
-                        }
-                    }
-
-                    // Función para actualizar los selects de productos en todos los items del pedido
-                    async function updateOrderProductsSelects() {
-                        try {
-                            const headers = { 'Content-Type': 'application/json' };
-                            if (authCredentials) {
-                                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-                            }
-                            
-                            const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
-                            if (response.status === 401) {
-                                isLoggedIn = false;
-                                updateUIBasedOnAuth();
-                                throw new Error('Autenticación requerida');
-                            }
-                            if (!response.ok) throw new Error('Error al obtener productos');
-                            
-                            const products = await response.json();
-                            
-                            // Actualizar todos los selects de productos en los items del pedido
-                            const items = document.querySelectorAll('.order-item');
-                            items.forEach(item => {
-                                const select = item.querySelector('.order-product-select');
-                                const currentValue = select.value;
-                                
-                                // Guardar la opción seleccionada actualmente
-                                const currentOption = select.querySelector(`option[value="${currentValue}"]`);
-                                const currentText = currentOption ? currentOption.textContent : '';
-                                
-                                // Limpiar y volver a llenar el select
-                                select.innerHTML = '<option value="">Seleccionar producto...</option>';
-                                
-                                products.forEach(product => {
-                                    const option = document.createElement('option');
-                                    option.value = product.id;
-                                    option.textContent = `${product.nombre} (${product.codigo})`;
-                                    option.dataset.price = product.precio;
-                                    select.appendChild(option);
-                                });
-                                
-                                // Intentar restaurar la selección anterior si el producto sigue existiendo
-                                if (currentValue) {
-                                    const optionToSelect = select.querySelector(`option[value="${currentValue}"]`);
-                                    if (optionToSelect) {
-                                        select.value = currentValue;
-                                    }
-                                }
-                            });
-                            
-                        } catch (error) {
-                            console.error('Error updating product selects:', error);
-                        }
-                    }
-
-                    // Función para mostrar alertas (ya existente en el sistema)
-                    function showAlert(message, type) {
-                        let alert = document.createElement('div');
-                        alert.className = `alert ${type}`;
-                        alert.textContent = message;
-                        document.body.appendChild(alert);
-                        setTimeout(() => alert.remove(), 3000);
-                    }
                 </script>
             </div>
         </div>
@@ -1574,77 +447,157 @@
             </div>
         </div>
 
-        <!-- Modal de Cierre de Caja -->
+        <!-- Modal de Cierre de Caja - Estructura mejorada para garantizar botones visibles -->
         <div id="cierreModal" class="edit-modal">
-            <div class="edit-form">
-                <h3 style="margin-bottom: 20px; color: #e4e9ee;">🧮 Cierre de Caja</h3>
+            <div class="cierre-modal-content" style="
+                background: #2d2d2d;
+                padding: 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                max-width: 600px;
+                width: 90%;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            ">
+                <!-- Header del modal - siempre visible arriba -->
+                <div style="
+                    flex-shrink: 0;
+                    padding: 20px 25px;
+                    border-bottom: 1px solid #444;
+                    background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
+                ">
+                    <h3 style="margin: 0; color: #e4e9ee; font-size: 18px;">🧮 Cierre de Caja</h3>
+                </div>
 
-                <!-- Sección de entrada (dinero inicial y fecha opcional) -->
-                <div id="cierre-input-section" style="margin-bottom: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div>
-                            <label for="cierreDineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500;">Dinero Inicial del Día:</label>
-                            <input type="number" id="cierreDineroInicial" step="0.01" min="0" placeholder="500.00" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;">
+                <!-- Contenido principal con scroll - área intermedia -->
+                <div style="
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 20px 25px;
+                    min-height: 200px;
+                    max-height: 60vh;
+                ">
+                    <!-- Sección de entrada (dinero inicial y fecha opcional) -->
+                    <div id="cierre-input-section" style="margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label for="cierreDineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500; color: white;">Dinero Inicial del Día:</label>
+                                <input type="number" id="cierreDineroInicial" step="0.01" min="0" placeholder="0.00" style="width: 100%; padding: 12px; border: 2px solid #444; border-radius: 6px; font-size: 14px; background: #1a1a1a; color: white;" required>
+                            </div>
+                            <div>
+                                <label for="cierreFechaEspecifica" style="display: block; margin-bottom: 5px; font-weight: 500; color: white;">Fecha Específica (opcional):</label>
+                                <input type="date" id="cierreFechaEspecifica" style="width: 100%; padding: 12px; border: 2px solid #444; border-radius: 6px; font-size: 14px; background: #1a1a1a; color: white;">
+                                <small style="color: #888; font-size: 12px;">Deja vacío para hoy</small>
+                            </div>
                         </div>
-                        <div>
-                            <label for="cierreFechaEspecifica" style="display: block; margin-bottom: 5px; font-weight: 500;">Fecha Específica (opcional):</label>
-                            <input type="date" id="cierreFechaEspecifica" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;">
-                            <small style="color: #666; font-size: 12px;">Deja vacío para hoy</small>
+                        <div id="cierre-validation-message" style="display: none; padding: 12px; background: #4a2d2d; border: 1px solid #dc3545; border-radius: 6px; color: #ff9999; font-size: 14px; margin-top: 10px;">
+                            <!-- Mensajes de validación aparecerán aquí -->
                         </div>
                     </div>
-                    <div id="cierre-validation-message" style="display: none; padding: 10px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; color: #721c24; font-size: 14px; margin-top: 10px;">
-                        <!-- Mensajes de validación aparecerán aquí -->
+
+                    <!-- Sección de resultados (oculta inicialmente) -->
+                    <div id="cierre-results-section" style="display: none;">
+                        <!-- Resumen Principal -->
+                        <div class="cierre-resultados" style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                            <h4 style="margin-bottom: 15px; color: #edf1f5; font-size: 16px;">📊 Resumen del Cierre</h4>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <p style="color: white; margin: 5px 0;"><strong>Dinero Inicial:</strong> <span id="cierre-inicial">$0,00</span></p>
+                                <p style="color: white; margin: 5px 0;"><strong>Total Ventas:</strong> <span id="cierre-total">$0,00</span></p>
+                                <p style="color: white; margin: 5px 0;"><strong>Total Esperado:</strong> <span id="cierre-esperado">$0,00</span></p>
+                                <p style="color: white; margin: 5px 0;"><strong>Diferencia:</strong> <span id="cierre-diferencia">$0,00</span></p>
+                                <p style="color: white; margin: 5px 0;"><strong>Cantidad de Ventas:</strong> <span id="cierre-cantidad">0</span></p>
+                                <p style="color: white; margin: 5px 0;"><strong>Fecha:</strong> <span id="cierre-fecha">-</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Detalle de Métodos de Pago -->
+                        <div id="cierre-payment-details-section" style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                            <h4 style="margin-bottom: 15px; color: #edf1f5; font-size: 16px;">💳 Detalle por Método de Pago</h4>
+                            <div id="cierre-payment-details" style="display: grid; gap: 8px;">
+                                <!-- Los totales por método de pago se mostrarán aquí -->
+                            </div>
+                        </div>
+
+                        <!-- Información de Vuelto -->
+                        <div id="cierre-vuelto-section" style="background: #4a3d2d; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                            <p style="margin: 0; font-size: 14px; color: white;"><strong>💰 Vuelto Total:</strong> <span id="cierre-vuelto">$0,00</span></p>
+                        </div>
+
+                        <div style="background: #4a3d2d; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; font-size: 14px; color: white;">
+                            <strong>⚠️ Revisar Información:</strong> Verifique que los cálculos sean correctos antes de confirmar el cierre.
+                        </div>
                     </div>
                 </div>
 
-                <!-- Sección de resultados (oculta inicialmente) -->
-                <div id="cierre-results-section" style="display: none;">
-                    <div class="cierre-resultados">
-                        <h4 style="margin-bottom: 15px; color: #edf1f5;">📊 Resultados del Cierre</h4>
-                        <p><strong>Dinero Inicial:</strong> <span id="cierre-inicial">$0,00</span></p>
-                        <p><strong>Total Ventas:</strong> <span id="cierre-total">$0,00</span></p>
-                        <div id="cierre-payment-totals" style="display: none; margin: 10px 0; padding: 10px; background: #000000; border-radius: 6px;">
-                            <h5 style="margin: 0 0 10px 0; color: #e8ecf0;">💳 Pagos por Método:</h5>
-                            <!-- Los totales por método de pago se mostrarán aquí -->
-                        </div>
-                        <p><strong>Total Esperado:</strong> <span id="cierre-esperado">$0,00</span></p>
-                        <p><strong>Diferencia:</strong> <span id="cierre-diferencia">$0,00</span></p>
-                        <p><strong>Cantidad de Ventas:</strong> <span id="cierre-cantidad">0</span></p>
-                        <p><strong>Fecha:</strong> <span id="cierre-fecha">-</span></p>
+                <!-- Footer con botones - siempre visible al final (NUNCA se oculta) -->
+                <div style="
+                    flex-shrink: 0;
+                    padding: 20px 25px;
+                    border-top: 1px solid #444;
+                    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+                    border-radius: 0 0 12px 12px;
+                ">
+                    <div class="button-group" style="display: flex; gap: 12px; justify-content: flex-end; margin: 0;">
+                        <button type="button" 
+                            onclick="closeCierreModal()" 
+                            style="
+                                padding: 12px 28px;
+                                font-size: 14px;
+                                font-weight: 500;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                background: #6c757d;
+                                color: white;
+                                transition: background-color 0.3s;
+                            "
+                            onmouseover="this.style.background='#545b62'"
+                            onmouseout="this.style.background='#6c757d'"
+                        >Cancelar</button>
+                        <button type="button" 
+                            onclick="calculateCloseRegister()" 
+                            style="
+                                padding: 12px 28px;
+                                font-size: 14px;
+                                font-weight: 500;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                background: #17a2b8;
+                                color: white;
+                                transition: background-color 0.3s;
+                            "
+                            onmouseover="this.style.background='#138496'"
+                            onmouseout="this.style.background='#17a2b8'"
+                        >Calcular Cierre</button>
                     </div>
-                    <div style="background: #6d5e2c; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin: 15px 0; font-size: 14px;">
-                        <strong>⚠️ Revisar Información:</strong> Verifique que los cálculos sean correctos antes de confirmar el cierre.
-                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Cierre Retroactivo -->
+        <div id="retroactiveClosureModal" class="edit-modal" style="display: none;">
+            <div class="edit-form" style="max-width: 500px;">
+                <h3 style="margin-bottom: 20px; color: #e9edf1;">📅 Cierre de Caja Retroactivo</h3>
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                    Selecciona la fecha para la que deseas realizar el cierre de caja.
+                </p>
+
+                <div class="form-group">
+                    <label for="retroFecha" style="display: block; margin-bottom: 5px; font-weight: 500;">Fecha del Cierre:</label>
+                    <input type="date" id="retroFecha" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="retroDineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500;">Dinero Inicial:</label>
+                    <input type="number" id="retroDineroInicial" step="0.01" min="0" placeholder="500.00" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
                 </div>
 
                 <div class="button-group" style="margin-top: 20px;">
-                    <button type="button" class="btn btn-primary" onclick="calculateCloseRegister()">Calcular Cierre</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeCierreModal()">Cancelar</button>
-                </div>
-
-                <!-- Modal de Cierre Retroactivo -->
-                <div id="retroactiveClosureModal" class="edit-modal" style="display: none;">
-                    <div class="edit-form" style="max-width: 500px;">
-                        <h3 style="margin-bottom: 20px; color: #e9edf1;">📅 Cierre de Caja Retroactivo</h3>
-                        <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
-                            Selecciona la fecha para la que deseas realizar el cierre de caja.
-                        </p>
-
-                        <div class="form-group">
-                            <label for="retroFecha" style="display: block; margin-bottom: 5px; font-weight: 500;">Fecha del Cierre:</label>
-                            <input type="date" id="retroFecha" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="retroDineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500;">Dinero Inicial:</label>
-                            <input type="number" id="retroDineroInicial" step="0.01" min="0" placeholder="500.00" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
-                        </div>
-
-                        <div class="button-group" style="margin-top: 20px;">
-                            <button type="button" class="btn btn-primary" onclick="calculateRetroactiveClosure()">Calcular Cierre Retroactivo</button>
-                            <button type="button" class="btn btn-secondary" onclick="closeRetroactiveModal()">Cancelar</button>
-                        </div>
-                    </div>
+                    <button type="button" class="btn btn-primary" onclick="calculateRetroactiveClosure()">Calcular Cierre Retroactivo</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeRetroactiveModal()">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -2087,7 +1040,7 @@
                 <form id="addProductForm">
                     <div class="form-group">
                         <label for="addCategoria">Categoría:</label>
-                        <input type="text" id="addCategoria" name="categoria" list="categoriaList" placeholder="Seleccionar o escribir nueva categoría" required onchange="generateProductCode()">
+                        <input type="text" id="addCategoria" list="categoriaList" placeholder="Seleccionar o escribir nueva categoría" required onchange="generateProductCode()">
                         <datalist id="categoriaList">
                             <option value="COND - Condimentos">
                             <option value="BEB - Bebidas">
@@ -2105,35 +1058,35 @@
 
                     <div class="form-group">
                         <label for="addCodigo">Código generado:</label>
-                        <input type="text" id="addCodigo" name="codigo" required placeholder="Se generará automáticamente" readonly onchange="checkCodeAvailability()">
+                        <input type="text" id="addCodigo" required placeholder="Se generará automáticamente" readonly onchange="checkCodeAvailability()">
                         <small style="color: #666; font-size: 12px;">Código único generado automáticamente</small>
                         <div id="codeAvailability" style="margin-top: 5px; font-size: 12px; font-weight: bold;"></div>
                     </div>
 
                     <div class="form-group">
                         <label for="addNombre">Nombre:</label>
-                        <input type="text" id="addNombre" name="nombre" required placeholder="Nombre del producto">
+                        <input type="text" id="addNombre" required placeholder="Nombre del producto">
                     </div>
 
                     <div class="form-group">
                         <label for="addDescripcion">Descripción:</label>
-                        <input type="text" id="addDescripcion" name="descripcion" placeholder="Descripción opcional">
+                        <input type="text" id="addDescripcion" placeholder="Descripción opcional">
                     </div>
 
                     <div class="form-group">
                         <label for="addPrecio">Precio:</label>
-                        <input type="number" id="addPrecio" name="precio" step="0.01" min="0" required placeholder="0.00">
+                        <input type="number" id="addPrecio" step="0.01" min="0" required placeholder="0.00">
                     </div>
 
                     <div class="form-group">
                         <label for="addStock">Stock:</label>
-                        <input type="number" id="addStock" name="stock" min="0" required placeholder="0">
+                        <input type="number" id="addStock" min="0" required placeholder="0">
                     </div>
 
                     <div class="form-group">
                         <label for="addBarcode">Código de Barras:</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="addBarcode" name="codigo_barras" placeholder="Código de barras opcional" maxlength="50" style="flex: 1;">
+                            <input type="text" id="addBarcode" placeholder="Código de barras opcional" maxlength="50" style="flex: 1;">
                             <button type="button" id="addBarcodeScanner" class="btn btn-secondary" style="padding: 10px; font-size: 14px;" onclick="openBarcodeScannerForAddProduct()">
                                 📱 Escanear
                             </button>
@@ -2201,6 +1154,63 @@
                     <div class="button-group">
                         <button type="button" class="btn btn-secondary" onclick="closeAddSupplierModal()">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Crear Proveedor</button>
+                        <script>
+                            document.getElementById('addSupplierForm').addEventListener('submit', createSupplier);
+    
+                            async function createSupplier(event) {
+                                event.preventDefault();
+                                
+                                const formData = {
+                                    nombre: document.getElementById('addNombreProveedor').value.trim(),
+                                    nombreContacto: document.getElementById('addNombreContacto').value.trim(),
+                                    telefono: document.getElementById('addTelefono').value.trim(),
+                                    email: document.getElementById('addEmail').value.trim(),
+                                    productosServicios: document.getElementById('addProductosServicios').value.trim(),
+                                    condicionesPago: document.getElementById('addCondicionesPago').value.trim(),
+                                    estatus: document.getElementById('addEstatus').value,
+                                    notas: document.getElementById('addNotas').value.trim()
+                                };
+                                
+                                // Validaciones básicas
+                                if (!formData.nombre) {
+                                    alert('Por favor ingresa el nombre del proveedor');
+                                    return;
+                                }
+                                
+                                try {
+                                    const headers = { 'Content-Type': 'application/json' };
+                                    if (authCredentials) {
+                                        headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
+                                    }
+                                    
+                                    const response = await fetch(`${window.ApiClient.API_BASE}/suppliers`, {
+                                        method: 'POST',
+                                        headers: headers,
+                                        body: JSON.stringify(formData)
+                                    });
+                                    
+                                    if (response.status === 401) {
+                                        isLoggedIn = false;
+                                        updateUIBasedOnAuth();
+                                        throw new Error('Autenticación requerida');
+                                    }
+                                    if (!response.ok) {
+                                        const errorData = await response.json();
+                                        throw new Error(errorData.error || 'Error al crear proveedor');
+                                    }
+                                    
+                                    const result = await response.json();
+                                    
+                                    alert('Proveedor creado exitosamente');
+                                    closeAddSupplierModal();
+                                    fetchSuppliers(); // Recargar la lista de proveedores
+                                    
+                                } catch (error) {
+                                    console.error('Error creating supplier:', error);
+                                    alert('Error al crear proveedor: ' + error.message);
+                                }
+                            }
+                        </script>
                     </div>
                 </form>
             </div>
@@ -2537,6 +1547,10 @@
                         <input type="checkbox" id="includeLotes" style="margin-right: 10px;">
                         📅 <strong>Lotes</strong> - Control de lotes y vencimientos
                     </label>
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeCuentasCorrientes" style="margin-right: 10px;">
+                        👥 <strong>Cuentas Corrientes</strong> - Estado de deudas de clientes
+                    </label>
                 </div>
 
                 <div style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
@@ -2649,6 +1663,19 @@
                 return metodoPago.toUpperCase() + changeText;
             }
             return 'No especificado';
+        }
+
+        // Función genérica para cerrar modales (elimina código duplicado)
+        function closeModal(modalId, resetFormId = null) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                // Resetear formulario si se especifica
+                if (resetFormId) {
+                    const form = document.getElementById(resetFormId);
+                    if (form) form.reset();
+                }
+            }
         }
 
         function showAlert(message, type) {
@@ -3035,8 +2062,7 @@
 
         // Función para cerrar el modal de edición
         function closeEditModal() {
-            document.getElementById('editModal').classList.remove('show');
-            document.getElementById('editProductForm').reset();
+            closeModal('editModal', 'editProductForm');
             selectedProductId = null;
         }
 
@@ -3254,8 +2280,7 @@
 
         // Función para cerrar modal de agregar producto
         function closeAddModal() {
-            document.getElementById('addModal').classList.remove('show');
-            document.getElementById('addProductForm').reset();
+            closeModal('addModal', 'addProductForm');
         }
 
         // Función para crear nuevo producto
@@ -3269,7 +2294,7 @@
                 precio: parseFloat(document.getElementById('addPrecio').value),
                 stock: parseInt(document.getElementById('addStock').value),
                 categoria: document.getElementById('addCategoria').value.trim(),
-                codigo_barras: document.getElementById('addBarcode').value.trim()
+                barcode: document.getElementById('addBarcode').value.trim()
             };
 
             // Validaciones básicas
@@ -3324,8 +2349,8 @@
         // Event listeners para el formulario de edición
         document.getElementById('editProductForm').addEventListener('submit', saveProductChanges);
 
-        // Event listeners para el formulario de agregar proveedor
-        document.getElementById('addSupplierForm').addEventListener('submit', createSupplier);
+        // Event listeners para el formulario de agregar producto
+        document.getElementById('addProductForm').addEventListener('submit', createProduct);
 
         // Event listeners para el formulario de crear promoción
         document.getElementById('createPromotionForm').addEventListener('submit', createPromotion);
@@ -3465,7 +2490,7 @@
 
         // Función para cerrar modal de crear promoción
         function closeCreatePromotionModal() {
-            document.getElementById('createPromotionModal').classList.remove('show');
+            closeModal('createPromotionModal');
             selectedPromotionProducts = [];
         }
 
@@ -4448,8 +3473,7 @@
 
         // Función para cerrar modal de agregar cliente
         function closeAddClientModal() {
-            document.getElementById('addClientModal').classList.remove('show');
-            document.getElementById('addClientForm').reset();
+            closeModal('addClientModal', 'addClientForm');
         }
 
         // Función para crear cliente
@@ -4540,8 +3564,7 @@
 
         // Función para cerrar modal de editar cliente
         function closeEditClientModal() {
-            document.getElementById('editClientModal').classList.remove('show');
-            document.getElementById('editClientForm').reset();
+            closeModal('editClientModal', 'editClientForm');
         }
 
         // Función para guardar cambios del cliente
@@ -4690,61 +3713,69 @@
             const deudasVencidas = deudas.filter(d => d.estado === 'vencida').length;
 
             let deudasHtml = `
-                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 15px 0; color: #ffffff;">Resumen de Deudas</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Total Pendiente:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
+                <div class="debts-summary">
+                    <h4>Resumen de Deudas</h4>
+                    <div class="debts-summary-grid">
+                        <div class="summary-card">
+                            <strong>Total Pendiente:</strong>
+                            <div class="summary-value positive">${formatCurrency(totalPendiente)}</div>
                         </div>
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Deudas Pendientes:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #ffc107; margin-top: 5px;">${deudasPendientes}</div>
+                        <div class="summary-card">
+                            <strong>Deudas Pendientes:</strong>
+                            <div class="summary-value warning">${deudasPendientes}</div>
                         </div>
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Deudas Vencidas:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #dc3545; margin-top: 5px;">${deudasVencidas}</div>
+                        <div class="summary-card">
+                            <strong>Deudas Vencidas:</strong>
+                            <div class="summary-value danger">${deudasVencidas}</div>
                         </div>
                     </div>
                 </div>
 
-                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px;">
-                    <h4 style="margin: 0 0 15px 0; color: #ffffff;">Detalles de Deudas</h4>
-                    <div style="overflow-x: auto;">
-                        <table class="client-debts-table" style="width: 100%; border-collapse: collapse; background: #3d3d3d; color: #ffffff;">
+                <div class="debts-details">
+                    <h4>Detalles de Deudas</h4>
+                    <div class="table-container">
+                        <table class="debts-table">
                             <thead>
-                                <tr style="background: #4a4a4a;">
-                                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #555;">Factura</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #555;">Fecha</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #555;">Producto</th>
-                                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #555;">Cantidad</th>
-                                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #555;">Precio de compra</th>
-                                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #555;">Precio Actual</th>
-                                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #555;">Diferencia</th>
-                                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #555;">Pendiente</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #555;">Vencimiento</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #555;">Estado</th>
-                                    <th style="padding: 10px; text-align: center; border-bottom: 1px solid #555;">Acciones</th>
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio de compra</th>
+                                    <th>Precio Actual</th>
+                                    <th>Diferencia</th>
+                                    <th>Pendiente</th>
+                                    <th>Vencimiento</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-            `;
+                `;
 
             deudas.forEach((deuda, index) => {
                 const fechaVencimiento = deuda.fecha_vencimiento ? new Date(deuda.fecha_vencimiento).toLocaleDateString('es-AR') : '-';
-                const estadoClass = deuda.estado === 'vencida' ? 'lote-vencido' : deuda.estado === 'pendiente' ? 'lote-proximo-vencer' : 'lote-vigente';
+                const estadoClass = deuda.estado === 'vencida' ? 'vencido' : deuda.estado === 'pendiente' ? 'proximo-vencer' : 'vigente';
                 const estadoText = deuda.estado === 'vencida' ? 'Vencida' : deuda.estado === 'pendiente' ? 'Pendiente' : 'Pagada';
 
                 // Obtener precio actual del producto
                 let precioActual;
                 let nombreProducto;
                 const cantidad = deuda.producto_cantidad || 1;
-                
-                // Usar directamente el precio actual que viene del backend
-                precioActual = deuda.precio_actual_producto;
-                nombreProducto = deuda.producto_nombre;
-                
-                const precioOriginal = deuda.precio_unitario;  // Ahora es el precio original guardado en la deuda
+
+                // Verificar si el producto existe en productosActuales
+                if (productosActuales && productosActuales[deuda.producto_id]) {
+                    // Si el producto existe, usar el precio actual del producto
+                    const producto = productosActuales[deuda.producto_id];
+                    precioActual = producto.precio;
+                    nombreProducto = producto.nombre;
+                } else {
+                    // Si el producto no existe, usar el precio actual de la deuda
+                    precioActual = deuda.precio_actual_producto;
+                    nombreProducto = deuda.producto_nombre;
+                }
+
+                const precioOriginal = deuda.precio_unitario;
 
                 // CÁLCULOS CORRECTOS CON CANTIDAD
                 // Precio original total = precio_unitario × cantidad
@@ -4755,38 +3786,29 @@
                 const pendienteRecalc = precioActualTotal;
                 // Diferencia total = (precio_actual - precio_original) × cantidad
                 const diferenciaTotal = precioActualTotal - precioOriginalTotal;
-                
-                let precioActualDisplay = '-';
-                let diferenciaDisplay = '-';
-                let diferenciaClass = '';
 
-                if (precioActual !== undefined && precioActual !== null && precioOriginal !== undefined && precioOriginal !== null) {
-                    precioActualDisplay = formatCurrency(precioActualTotal);
-                    diferenciaClass = diferenciaTotal > 0 ? 'color: #dc3545;' : diferenciaTotal < 0 ? 'color: #28a745;' : '';
-                    diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
-                } else {
-                    precioActualDisplay = precioActual ? formatCurrency(precioActualTotal) : '-';
-                    diferenciaDisplay = 'No calculable';
-                }
+                let precioActualDisplay = formatCurrency(precioActualTotal);
+                let diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
+                let diferenciaClass = diferenciaTotal > 0 ? 'danger' : diferenciaTotal < 0 ? 'success' : 'neutral';
 
                 deudasHtml += `
-                    <tr style="border-bottom: 1px solid #555;">
-                        <td style="padding: 10px;">${deuda.venta_numero_factura || '-'}</td>
-                        <td style="padding: 10px;">${deuda.venta_fecha ? new Date(deuda.venta_fecha).toLocaleDateString('es-AR') : '-'}</td>
-                        <td style="padding: 10px;">${nombreProducto}</td>
-                        <td style="padding: 10px; text-align: right;">${cantidad}</td>
-                        <td style="padding: 10px; text-align: right;">${formatCurrency(precioOriginalTotal)}</td>
-                        <td style="padding: 10px; text-align: right; font-weight: bold;">${precioActualDisplay}</td>
-                        <td style="padding: 10px; text-align: right; font-weight: bold; ${diferenciaClass}">${diferenciaDisplay}</td>
-                        <td style="padding: 10px; text-align: right; font-weight: bold; color: ${pendienteRecalc > 0 ? '#dc3545' : '#28a745'};">${formatCurrency(pendienteRecalc)}</td>
-                        <td style="padding: 10px;">${fechaVencimiento}</td>
-                        <td style="padding: 10px;"><span class="status-badge ${estadoClass}">${estadoText}</span></td>
-                        <td style="padding: 10px; text-align: center;">
+                    <tr>
+                        <td>${deuda.venta_numero_factura || '-'}</td>
+                        <td>${deuda.venta_fecha ? new Date(deuda.venta_fecha).toLocaleDateString('es-AR') : '-'}</td>
+                        <td>${nombreProducto}</td>
+                        <td>${cantidad}</td>
+                        <td>${formatCurrency(precioOriginalTotal)}</td>
+                        <td>${precioActualDisplay}</td>
+                        <td class="${diferenciaClass}">${diferenciaDisplay}</td>
+                        <td class="${pendienteRecalc > 0 ? 'danger' : 'success'}">${formatCurrency(pendienteRecalc)}</td>
+                        <td>${fechaVencimiento}</td>
+                        <td><span class="status-badge ${estadoClass}">${estadoText}</span></td>
+                        <td>
                             ${parseFloat(deuda.monto_pendiente || 0) > 0 ? `
-                                <button onclick="registerPayment(${deuda.id}, ${precioActualTotal}, '${deuda.venta_numero_factura || ''}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px;">Pagar</button>
-                                <button onclick="showPaymentHistory(${deuda.id})" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Historial</button>
+                                <button class="action-button success" onclick="registerPayment(${deuda.id}, ${precioActualTotal}, '${deuda.venta_numero_factura || ''}')">Pagar</button>
+                                <button class="action-button info" onclick="showPaymentHistory(${deuda.id})">Historial</button>
                             ` : `
-                                <span style="color: #28a745; font-weight: bold;">Pagada</span>
+                                <span class="status-badge success">Pagada</span>
                             `}
                         </td>
                     </tr>
@@ -4853,7 +3875,7 @@
 
         // Función para cerrar modal de deudas
         function closeClientDebtsModal() {
-            document.getElementById('clientDebtsModal').classList.remove('show');
+            closeModal('clientDebtsModal');
         }
 
         // Función para mostrar historial de pagos de una deuda
@@ -4959,7 +3981,7 @@
 
         // Función para cerrar modal de historial de pagos
         function closePaymentHistoryModal() {
-            document.getElementById('paymentHistoryModal').classList.remove('show');
+            closeModal('paymentHistoryModal');
         }
 
         // Función para mostrar resumen de actualización de precios de deudas
@@ -5057,7 +4079,7 @@
 
         // Función para cerrar modal de resumen
         function closeDebtsUpdateSummaryModal() {
-            document.getElementById('debtsUpdateSummaryModal').classList.remove('show');
+            closeModal('debtsUpdateSummaryModal');
         }
 
         // Función para hacer rollback de la actualización
@@ -5220,7 +4242,7 @@
 
         // Función para cerrar modal de resumen de deudas
         function closeDebtsSummaryModal() {
-            document.getElementById('debtsSummaryModal').classList.remove('show');
+            closeModal('debtsSummaryModal');
         }
 
         // Función para mostrar el resumen de deudas
@@ -5646,56 +4668,56 @@
             const hora = new Date(cierre.fecha_cierre || cierre.fecha).toLocaleTimeString('es-AR');
 
             const modalContent = `
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80%; overflow-y: auto;">
-                    <h3 style="margin: 0 0 20px 0; color: #333; text-align: center;">Detalles del Cierre de Caja</h3>
+                <div style="background: #2d2d2d; color: #ffffff; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80%; overflow-y: auto;">
+                    <h3 style="margin: 0 0 20px 0; color: #ffffff; text-align: center;">Detalles del Cierre de Caja</h3>
 
                     <div style="display: grid; gap: 15px;">
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Fecha:</strong>
-                            <span>${fecha}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Fecha:</strong>
+                            <span style="color: #ffffff;">${fecha}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Hora:</strong>
-                            <span>${hora}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Hora:</strong>
+                            <span style="color: #ffffff;">${hora}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Dinero Inicial:</strong>
-                            <span>${formatCurrency(cierre.dinero_inicial || 0)}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Dinero Inicial:</strong>
+                            <span style="color: #ffffff;">${formatCurrency(cierre.dinero_inicial || 0)}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Total Ventas:</strong>
-                            <span>${formatCurrency(cierre.total_ventas || 0)}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Total Ventas:</strong>
+                            <span style="color: #ffffff;">${formatCurrency(cierre.total_ventas || 0)}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Total Esperado:</strong>
-                            <span>${formatCurrency(cierre.total_esperado || 0)}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Total Esperado:</strong>
+                            <span style="color: #ffffff;">${formatCurrency(cierre.total_esperado || 0)}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: ${cierre.diferencia < 0 ? '#f8d7da' : '#d4edda'}; border-radius: 6px;">
-                            <strong>Diferencia:</strong>
-                            <span style="color: ${cierre.diferencia < 0 ? '#721c24' : '#155724'};">${formatCurrency(cierre.diferencia || 0)}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: ${cierre.diferencia < 0 ? '#4a2d2d' : '#2d4a2d'}; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Diferencia:</strong>
+                            <span style="color: #ffffff;">${formatCurrency(cierre.diferencia || 0)}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Cantidad de Ventas:</strong>
-                            <span>${cierre.cantidad_ventas || 0}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Cantidad de Ventas:</strong>
+                            <span style="color: #ffffff;">${cierre.cantidad_ventas || 0}</span>
                         </div>
 
                         ${cierre.tipo_cierre ? `
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px;">
-                            <strong>Tipo de Cierre:</strong>
-                            <span>${cierre.tipo_cierre}</span>
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #3d3d3d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Tipo de Cierre:</strong>
+                            <span style="color: #ffffff;">${cierre.tipo_cierre}</span>
                         </div>
                         ` : ''}
 
                         ${cierre.notas ? `
-                        <div style="padding: 10px; background: #fff3cd; border-radius: 6px;">
-                            <strong>Notas:</strong><br>
-                            <span>${cierre.notas}</span>
+                        <div style="padding: 10px; background: #4a4a2d; border-radius: 6px; color: #ffffff;">
+                            <strong style="color: #ffffff;">Notas:</strong><br>
+                            <span style="color: #ffffff;">${cierre.notas}</span>
                         </div>
                         ` : ''}
                     </div>
@@ -5706,6 +4728,19 @@
                 </div>
             `;
 
+            // Crear y mostrar el modal
+            const modal = document.createElement('div');
+            modal.className = 'cierre-details-modal edit-modal';
+            modal.innerHTML = modalContent;
+            document.body.appendChild(modal);
+            modal.classList.add('show');
+
+            // Event listener para cerrar al hacer clic fuera
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    modal.remove();
+                }
+            });
         }
 
         // Función para limpiar selección de cierre
@@ -6221,7 +5256,7 @@
 
         // Función para cerrar modal de detalles de factura
         function closeInvoiceDetailsModal() {
-            document.getElementById('invoiceDetailsModal').classList.remove('show');
+            closeModal('invoiceDetailsModal');
         }
 
         // Función para imprimir factura
@@ -6389,7 +5424,7 @@
 
         // Función para cerrar modal de opciones de reporte
         function closeReportOptionsModal() {
-            document.getElementById('reportOptionsModal').classList.remove('show');
+            closeModal('reportOptionsModal');
         }
 
         // Función para mostrar modal de soporte
@@ -6399,7 +5434,7 @@
 
         // Función para cerrar modal de soporte
         function closeSupportModal() {
-            document.getElementById('supportModal').classList.remove('show');
+            closeModal('supportModal');
         }
 
         // >>> FUNCIONES PARA PEDIDOS A PROVEEDORES
@@ -6420,7 +5455,7 @@
 
         // Función para cerrar modal de crear pedido
         function closeCreateOrderModal() {
-            document.getElementById('createOrderModal').classList.remove('show');
+            closeModal('createOrderModal');
         }
 
         // Función para cargar proveedores en el select del pedido
@@ -7020,7 +6055,7 @@
 
         // Función para cerrar modal de opciones de reset
         function closeResetModal() {
-            document.getElementById('resetModal').classList.remove('show');
+            closeModal('resetModal');
         }
 
         // Función para seleccionar todas las secciones de reset
@@ -7054,6 +6089,7 @@
             document.getElementById('includeProductos').checked = true;
             document.getElementById('includeProveedores').checked = true;
             document.getElementById('includeLotes').checked = true;
+            document.getElementById('includeCuentasCorrientes').checked = true;
         }
 
         // Función para deseleccionar todas las secciones
@@ -7063,6 +6099,7 @@
             document.getElementById('includeProductos').checked = false;
             document.getElementById('includeProveedores').checked = false;
             document.getElementById('includeLotes').checked = false;
+            document.getElementById('includeCuentasCorrientes').checked = false;
         }
 
         // >>> FUNCIONES PARA GESTIÓN DE LOTES
@@ -7580,6 +6617,7 @@
             const includeProductos = document.getElementById('includeProductos').checked;
             const includeProveedores = document.getElementById('includeProveedores').checked;
             const includeLotes = document.getElementById('includeLotes').checked;
+            const includeCuentasCorrientes = document.getElementById('includeCuentasCorrientes').checked;
 
             // Cerrar modal
             closeReportOptionsModal();

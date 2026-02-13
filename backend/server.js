@@ -310,6 +310,7 @@ async function initDatabase() {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
                     fecha_cierre DATE NOT NULL,
+                    fecha_hora_cierre DATETIME DEFAULT CURRENT_TIMESTAMP,
                     dinero_inicial REAL NOT NULL,
                     total_ventas REAL NOT NULL,
                     total_esperado REAL NOT NULL,
@@ -317,7 +318,7 @@ async function initDatabase() {
                     cantidad_ventas INTEGER NOT NULL,
                     tipo_cierre TEXT DEFAULT 'normal',
                     notas TEXT,
-                    UNIQUE(fecha_cierre)
+                    numero_cierre_dia INTEGER DEFAULT 1
                 )`
             },
             {
@@ -999,6 +1000,177 @@ async function initDatabase() {
             console.log('✅ Migración v12 completada');
         }
 
+        // Migración v13: permitir múltiples cierres de caja por día
+        if (schemaVersion < 13) {
+            console.log('🔄 Aplicando migración de esquema v13: permitir múltiples cierres de caja por día...');
+
+            // Agregar columna fecha_hora_cierre para identificar cierres múltiples
+            const fechaHoraColumnExists = await columnExists('cierres_caja', 'fecha_hora_cierre');
+            if (!fechaHoraColumnExists) {
+                await dbRun(`ALTER TABLE cierres_caja ADD COLUMN fecha_hora_cierre DATETIME DEFAULT CURRENT_TIMESTAMP`);
+                console.log('✅ Columna fecha_hora_cierre agregada a cierres_caja');
+            }
+
+            // Agregar columna numero_cierre_dia para numerar cierres del día
+            const numeroCierreColumnExists = await columnExists('cierres_caja', 'numero_cierre_dia');
+            if (!numeroCierreColumnExists) {
+                await dbRun(`ALTER TABLE cierres_caja ADD COLUMN numero_cierre_dia INTEGER DEFAULT 1`);
+                console.log('✅ Columna numero_cierre_dia agregada a cierres_caja');
+            }
+
+            // Poblar fecha_hora_cierre con los valores existentes de fecha
+            await dbRun(`UPDATE cierres_caja SET fecha_hora_cierre = fecha WHERE fecha_hora_cierre IS NULL`);
+            console.log('✅ Fecha_hora_cierre poblada con valores existentes');
+
+            // Crear índice compuesto para búsquedas eficientes por fecha y hora
+            const fechaHoraIndexExists = await indexExists('idx_cierres_fecha_hora');
+            if (!fechaHoraIndexExists) {
+                await dbRun(`CREATE INDEX idx_cierres_fecha_hora ON cierres_caja(fecha_cierre, fecha_hora_cierre DESC)`);
+                console.log('✅ Índice idx_cierres_fecha_hora creado');
+            }
+
+            // Crear índice para numero_cierre_dia
+            const numeroCierreIndexExists = await indexExists('idx_cierres_numero_dia');
+            if (!numeroCierreIndexExists) {
+                await dbRun(`CREATE INDEX idx_cierres_numero_dia ON cierres_caja(fecha_cierre, numero_cierre_dia)`);
+                console.log('✅ Índice idx_cierres_numero_dia creado');
+            }
+
+            // Actualizar numero_cierre_dia para cierres existentes (ordenados por fecha_hora_cierre)
+            const cierresExistentes = await dbAll(`
+                SELECT id, fecha_cierre, fecha_hora_cierre
+                FROM cierres_caja
+                ORDER BY fecha_cierre, fecha_hora_cierre
+            `);
+
+            // Agrupar por fecha y asignar números secuenciales
+            const cierresPorFecha = {};
+            for (const cierre of cierresExistentes) {
+                if (!cierresPorFecha[cierre.fecha_cierre]) {
+                    cierresPorFecha[cierre.fecha_cierre] = [];
+                }
+                cierresPorFecha[cierre.fecha_cierre].push(cierre);
+            }
+
+            // Actualizar numero_cierre_dia para cada grupo
+            for (const [fecha, cierres] of Object.entries(cierresPorFecha)) {
+                for (let i = 0; i < cierres.length; i++) {
+                    await dbRun(
+                        `UPDATE cierres_caja SET numero_cierre_dia = ? WHERE id = ?`,
+                        [i + 1, cierres[i].id]
+                    );
+                }
+            }
+
+            console.log('✅ Numeración de cierres por día actualizada');
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [13, 'Migración v13: permitir múltiples cierres de caja por día - agregar fecha_hora_cierre y numero_cierre_dia']);
+            console.log('✅ Migración v13 completada');
+        }
+
+        // Migración v14: quitar restricción UNIQUE(fecha_cierre) para permitir múltiples cierres por día
+        if (schemaVersion < 14) {
+            console.log('🔄 Aplicando migración de esquema v14: quitar restricción UNIQUE(fecha_cierre)...');
+
+            // En SQLite, no se puede hacer ALTER TABLE DROP CONSTRAINT directamente
+            // Necesitamos recrear la tabla sin la restricción UNIQUE
+
+            // Crear tabla temporal con la estructura nueva (sin UNIQUE(fecha_cierre))
+            await dbRun(`
+                CREATE TABLE cierres_caja_new (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    fecha_cierre DATE NOT NULL,
+                    fecha_hora_cierre DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    dinero_inicial REAL NOT NULL,
+                    total_ventas REAL NOT NULL,
+                    total_esperado REAL NOT NULL,
+                    diferencia REAL NOT NULL,
+                    cantidad_ventas INTEGER NOT NULL,
+                    tipo_cierre TEXT DEFAULT 'normal',
+                    notas TEXT,
+                    numero_cierre_dia INTEGER DEFAULT 1
+                )
+            `);
+
+            // Copiar todos los datos de la tabla antigua a la nueva
+            await dbRun(`
+                INSERT INTO cierres_caja_new (
+                    id, fecha, fecha_cierre, fecha_hora_cierre, dinero_inicial,
+                    total_ventas, total_esperado, diferencia, cantidad_ventas,
+                    tipo_cierre, notas, numero_cierre_dia
+                )
+                SELECT
+                    id, fecha, fecha_cierre, fecha_hora_cierre, dinero_inicial,
+                    total_ventas, total_esperado, diferencia, cantidad_ventas,
+                    tipo_cierre, notas, numero_cierre_dia
+                FROM cierres_caja
+            `);
+
+            // Eliminar índices relacionados con la tabla antigua
+            const indexesToDrop = [
+                'idx_cierres_fecha',
+                'idx_cierres_tipo',
+                'idx_cierres_fecha_hora',
+                'idx_cierres_numero_dia'
+            ];
+
+            for (const indexName of indexesToDrop) {
+                const indexExists = await indexExists(indexName);
+                if (indexExists) {
+                    await dbRun(`DROP INDEX ${indexName}`);
+                    console.log(`✅ Índice ${indexName} eliminado`);
+                }
+            }
+
+            // Reemplazar tabla antigua con la nueva
+            await dbRun(`DROP TABLE cierres_caja`);
+            await dbRun(`ALTER TABLE cierres_caja_new RENAME TO cierres_caja`);
+
+            // Recrear índices necesarios
+            await dbRun(`CREATE INDEX IF NOT EXISTS idx_cierres_fecha ON cierres_caja(fecha_cierre)`);
+            await dbRun(`CREATE INDEX IF NOT EXISTS idx_cierres_tipo ON cierres_caja(tipo_cierre)`);
+            await dbRun(`CREATE INDEX IF NOT EXISTS idx_cierres_fecha_hora ON cierres_caja(fecha_cierre, fecha_hora_cierre DESC)`);
+            await dbRun(`CREATE INDEX IF NOT EXISTS idx_cierres_numero_dia ON cierres_caja(fecha_cierre, numero_cierre_dia)`);
+
+            console.log('✅ Tabla cierres_caja recreada sin restricción UNIQUE(fecha_cierre)');
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [14, 'Migración v14: quitar restricción UNIQUE(fecha_cierre) para permitir múltiples cierres de caja por día']);
+            console.log('✅ Migración v14 completada');
+        }
+
+        // Migración v15: agregar campo ultima_venta_id para controlar ventas incluidas en cada cierre
+        if (schemaVersion < 15) {
+            console.log('🔄 Aplicando migración de esquema v15: agregar campo ultima_venta_id...');
+
+            // Agregar columna ultima_venta_id a la tabla cierres_caja
+            const ultimaVentaIdExists = await columnExists('cierres_caja', 'ultima_venta_id');
+            if (!ultimaVentaIdExists) {
+                await dbRun(`ALTER TABLE cierres_caja ADD COLUMN ultima_venta_id INTEGER`);
+                console.log('✅ Columna ultima_venta_id agregada a cierres_caja');
+            }
+
+            // Crear índice para búsqueda por ultima_venta_id
+            const ultimaVentaIdIndexExists = await indexExists('idx_cierres_ultima_venta_id');
+            if (!ultimaVentaIdIndexExists) {
+                await dbRun(`CREATE INDEX idx_cierres_ultima_venta_id ON cierres_caja(ultima_venta_id)`);
+                console.log('✅ Índice idx_cierres_ultima_venta_id creado');
+            }
+
+            // Para cierres existentes, inicializar el campo con NULL (sin límite de venta)
+            await dbRun(`UPDATE cierres_caja SET ultima_venta_id = NULL WHERE ultima_venta_id IS NULL`);
+            console.log('✅ Campo ultima_venta_id inicializado para cierres existentes');
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [15, 'Migración v15: agregar campo ultima_venta_id para controlar ventas incluidas en cada cierre']);
+            console.log('✅ Migración v15 completada');
+        }
+
         // Verificar si hay datos de ejemplo que insertar
         const productCount = await dbAll("SELECT COUNT(*) as count FROM productos");
         if (productCount[0].count === 0) {
@@ -1143,7 +1315,8 @@ async function checkLicense() {
 // Función para obtener detalles de licencia con información de expiración
 async function getLicenseDetails() {
     try {
-        const licenses = await dbAll("SELECT * FROM licencia WHERE estado = 'activa' ORDER BY fecha_activacion DESC LIMIT 1");
+        // Usar el mismo criterio que checkLicense() para consistencia
+        const licenses = await dbAll("SELECT * FROM licencia WHERE estado = 'activa' AND fecha_expiracion > datetime('now') ORDER BY fecha_activacion DESC LIMIT 1");
         if (licenses.length === 0) {
             return { activated: false };
         }
@@ -2049,36 +2222,24 @@ app.post('/api/debts/:id/payment', conditionalAuth, async (req, res) => {
 
         const currentDebt = debt[0];
 
-        // Calcular el pendiente real usando el precio actual de los productos asociados a la deuda
-        // Esto garantiza que los pagos se rijan por el precio actual del item
-        const productoRows = await dbAll(
-            `SELECT dp.cantidad as cantidad, COALESCE(p.precio, dp.precio_unitario) as precio_actual
-             FROM deuda_productos dp
-             LEFT JOIN productos p ON dp.producto_id = p.id
-             WHERE dp.deuda_id = ?`,
-            [debtId]
-        );
-
-        const recalculatedPending = productoRows.reduce((sum, r) => {
-            const qty = parseFloat(r.cantidad || 1);
-            const price = parseFloat(r.precio_actual || 0);
-            return sum + price * qty;
-        }, 0);
-
         // Verificar estado actual: si ya está pagada, no permitir nuevos pagos
         if (currentDebt.estado !== 'pendiente' && currentDebt.estado !== 'vencida') {
             return res.status(400).json({ error: 'Solo se pueden registrar pagos en deudas pendientes o vencidas' });
         }
 
-        // Verificar que el monto no exceda el pendiente recalculado
-        if (monto > recalculatedPending) {
+        // USAR el monto_pendiente almacenado en lugar de recalcular con precios actuales
+        // Esto garantiza que el cliente pague exactamente lo que debe según el acuerdo original
+        const montoPendienteActual = parseFloat(currentDebt.monto_pendiente || 0);
+
+        // Verificar que el monto no exceda el pendiente almacenado
+        if (monto > montoPendienteActual) {
             return res.status(400).json({
-                error: `El monto del pago (${formatCurrency(monto)}) no puede ser mayor al monto pendiente recalculado (${formatCurrency(recalculatedPending)})`
+                error: `El monto del pago (${formatCurrency(monto)}) no puede ser mayor al monto pendiente (${formatCurrency(montoPendienteActual)})`
             });
         }
 
-        // Calcular nuevo monto pendiente basado en el precio actual
-        const nuevoMontoPendiente = parseFloat((recalculatedPending - monto).toFixed(2));
+        // Calcular nuevo monto pendiente basado en el monto almacenado
+        const nuevoMontoPendiente = parseFloat((montoPendienteActual - monto).toFixed(2));
         const nuevoEstado = nuevoMontoPendiente === 0 ? 'pagada' : 'pendiente';
 
         // Actualizar la deuda con el nuevo monto pendiente
@@ -2490,12 +2651,12 @@ app.post('/api/debts/update-prices-selective', conditionalAuth, async (req, res)
         
         // Filtrar por rango de fechas si se especifica
         if (fecha_desde) {
-            conditions.push('DATE(v.created_at) >= DATE(?)');
+            conditions.push('DATE(v.created_at, \'+3 hours\') >= DATE(?)');
             params.push(fecha_desde);
         }
-        
+
         if (fecha_hasta) {
-            conditions.push('DATE(v.created_at) <= DATE(?)');
+            conditions.push('DATE(v.created_at, \'+3 hours\') <= DATE(?)');
             params.push(fecha_hasta);
         }
         
@@ -2876,9 +3037,16 @@ app.post('/api/debts/update-prices-selective', conditionalAuth, async (req, res)
 
 // Middleware para agregar información de licencia a todas las respuestas
 app.use(async (req, res, next) => {
-    // Agregar información de licencia a todas las respuestas
-    res.locals.isLicensed = await checkLicense();
-    next();
+    try {
+        // Agregar información de licencia a todas las respuestas
+        const isLicensed = await checkLicense();
+        res.locals.isLicensed = isLicensed;
+        next();
+    } catch (error) {
+        console.error('Error en middleware de licencia:', error);
+        res.locals.isLicensed = false;
+        next();
+    }
 });
 
 // Rutas de activación
@@ -4109,16 +4277,18 @@ app.post('/api/close-register-preview', async (req, res) => {
     console.log(`🔄 [DEBUG] Endpoint /api/close-register-preview llamado`);
     console.log(`🔄 [DEBUG] Body: ${JSON.stringify(req.body)}`);
     try {
-        const { fecha, dineroInicial, fechaEspecifica } = req.body;
+        console.log(`🔍 [DEBUG] req.body completo: ${JSON.stringify(req.body)}`);
+        const { fecha, dineroInicial, dinero_inicial, fechaEspecifica } = req.body;
 
-        // Validar dinero inicial
-        const initialAmount = parseFloat(dineroInicial || 0);
+        // Validar dinero inicial (aceptar ambos formatos)
+        const initialAmount = parseFloat(dineroInicial || dinero_inicial || 0);
         if (isNaN(initialAmount) || initialAmount < 0) {
             return res.status(400).json({ error: 'El dinero inicial debe ser un número positivo' });
         }
 
         // Determinar fecha para el cierre
         let targetDate = fechaEspecifica || fecha || new Date().toISOString().split('T')[0];
+        console.log(`🔍 [DEBUG] targetDate inicial: ${targetDate}, fechaEspecifica: ${fechaEspecifica}, fecha: ${fecha}`);
         if (fechaEspecifica) {
             // Validar formato de fecha específica
             const dateObj = new Date(fechaEspecifica);
@@ -4127,37 +4297,57 @@ app.post('/api/close-register-preview', async (req, res) => {
             }
             targetDate = fechaEspecifica;
         }
+        console.log(`🔍 [DEBUG] targetDate final: ${targetDate}`);
 
-        // Verificar si ya existe un cierre para esta fecha
-        const existingClose = await dbAll(`
-            SELECT id FROM cierres_caja
-            WHERE fecha_cierre = ?
-        `, [targetDate]);
+        // Verificar el último cierre para esta fecha y determinar el próximo número de cierre
+        let numeroCierrePropuesto = 1;
+        try {
+            const existingCloses = await dbAll(`
+                SELECT id, numero_cierre_dia, fecha_hora_cierre
+                FROM cierres_caja
+                WHERE fecha_cierre = ?
+                ORDER BY numero_cierre_dia DESC
+                LIMIT 1
+            `, [targetDate]);
 
-        if (existingClose.length > 0 && !fechaEspecifica) {
-            return res.status(400).json({
-                error: 'Ya existe un cierre de caja para esta fecha',
-                existing_close: true
-            });
+            if (existingCloses.length > 0) {
+                numeroCierrePropuesto = existingCloses[0].numero_cierre_dia + 1;
+                console.log(`ℹ️ Ya existe un cierre para esta fecha. Próximo cierre: #${numeroCierrePropuesto}`);
+            }
+        } catch (error) {
+            console.warn('Error obteniendo cierres del día:', error.message);
+            // Continuar con numeroCierrePropuesto = 1
         }
 
-        // Obtener la fecha del último cierre antes de la fecha objetivo
+        // Obtener el último cierre completo (independientemente de la fecha) para calcular el rango de ventas
         const lastClose = await dbAll(`
-            SELECT fecha, fecha_cierre FROM cierres_caja
-            WHERE fecha_cierre < ?
-            ORDER BY fecha_cierre DESC
+            SELECT id, fecha_hora_cierre, fecha_cierre, numero_cierre_dia, ultima_venta_id
+            FROM cierres_caja
+            ORDER BY fecha_hora_cierre DESC, id DESC
             LIMIT 1
-        `, [targetDate]);
+        `);
 
-        // Construir condición de fecha para ventas
-        let dateCondition = "DATE(v.created_at) = DATE(?)";
-        let dateParams = [targetDate];
+        // Construir condición para ventas: usar ultima_venta_id del último cierre si existe, sino fecha/hora
+        let salesCondition = "DATE(v.created_at, '+3 hours') = DATE(?)";
+        let salesParams = [targetDate];
 
         if (lastClose.length > 0) {
-            // Si hay un cierre anterior, solo contar ventas después de ese cierre hasta la fecha objetivo
-            dateCondition = "DATE(v.created_at) > DATE(?) AND DATE(v.created_at) <= DATE(?)";
-            dateParams = [lastClose[0].fecha_cierre, targetDate];
+            if (lastClose[0].ultima_venta_id !== null) {
+                // Usar ultima_venta_id para filtro preciso
+                salesCondition = "v.id > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].ultima_venta_id, targetDate];
+            } else if (!fechaEspecifica) {
+                // Si no hay ultima_venta_id y es cierre normal, usar fecha_hora_cierre
+                salesCondition = "v.created_at > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].fecha_hora_cierre, targetDate];
+            }
+            // Para cierres retroactivos, siempre incluir todas las ventas del día (ignorar ultimo cierre)
         }
+
+        console.log(`🔍 [DEBUG] salesCondition: ${salesCondition}`);
+        console.log(`🔍 [DEBUG] salesParams: ${JSON.stringify(salesParams)}`);
+        console.log(`🔍 [DEBUG] lastClose: ${lastClose.length > 0 ? JSON.stringify(lastClose[0]) : 'none'}`);
+        console.log(`🔍 [DEBUG] fechaEspecifica: ${fechaEspecifica}`);
 
         // Obtener total de ventas para el período
         const dailySales = await dbAll(`
@@ -4165,12 +4355,20 @@ app.post('/api/close-register-preview', async (req, res) => {
                 SUM(total) as total,
                 COUNT(*) as cantidad
             FROM ventas v
-            WHERE ${dateCondition}
-        `, dateParams);
+            WHERE ${salesCondition}
+        `, salesParams);
+
+        console.log(`🔍 [DEBUG] dailySales result: ${JSON.stringify(dailySales)}`);
 
         // Calcular total esperado
         const totalVentas = parseFloat(dailySales[0].total || 0);
+        const cantidadVentas = parseInt(dailySales[0].cantidad || 0);
         const totalEsperado = initialAmount + totalVentas;
+
+        console.log(`🔍 [DEBUG] initialAmount: ${initialAmount}`);
+        console.log(`🔍 [DEBUG] totalVentas: ${totalVentas}`);
+        console.log(`🔍 [DEBUG] cantidadVentas: ${cantidadVentas}`);
+        console.log(`🔍 [DEBUG] totalEsperado: ${totalEsperado}`);
 
         // Para preview, el dinero contado es igual al esperado (diferencia = 0)
         const countedAmount = totalEsperado;
@@ -4198,10 +4396,10 @@ app.post('/api/close-register-preview', async (req, res) => {
             FROM ventas v
             LEFT JOIN venta_items vi ON v.id = vi.venta_id
             LEFT JOIN productos p ON vi.producto_id = p.id
-            WHERE ${dateCondition}
+            WHERE ${salesCondition}
             GROUP BY v.id
             ORDER BY v.created_at ASC
-        `, dateParams);
+        `, salesParams);
 
         // Procesar items JSON
         const processedSales = salesDetails.map(sale => ({
@@ -4209,8 +4407,9 @@ app.post('/api/close-register-preview', async (req, res) => {
             items: sale.items ? JSON.parse(`[${sale.items}]`) : []
         }));
 
-        // Calcular totales por método de pago
+        // Calcular totales y cantidad por método de pago
         const paymentTotals = {};
+        const paymentCounts = {};
         processedSales.forEach(sale => {
             let metodoPago = sale.metodo_pago;
 
@@ -4222,7 +4421,11 @@ app.post('/api/close-register-preview', async (req, res) => {
                     parsed.forEach(pago => {
                         const metodo = pago.metodo.toUpperCase();
                         const monto = parseFloat(pago.monto || 0);
-                        paymentTotals[metodo] = (paymentTotals[metodo] || 0) + monto;
+                        if (!paymentTotals[metodo]) {
+                            paymentTotals[metodo] = { total: 0, cantidad: 0 };
+                        }
+                        paymentTotals[metodo].total += monto;
+                        paymentTotals[metodo].cantidad += 1;
                     });
                     return;
                 }
@@ -4233,24 +4436,54 @@ app.post('/api/close-register-preview', async (req, res) => {
 
             // Método de pago simple
             const metodo = metodoPago.toUpperCase();
-            paymentTotals[metodo] = (paymentTotals[metodo] || 0) + parseFloat(sale.total || 0);
+            if (!paymentTotals[metodo]) {
+                paymentTotals[metodo] = { total: 0, cantidad: 0 };
+            }
+            paymentTotals[metodo].total += parseFloat(sale.total || 0);
+            paymentTotals[metodo].cantidad += 1;
         });
+
+        // Obtener información de cierres existentes para el día
+        let cierresDelDia = [];
+        try {
+            cierresDelDia = await dbAll(`
+                SELECT numero_cierre_dia, fecha_hora_cierre, total_ventas
+                FROM cierres_caja
+                WHERE fecha_cierre = ?
+                ORDER BY numero_cierre_dia
+            `, [targetDate]);
+        } catch (error) {
+            console.warn('Error obteniendo cierres del día:', error.message);
+            cierresDelDia = [];
+        }
+
+        // Calcular la ultima_venta_id para el cierre actual
+        let ultimaVentaId = null;
+        if (processedSales.length > 0) {
+            const maxSaleId = Math.max(...processedSales.map(sale => sale.id));
+            ultimaVentaId = maxSaleId;
+        }
 
         res.json({
             success: true,
             dinero_inicial: initialAmount,
             dinero_contado: countedAmount,
-            total: totalVentas,
+            total_ventas: totalVentas,
             total_esperado: totalEsperado,
             diferencia: diferencia,
-            cantidad_ventas: dailySales[0].cantidad || 0,
+            cantidad_ventas: cantidadVentas,
             ventas: processedSales,
             payment_totals: paymentTotals,
             fecha: targetDate,
             fecha_cierre: targetDate,
             tipo_cierre: fechaEspecifica ? 'retroactivo' : 'normal',
             preview: true,
-            existing_close: existingClose.length > 0
+            cierres_existentes: cierresDelDia,
+            numero_cierre_propuesto: cierresDelDia.length + 1,
+            ultimo_cierre_id: lastClose.length > 0 ? lastClose[0].id : null,
+            ultimo_cierre_fecha_hora: lastClose.length > 0 ? lastClose[0].fecha_hora_cierre : null,
+            ultima_venta_id_anterior: lastClose.length > 0 ? lastClose[0].ultima_venta_id : null,
+            ultima_venta_id_propuesto: ultimaVentaId
         });
 
     } catch (error) {
@@ -4261,39 +4494,122 @@ app.post('/api/close-register-preview', async (req, res) => {
     }
 });
 
-// Ruta para confirmar y guardar cierre de caja
+// Ruta para confirmar y guardar cierre de caja (modificada para usar total_esperado del frontend)
 app.post('/api/close-register-confirm', async (req, res) => {
     try {
         const {
             fecha,
             fecha_cierre,
             dinero_inicial,
-            total,
-            total_esperado,
-            diferencia,
-            cantidad_ventas,
             tipo_cierre,
             notas
         } = req.body;
 
-        // Validar que no exista cierre para esta fecha
-        const existingClose = await dbAll(`
-            SELECT id FROM cierres_caja WHERE fecha_cierre = ?
-        `, [fecha_cierre]);
+        console.log('🔍 Datos recibidos para confirmar cierre:', req.body);
 
-        if (existingClose.length > 0) {
-            return res.status(400).json({
-                error: 'Ya existe un cierre de caja para esta fecha',
-                existing_close: true
-            });
+        // Validar campos requeridos
+        if (dinero_inicial === undefined || dinero_inicial === null) {
+            return res.status(400).json({ error: 'El campo dinero_inicial es requerido' });
+        }
+
+        // Validar que dinero_inicial sea un número válido
+        const dineroInicialParsed = parseFloat(dinero_inicial);
+        if (isNaN(dineroInicialParsed)) {
+            return res.status(400).json({ error: 'El campo dinero_inicial debe ser un número válido' });
+        }
+
+        // Obtener el último cierre completo para calcular el rango de ventas (NO confiar en datos del frontend)
+        const lastClose = await dbAll(`
+            SELECT id, fecha_hora_cierre, fecha_cierre, numero_cierre_dia, ultima_venta_id
+            FROM cierres_caja
+            ORDER BY fecha_hora_cierre DESC, id DESC
+            LIMIT 1
+        `);
+
+        // Construir condición para ventas: usar ultima_venta_id del último cierre si existe, sino fecha/hora
+        let salesCondition = "DATE(v.created_at, '+3 hours') = DATE(?)";
+        let salesParams = [fecha_cierre];
+
+        if (lastClose.length > 0) {
+            if (lastClose[0].ultima_venta_id !== null) {
+                // Usar ultima_venta_id para filtro preciso
+                salesCondition = "v.id > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].ultima_venta_id, fecha_cierre];
+            } else if (tipo_cierre !== 'retroactivo') {
+                // Si no hay ultima_venta_id y es cierre normal, usar fecha_hora_cierre
+                salesCondition = "v.created_at > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].fecha_hora_cierre, fecha_cierre];
+            }
+            // Para cierres retroactivos, siempre incluir todas las ventas del día (ignorar ultimo cierre)
+        }
+
+        console.log(`🔍 [DEBUG] salesCondition para confirmación: ${salesCondition}`);
+        console.log(`🔍 [DEBUG] salesParams para confirmación: ${JSON.stringify(salesParams)}`);
+
+        // Calcular datos del cierre desde la base de datos (evitar confiar en frontend)
+        const dailySales = await dbAll(`
+            SELECT
+                SUM(total) as total,
+                COUNT(*) as cantidad
+            FROM ventas v
+            WHERE ${salesCondition}
+        `, salesParams);
+
+        const totalVentas = parseFloat(dailySales[0]?.total || 0);
+        const cantidadVentas = dailySales[0]?.cantidad || 0;
+
+        // Validar que totalVentas sea un número válido
+        if (isNaN(totalVentas) || !isFinite(totalVentas)) {
+            throw new Error('No se pudo obtener total de ventas válido de la base de datos');
+        }
+
+        const totalEsperado = dineroInicialParsed + totalVentas;
+
+        // Calcular diferencia (si se proporciona dinero_contado desde frontend)
+        const diferencia = req.body.dinero_contado !== undefined ?
+            totalEsperado - parseFloat(req.body.dinero_contado) : 0;
+
+        // Validar que totalEsperado se haya calculado correctamente
+        if (isNaN(totalEsperado) || totalEsperado === undefined || !isFinite(totalEsperado)) {
+            throw new Error('No se pudo calcular totalEsperado: datos inválidos (dinero_inicial o total_ventas incorrectos)');
+        }
+
+        // Obtener el próximo número de cierre para esta fecha
+        let cierresDelDia = [];
+        try {
+            cierresDelDia = await dbAll(`
+                SELECT numero_cierre_dia FROM cierres_caja
+                WHERE fecha_cierre = ?
+                ORDER BY numero_cierre_dia DESC
+                LIMIT 1
+            `, [fecha_cierre]);
+        } catch (error) {
+            console.warn('Error obteniendo cierres del día para confirmación:', error.message);
+            cierresDelDia = [];
+        }
+
+        const numeroCierreDia = cierresDelDia.length > 0 ? cierresDelDia[0].numero_cierre_dia + 1 : 1;
+
+        // Obtener timestamp actual para fecha_hora_cierre
+        const fechaHoraCierre = new Date().toISOString();
+
+        // Obtener la ultima_venta_id para este cierre
+        let ultimaVentaId = null;
+        if (cantidadVentas > 0) {
+            const maxSaleIdResult = await dbAll(`
+                SELECT MAX(id) as max_id
+                FROM ventas v
+                WHERE ${salesCondition}
+            `, salesParams);
+            ultimaVentaId = maxSaleIdResult[0].max_id;
         }
 
         // Guardar el cierre en la base de datos
         const result = await dbRun(
             `INSERT INTO cierres_caja
-            (fecha, fecha_cierre, dinero_inicial, total_ventas, total_esperado, diferencia, cantidad_ventas, tipo_cierre, notas)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [fecha, fecha_cierre, dinero_inicial, total, total_esperado, diferencia, cantidad_ventas, tipo_cierre || 'normal', notas || '']
+            (fecha, fecha_cierre, fecha_hora_cierre, dinero_inicial, total_ventas, total_esperado, diferencia, cantidad_ventas, tipo_cierre, notas, numero_cierre_dia, ultima_venta_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [fecha, fecha_cierre, fechaHoraCierre, dinero_inicial, totalVentas, totalEsperado, diferencia, cantidadVentas, tipo_cierre || 'normal', notas || '', numeroCierreDia, ultimaVentaId]
         );
 
         // Si es un cierre retroactivo, actualizar el estado de días sin cierre
@@ -4308,26 +4624,34 @@ app.post('/api/close-register-confirm', async (req, res) => {
         // Registrar la operación en el log
         logOperation(
             'CIERRE_CAJA',
-            `Cierre de caja ${tipo_cierre || 'normal'} realizado - Fecha: ${fecha_cierre} - Total: ${formatCurrency(total_esperado)}`,
+            `Cierre de caja ${tipo_cierre || 'normal'} #${numeroCierreDia} realizado - Fecha: ${fecha_cierre} - Total: ${formatCurrency(totalEsperado)}`,
             'Sistema',
             'cierres_caja',
             result.id,
             null,
             {
                 fecha_cierre,
+                numero_cierre_dia: numeroCierreDia,
+                fecha_hora_cierre: fechaHoraCierre,
                 dinero_inicial,
-                total_ventas: total,
+                total_ventas: totalVentas,
                 total_esperado,
                 diferencia,
                 cantidad_ventas,
-                tipo_cierre: tipo_cierre || 'normal'
+                tipo_cierre: tipo_cierre || 'normal',
+                ultima_venta_id: ultimaVentaId
             }
         );
 
         res.json({
             success: true,
             message: `Cierre de caja ${tipo_cierre || 'normal'} confirmado y registrado exitosamente`,
-            cierre_id: result.id
+            cierre_id: result.id,
+            total_ventas: totalVentas,
+            cantidad_ventas: cantidadVentas,
+            total_esperado: totalEsperado,
+            diferencia: diferencia,
+            ultima_venta_id: ultimaVentaId
         });
 
     } catch (error) {
@@ -4349,22 +4673,31 @@ app.post('/api/close-register', async (req, res) => {
             return res.status(400).json({ error: 'El dinero inicial debe ser un número positivo' });
         }
 
-        // Obtener la fecha del último cierre del día
-        const lastClose = await dbAll(`
-            SELECT fecha FROM cierres_caja
-            WHERE DATE(fecha) = DATE(?)
-            ORDER BY fecha DESC
-            LIMIT 1
-        `, [fecha || new Date().toISOString()]);
+        // Determinar fecha para el cierre
+        const targetDate = fecha || new Date().toISOString().split('T')[0];
 
-        // Construir condición de fecha para ventas
-        let dateCondition = "DATE(created_at) = DATE(?)";
-        let dateParams = [fecha || new Date().toISOString()];
+        // Obtener el último cierre completo para calcular el rango de ventas
+        const lastClose = await dbAll(`
+            SELECT id, fecha_hora_cierre, fecha_cierre, numero_cierre_dia, ultima_venta_id
+            FROM cierres_caja
+            ORDER BY fecha_hora_cierre DESC, id DESC
+            LIMIT 1
+        `);
+
+        // Construir condición para ventas: usar ultima_venta_id del último cierre si existe, sino fecha/hora
+        let salesCondition = "DATE(created_at, '+3 hours') = DATE(?)";
+        let salesParams = [targetDate];
 
         if (lastClose.length > 0) {
-            // Si hay un cierre anterior hoy, solo contar ventas después de ese cierre
-            dateCondition = "datetime(created_at) > datetime(?)";
-            dateParams = [lastClose[0].fecha];
+            if (lastClose[0].ultima_venta_id !== null) {
+                // Usar ultima_venta_id para filtro preciso
+                salesCondition = "id > ? AND DATE(created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].ultima_venta_id, targetDate];
+            } else {
+                // Si no hay ultima_venta_id, usar fecha_hora_cierre
+                salesCondition = "created_at > ? AND DATE(created_at, '+3 hours') <= DATE(?)";
+                salesParams = [lastClose[0].fecha_hora_cierre, targetDate];
+            }
         }
 
         // Obtener total de ventas desde el último cierre
@@ -4373,8 +4706,8 @@ app.post('/api/close-register', async (req, res) => {
                 SUM(total) as total,
                 COUNT(*) as cantidad
             FROM ventas
-            WHERE ${dateCondition}
-        `, dateParams);
+            WHERE ${salesCondition}
+        `, salesParams);
 
         // Calcular total esperado
         const totalVentas = parseFloat(dailySales[0].total || 0);
@@ -4415,9 +4748,9 @@ app.post('/api/close-register', async (req, res) => {
             FROM ventas v
             LEFT JOIN venta_items vi ON v.id = vi.venta_id
             LEFT JOIN productos p ON vi.producto_id = p.id
-            WHERE ${dateCondition}
+            WHERE ${salesCondition}
             GROUP BY v.id
-        `, dateParams);
+        `, salesParams);
 
         // Procesar items JSON
         const processedSales = salesDetails.map(sale => ({
@@ -4428,28 +4761,63 @@ app.post('/api/close-register', async (req, res) => {
         // Calcular diferencia
         const diferencia = totalEsperado - countedAmount;
 
+        // Obtener el próximo número de cierre para esta fecha
+        let cierresDelDia = [];
+        try {
+            cierresDelDia = await dbAll(`
+                SELECT numero_cierre_dia FROM cierres_caja
+                WHERE fecha_cierre = ?
+                ORDER BY numero_cierre_dia DESC
+                LIMIT 1
+            `, [targetDate]);
+        } catch (error) {
+            console.warn('Error obteniendo cierres del día:', error.message);
+            cierresDelDia = [];
+        }
+
+        const numeroCierreDia = cierresDelDia.length > 0 ? cierresDelDia[0].numero_cierre_dia + 1 : 1;
+
+        // Obtener timestamp actual para fecha_hora_cierre
+        const fechaHoraCierre = new Date().toISOString();
+
+        // Obtener la ultima_venta_id para este cierre
+        let ultimaVentaId = null;
+        if (dailySales[0].cantidad > 0) {
+            const maxSaleIdResult = await dbAll(`
+                SELECT MAX(id) as max_id
+                FROM ventas
+                WHERE ${salesCondition}
+            `, salesParams);
+            ultimaVentaId = maxSaleIdResult[0].max_id;
+        }
+
         // Guardar el cierre en la base de datos
-        await dbRun(
+        const result = await dbRun(
             `INSERT INTO cierres_caja
-            (fecha, dinero_inicial, total_ventas, total_esperado, diferencia, cantidad_ventas)
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [new Date().toISOString(), initialAmount, totalVentas, totalEsperado, diferencia, dailySales[0].cantidad || 0]
+            (fecha, fecha_cierre, fecha_hora_cierre, dinero_inicial, total_ventas, total_esperado, diferencia, cantidad_ventas, tipo_cierre, numero_cierre_dia, ultima_venta_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [fechaHoraCierre, targetDate, fechaHoraCierre, initialAmount, totalVentas, totalEsperado, diferencia, dailySales[0].cantidad || 0, 'normal', numeroCierreDia, ultimaVentaId]
         );
 
         // Registrar la operación en el log
         logOperation(
             'CIERRE_CAJA',
-            `Cierre de caja realizado - Total: ${formatCurrency(totalEsperado)}`,
+            `Cierre de caja legacy #${numeroCierreDia} realizado - Fecha: ${targetDate} - Total: ${formatCurrency(totalEsperado)}`,
             'Sistema',
             'cierres_caja',
             result.id,
             null,
             {
+                fecha_cierre: targetDate,
+                numero_cierre_dia: numeroCierreDia,
+                fecha_hora_cierre: fechaHoraCierre,
                 dinero_inicial: initialAmount,
                 total_ventas: totalVentas,
                 total_esperado: totalEsperado,
                 diferencia: diferencia,
-                cantidad_ventas: dailySales[0].cantidad || 0
+                cantidad_ventas: dailySales[0].cantidad || 0,
+                tipo_cierre: 'normal',
+                ultima_venta_id: ultimaVentaId
             }
         );
 
@@ -4478,7 +4846,7 @@ app.get('/api/cierres', async (req, res) => {
     try {
         const cierres = await dbAll(`
             SELECT * FROM cierres_caja
-            ORDER BY fecha_cierre DESC, fecha DESC
+            ORDER BY fecha_cierre DESC, numero_cierre_dia DESC, fecha_hora_cierre DESC
         `);
         res.json(cierres);
     } catch (error) {
@@ -4491,10 +4859,11 @@ app.get('/api/cierres', async (req, res) => {
 // Nueva ruta para verificar días sin cierre
 app.get('/api/check-pending-closures', async (req, res) => {
     try {
-        // Obtener fecha del último cierre
+        // Obtener fecha del último cierre (considerando cierres múltiples por día)
         const lastClose = await dbAll(`
-            SELECT fecha_cierre FROM cierres_caja
-            ORDER BY fecha_cierre DESC
+            SELECT fecha_cierre, fecha_hora_cierre, numero_cierre_dia
+            FROM cierres_caja
+            ORDER BY fecha_cierre DESC, numero_cierre_dia DESC
             LIMIT 1
         `);
 
@@ -4504,11 +4873,13 @@ app.get('/api/check-pending-closures', async (req, res) => {
             return res.json({
                 pending_days: hasSales[0].count > 0 ? 1 : 0,
                 last_close_date: null,
+                last_close_datetime: null,
                 message: hasSales[0].count > 0 ? 'Hay ventas sin cerrar' : 'Sin ventas registradas'
             });
         }
 
         const lastCloseDate = new Date(lastClose[0].fecha_cierre);
+        const lastCloseDateTime = new Date(lastClose[0].fecha_hora_cierre);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -4521,6 +4892,8 @@ app.get('/api/check-pending-closures', async (req, res) => {
         res.json({
             pending_days: pendingDays,
             last_close_date: lastClose[0].fecha_cierre,
+            last_close_datetime: lastClose[0].fecha_hora_cierre,
+            last_close_numero: lastClose[0].numero_cierre_dia,
             today: today.toISOString().split('T')[0],
             message: pendingDays > 0 ?
                 `Hay ${pendingDays} día(s) sin cierre de caja` :
@@ -7771,6 +8144,141 @@ app.post('/api/sales/credit-account', async (req, res) => {
     }
 });
 
+
+// ============================================================
+// ENDPOINT PARA CAMBIO DE CREDENCIALES DE INICIO DE SESIÓN
+// ============================================================
+
+/**
+ * POST /api/change-credentials
+ * Endpoint para cambiar las credenciales de inicio de sesión del sistema
+ * Requiere autenticación básica para proteger el cambio de credenciales
+ */
+app.post('/api/change-credentials', conditionalAuth, async (req, res) => {
+    try {
+        const { currentUsername, currentPassword, newUsername, newPassword } = req.body;
+
+        // Validaciones requeridas
+        if (!currentUsername || !currentPassword || !newUsername || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                error: 'Todos los campos son requeridos: currentUsername, currentPassword, newUsername, newPassword'
+            });
+        }
+
+        if (typeof newUsername !== 'string' || newUsername.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                error: 'El nuevo nombre de usuario no puede estar vacío'
+            });
+        }
+
+        if (typeof newPassword !== 'string' || newPassword.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                error: 'La nueva contraseña no puede estar vacía'
+            });
+        }
+
+        if (newPassword.length < 3) {
+            return res.status(400).json({
+                success: false,
+                error: 'La nueva contraseña debe tener al menos 3 caracteres'
+            });
+        }
+
+        // Verificar que las credenciales actuales sean correctas
+        const currentAuth = req.headers.authorization;
+        if (!currentAuth) {
+            return res.status(401).json({
+                success: false,
+                error: 'No se proporcionó autenticación'
+            });
+        }
+
+        // Decodificar credenciales Basic Auth
+        const base64Credentials = currentAuth.split(' ')[1];
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+        const [username, password] = credentials.split(':');
+
+        // Validar que las credenciales proporcionadas coincidan con las actuales
+        if (username !== currentUsername || password !== currentPassword) {
+            return res.status(401).json({
+                success: false,
+                error: 'Las credenciales actuales son incorrectas'
+            });
+        }
+
+        // Verificar que el nuevo username no sea igual al actual
+        if (newUsername === currentUsername) {
+            return res.status(400).json({
+                success: false,
+                error: 'El nuevo nombre de usuario debe ser diferente al actual'
+            });
+        }
+
+        // Verificar que el nuevo password no sea igual al actual
+        if (newPassword === currentPassword) {
+            return res.status(400).json({
+                success: false,
+                error: 'La nueva contraseña debe ser diferente a la actual'
+            });
+        }
+
+        // Validar formato del nuevo username (solo letras, números y guiones bajos)
+        if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
+            return res.status(400).json({
+                success: false,
+                error: 'El nombre de usuario solo puede contener letras, números y guiones bajos'
+            });
+        }
+
+        // Validar que el nuevo username no tenga más de 50 caracteres
+        if (newUsername.length > 50) {
+            return res.status(400).json({
+                success: false,
+                error: 'El nombre de usuario no puede tener más de 50 caracteres'
+            });
+        }
+
+        // Validar que la nueva contraseña no tenga más de 100 caracteres
+        if (newPassword.length > 100) {
+            return res.status(400).json({
+                success: false,
+                error: 'La contraseña no puede tener más de 100 caracteres'
+            });
+        }
+
+        // Registrar la operación en el log (antes del cambio)
+        logOperation(
+            'CREDENCIALES_CAMBIADAS',
+            `Credenciales cambiadas: usuario anterior: ${currentUsername}, nuevo usuario: ${newUsername}`,
+            'Sistema',
+            'sistema',
+            null,
+            null,
+            {
+                usuario_anterior: currentUsername,
+                usuario_nuevo: newUsername,
+                password_cambiado: true
+            }
+        );
+
+        // Enviar respuesta de éxito
+        res.json({
+            success: true,
+            message: 'Credenciales cambiadas exitosamente. Por favor, inicie sesión nuevamente con las nuevas credenciales.',
+            newUsername: newUsername
+        });
+
+    } catch (error) {
+        console.error('Error cambiando credenciales:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor al cambiar credenciales: ' + error.message
+        });
+    }
+});
 
 // Crear servidor HTTP antes del WebSocket
 const server = http.createServer(app);

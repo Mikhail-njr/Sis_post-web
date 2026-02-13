@@ -1,56 +1,14 @@
 # Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Database files
-*.db
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
-backend/pos_database.sqlite
-backend/pos_database.sqlite-*
-
-# Logs
-*.log
-logs/
-test_log.txt
-comprehensive_test_report.json
+# Build outputs
+dist/
+build/
 
 # Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Firebase
-.firebase/
-.firebase.json
-.firebaserc
-
-# Railway
-backend/railway.toml
-
-# Vercel
-frontend/vercel.json
-frontend/_redirects
-
-# Backups
-backups/
-
-# Tools
-tools/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+.env.*.local
 
 # IDE
 .vscode/
@@ -58,16 +16,30 @@ Thumbs.db
 *.swp
 *.swo
 
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Temporary files
-*.tmp
-*.temp
-*.bak
+tmp/
+temp/
 
-# Compressed files
-*.rar
-*.zip
-*.7z
+# Large model files (except config)
+models/Xenova/all-MiniLM-L6-v2/*.onnx
+!models/Xenova/all-MiniLM-L6-v2/config.json
 
-# Package lock files (optional, uncomment if you want to exclude)
-# package-lock.json
-# yarn.lock
+# Package lock para evitar duplicados
+package-lock.json
+
+# Excluded folder
+excluded/
+
+# Backup files
+*.backup
+*.backup_*

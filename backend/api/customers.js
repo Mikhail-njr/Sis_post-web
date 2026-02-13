@@ -92,36 +92,78 @@ router.post('/', (req, res) => {
 
     // Validación básica
     if (!nombre || !telefono) {
-        return res.status(400).json({ 
-            error: 'Nombre y teléfono son requeridos' 
+        return res.status(400).json({
+            error: 'Nombre y teléfono son requeridos'
         });
     }
 
-    const query = `
-        INSERT INTO clientes (nombre, telefono, dni, direccion, email, fecha_registro, activo)
-        VALUES (?, ?, ?, ?, ?, datetime('now'), 1)
+    // Verificar si ya existe un cliente con el mismo DNI o teléfono
+    const checkQuery = `
+        SELECT id, nombre
+        FROM clientes
+        WHERE (dni = ? OR telefono = ?) AND activo = 1
     `;
 
-    db.run(query, [nombre, telefono, dni, direccion, email], function(err) {
+    db.get(checkQuery, [dni, telefono], (err, existingClient) => {
         if (err) {
-            console.error('Error al crear cliente:', err);
-            return res.status(500).json({ 
-                error: 'Error al crear cliente',
-                details: err.message 
+            console.error('Error al verificar cliente existente:', err);
+            return res.status(500).json({
+                error: 'Error al verificar cliente existente',
+                details: err.message
             });
         }
 
-        res.status(201).json({
-            success: true,
-            message: 'Cliente creado exitosamente',
-            data: {
-                id: this.lastID,
-                nombre,
-                telefono,
-                dni,
-                direccion,
-                email
+        // Si ya existe un cliente con el mismo DNI o teléfono
+        if (existingClient) {
+            // Determinar qué campo está duplicado
+            let campoDuplicado = '';
+            if (existingClient.dni === dni) {
+                campoDuplicado = 'DNI';
+            } else if (existingClient.telefono === telefono) {
+                campoDuplicado = 'teléfono';
             }
+
+            return res.status(409).json({
+                error: 'Cliente duplicado detectado',
+                message: `Ya existe un cliente con el mismo ${campoDuplicado}: ${existingClient.nombre}`,
+                campo_duplicado: campoDuplicado,
+                valor_duplicado: campoDuplicado === 'DNI' ? dni : telefono,
+                existingClient: {
+                    id: existingClient.id,
+                    nombre: existingClient.nombre,
+                    telefono: existingClient.telefono,
+                    dni: existingClient.dni
+                }
+            });
+        }
+
+        // Si no existe, proceder con la creación
+        const insertQuery = `
+            INSERT INTO clientes (nombre, telefono, dni, direccion, email, fecha_registro, activo)
+            VALUES (?, ?, ?, ?, ?, datetime('now'), 1)
+        `;
+
+        db.run(insertQuery, [nombre, telefono, dni, direccion, email], function(err) {
+            if (err) {
+                console.error('Error al crear cliente:', err);
+                return res.status(500).json({
+                    error: 'Error al crear cliente',
+                    details: err.message
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                message: 'Cliente creado exitosamente',
+                data: {
+                    id: this.lastID,
+                    nombre,
+                    telefono,
+                    dni,
+                    direccion,
+                    email
+                }
+            });
         });
     });
 });
