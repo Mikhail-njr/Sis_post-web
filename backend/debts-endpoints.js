@@ -225,4 +225,40 @@ router.get('/clientes/:id', authenticate, async (req, res, next) => {
     }
 });
 
+/**
+ * DELETE /api/clientes/:clienteId/limpiar-deudas
+ * Limpiar todas las deudas de un cliente (establecer como pagadas)
+ */
+router.delete('/clientes/:clienteId/limpiar-deudas', authenticate, async (req, res, next) => {
+    try {
+        const clienteId = parseInt(req.params.clienteId);
+        
+        if (!Number.isInteger(clienteId) || clienteId <= 0) {
+            return next(new ApiError('ID de cliente inválido', 400));
+        }
+
+        // Verificar que el cliente exista
+        const cliente = await debtsRepo.getClientById(clienteId);
+        if (!cliente) {
+            return next(new ApiError('Cliente no encontrado', 404));
+        }
+
+        const result = await debtsRepo.clearAllDebts(clienteId);
+        
+        res.json({
+            success: true,
+            message: result.message,
+            cleared: result.cleared,
+            totalAmount: result.totalAmount,
+            cliente: {
+                id: cliente.id,
+                nombre: cliente.nombre
+            }
+        });
+    } catch (error) {
+        console.error('Error limpiando deudas:', error);
+        next(new ApiError('Error al limpiar las deudas', 500));
+    }
+});
+
 module.exports = router;

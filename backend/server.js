@@ -1171,6 +1171,24 @@ async function initDatabase() {
             console.log('✅ Migración v15 completada');
         }
 
+        // Migración v16: agregar columna updated_at a tabla deudas
+        if (schemaVersion < 16) {
+            console.log('🔄 Aplicando migración de esquema v16: agregar columna updated_at a deudas...');
+
+            const updatedAtColumnExists = await columnExists('deudas', 'updated_at');
+            if (!updatedAtColumnExists) {
+                // SQLite no permite agregar columna con DEFAULT CURRENT_TIMESTAMP
+                // Por eso usamos NULL y actualizamos los valores después
+                await dbRun(`ALTER TABLE deudas ADD COLUMN updated_at DATETIME`);
+                console.log('✅ Columna updated_at agregada a deudas');
+            }
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [16, 'Migración v16: agregar columna updated_at a tabla deudas']);
+            console.log('✅ Migración v16 completada');
+        }
+
         // Verificar si hay datos de ejemplo que insertar
         const productCount = await dbAll("SELECT COUNT(*) as count FROM productos");
         if (productCount[0].count === 0) {
@@ -1270,6 +1288,9 @@ function formatCurrency(amount) {
 
 // Importar utilidades de códigos de barras
 const { isValidBarcode } = require('../shared/barcode-utils');
+
+// Importar repositorio de deudas
+const DebtsRepository = require('./repositories/debts-repository');
 
 // Función para obtener fecha actual del sistema en zona horaria correcta
 function getSystemDateTime() {
@@ -1795,6 +1816,46 @@ app.delete('/api/customers/:id', async (req, res) => {
 });
 
 /**
+ * DELETE /api/customers/:clienteId/limpiar-deudas
+ * Limpiar todas las deudas de un cliente (establecer como pagadas)
+ */
+app.delete('/api/customers/:clienteId/limpiar-deudas', conditionalAuth, async (req, res) => {
+    const clienteId = parseInt(req.params.clienteId);
+    
+    if (!Number.isInteger(clienteId) || clienteId <= 0) {
+        return res.status(400).json({ error: 'ID de cliente inválido' });
+    }
+    
+    try {
+        // Verificar que el cliente exista
+        const cliente = await dbAll("SELECT id, nombre FROM clientes WHERE id = ?", [clienteId]);
+        if (cliente.length === 0) {
+            return res.status(404).json({ error: 'Cliente no encontrado' });
+        }
+        
+        // Usar el repositorio de deudas
+        const debtsRepo = new DebtsRepository();
+        const result = await debtsRepo.clearAllDebts(clienteId);
+        
+        console.log('✅ Deudas limpiadas para cliente:', cliente[0].nombre, '- Cantidad:', result.cleared);
+        
+        res.json({
+            success: true,
+            message: result.message,
+            cleared: result.cleared,
+            totalAmount: result.totalAmount,
+            cliente: {
+                id: cliente[0].id,
+                nombre: cliente[0].nombre
+            }
+        });
+    } catch (error) {
+        console.error('❌ Error limpiando deudas:', error);
+        res.status(500).json({ error: 'Error al limpiar las deudas: ' + error.message });
+    }
+});
+
+/**
  * GET /api/customers/search
  * Búsqueda de clientes con paginación (versión unificada)
  */
@@ -1951,65 +2012,27 @@ async function buscarClientesSimilares(nombre, dni, telefono) {
 // >>> ENDPOINTS EXISTENTES (mantenidos para compatibilidad, pero redirigidos)
 
 // Rutas para clientes (REDIRECCIONADAS automáticamente)
+// MODIFICADO: Ahora usa DebtsRepository
 app.get('/api/customers/cuenta-corriente', async (req, res) => {
     try {
-        console.log('🔍 [DEBUG] Iniciando consulta de clientes con cuenta corriente');
-        console.log('🔍 [DEBUG] Consulta SQL ejecutada: SELECT DISTINCT c.id, c.nombre, c.telefono, c.dni, COALESCE(SUM(d.monto_pendiente), 0) as saldo_pendiente, COUNT(d.id) as cantidad_deudas FROM clientes c LEFT JOIN deudas d ON c.id = d.cliente_id AND d.estado = \'pendiente\' AND d.monto_pendiente > 0 GROUP BY c.id, c.nombre, c.telefono, c.dni ORDER BY saldo_pendiente DESC, c.nombre ASC');
-
-        // Versión corregida: solo buscar clientes con deudas pendientes (sin columna tiene_cuenta_corriente)
-        const clientesConCuentaCorriente = await dbAll(`
-            SELECT DISTINCT
-                c.id,
-                c.nombre,
-                c.telefono,
-                c.dni,
-                COALESCE(SUM(d.monto_pendiente), 0) as saldo_pendiente,
-                COUNT(d.id) as cantidad_deudas
-            FROM clientes c
-            LEFT JOIN deudas d ON c.id = d.cliente_id AND d.estado = 'pendiente' AND d.monto_pendiente > 0
-            GROUP BY c.id, c.nombre, c.telefono, c.dni
-            HAVING saldo_pendiente > 0 OR cantidad_deudas > 0
-            ORDER BY saldo_pendiente DESC, c.nombre ASC
-        `);
-
-        console.log('🔍 [DEBUG] Resultados de la consulta:', clientesConCuentaCorriente);
-        console.log('🔍 [DEBUG] Total de clientes encontrados:', clientesConCuentaCorriente.length);
-
-        // Mostrar detalles de cada cliente encontrado
-        clientesConCuentaCorriente.forEach((cliente, index) => {
-            console.log(`🔍 [DEBUG] Cliente ${index + 1}:`, {
-                id: cliente.id,
-                nombre: cliente.nombre,
-                telefono: cliente.telefono,
-                dni: cliente.dni,
-                saldo_pendiente: cliente.saldo_pendiente,
-                cantidad_deudas: cliente.cantidad_deudas
-            });
-        });
-
-        // Validar que los clientes existan y tengan el formato esperado
-        if (!clientesConCuentaCorriente || !Array.isArray(clientesConCuentaCorriente)) {
-            console.log('🔍 [DEBUG] Data.clientes no es un array válido');
-            throw new Error('Formato de datos incorrecto: clientes no es un array');
-        }
-
-        console.log('🔍 [DEBUG] Clientes válidos encontrados:', clientesConCuentaCorriente.length);
-        console.log('🔍 [DEBUG] Carga de clientes completada exitosamente');
-
+        console.log('🔍 [REPO] Obteniendo clientes con cuenta corriente via repository');
+        
+        const debtsRepo = new DebtsRepository();
+        const clientes = await debtsRepo.getCustomersWithCredit();
+        
         res.json({
             success: true,
-            clientes: clientesConCuentaCorriente,
-            total: clientesConCuentaCorriente.length
+            clientes: clientes,
+            total: clientes.length
         });
     } catch (error) {
-        console.error('❌ [ERROR] Error en cargarClientesParaCuentaCorriente:', error);
-        console.error('❌ [ERROR] Stack trace:', error.stack);
-        res.status(500).json({
-            success: false,
-            error: 'Error al cargar clientes con cuenta corriente: ' + error.message
-        });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
+        console.log('🔍 [DEBUG] Consulta SQL ejecutada: SELECT DISTINCT c.id, c.nombre, c.telefono, c.dni, COALESCE(SUM(d.monto_pendiente), 0) as saldo_pendiente, COUNT(d.id) as cantidad_deudas FROM clientes c LEFT JOIN deudas d ON c.id = d.cliente_id AND d.estado = \'pendiente\' AND d.monto_pendiente > 0 GROUP BY c.id, c.nombre, c.telefono, c.dni ORDER BY saldo_pendiente DESC, c.nombre ASC');
+
+
+
 
 // Rutas para deudas
 app.get('/api/debts', async (req, res) => {
@@ -2202,125 +2225,41 @@ app.post('/api/debts', conditionalAuth, async (req, res) => {
     }
 });
 
+// MODIFICADO: Ahora usa DebtsRepository
 app.post('/api/debts/:id/payment', conditionalAuth, async (req, res) => {
     const debtId = req.params.id;
-    const { monto } = req.body;
+    const { monto, descripcion } = req.body;
 
-    // Validaciones requeridas
     if (!monto || typeof monto !== 'number' || monto <= 0) {
-        return res.status(400).json({
-            error: 'El campo monto es requerido y debe ser un número mayor a 0'
-        });
+        return res.status(400).json({ error: 'El campo monto es requerido y debe ser un número mayor a 0' });
     }
 
     try {
-        // Verificar que la deuda existe
-        const debt = await dbAll("SELECT * FROM deudas WHERE id = ?", [debtId]);
-        if (debt.length === 0) {
-            return res.status(404).json({ error: 'Deuda no encontrada' });
-        }
-
-        const currentDebt = debt[0];
-
-        // Verificar estado actual: si ya está pagada, no permitir nuevos pagos
-        if (currentDebt.estado !== 'pendiente' && currentDebt.estado !== 'vencida') {
-            return res.status(400).json({ error: 'Solo se pueden registrar pagos en deudas pendientes o vencidas' });
-        }
-
-        // USAR el monto_pendiente almacenado en lugar de recalcular con precios actuales
-        // Esto garantiza que el cliente pague exactamente lo que debe según el acuerdo original
-        const montoPendienteActual = parseFloat(currentDebt.monto_pendiente || 0);
-
-        // Verificar que el monto no exceda el pendiente almacenado
-        if (monto > montoPendienteActual) {
-            return res.status(400).json({
-                error: `El monto del pago (${formatCurrency(monto)}) no puede ser mayor al monto pendiente (${formatCurrency(montoPendienteActual)})`
-            });
-        }
-
-        // Calcular nuevo monto pendiente basado en el monto almacenado
-        const nuevoMontoPendiente = parseFloat((montoPendienteActual - monto).toFixed(2));
-        const nuevoEstado = nuevoMontoPendiente === 0 ? 'pagada' : 'pendiente';
-
-        // Actualizar la deuda con el nuevo monto pendiente
-        await dbRun(
-            `UPDATE deudas SET monto_pendiente = ?, estado = ? WHERE id = ?`,
-            [nuevoMontoPendiente, nuevoEstado, debtId]
-        );
-
-        // Registrar el pago en la tabla de historial
-        await dbRun(
-            `INSERT INTO pagos_deudas (deuda_id, monto, descripcion)
-             VALUES (?, ?, ?)`,
-            [debtId, monto, `Pago registrado - Monto pendiente restante: ${formatCurrency(nuevoMontoPendiente)}`]
-        );
-
-        // Obtener la deuda actualizada
-        const updatedDebt = await dbAll("SELECT * FROM deudas WHERE id = ?", [debtId]);
+        const debtsRepo = new DebtsRepository();
+        const result = await debtsRepo.registerPayment(debtId, monto, descripcion);
         
-        // Registrar la operación en el log
-        logOperation(
-            'PAGO_DEUDA',
-            `Pago registrado en deuda ID ${debtId} - Monto: ${formatCurrency(monto)} - Pendiente restante: ${formatCurrency(nuevoMontoPendiente)}`,
-            'Sistema',
-            'deudas',
-            debtId,
-            currentDebt,
-            {
-                monto_pagado: monto,
-                monto_pendiente_anterior: currentDebt.monto_pendiente,
-                monto_pendiente_nuevo: nuevoMontoPendiente,
-                estado_anterior: currentDebt.estado,
-                estado_nuevo: nuevoEstado
-            }
-        );
-
-        res.json({
-            success: true,
-            message: 'Pago registrado exitosamente',
-            debt: updatedDebt[0],
-            pago: {
-                monto: monto,
-                restante: nuevoMontoPendiente,
-                completado: nuevoMontoPendiente === 0
-            }
-        });
-
+        res.json(result);
     } catch (error) {
         console.error('Error registrando pago:', error);
+        if (error.message.includes('no encontrada') || error.message.includes('Solo se pueden')) {
+            return res.status(400).json({ error: error.message });
+        }
         res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
     }
 });
 
-// >>> NUEVO ENDPOINT: obtener historial de pagos de una deuda
+// MODIFICADO: Ahora usa DebtsRepository
 app.get('/api/debts/:id/payments', async (req, res) => {
     try {
         const debtId = req.params.id;
-
-        // Verificar que la deuda existe
-        const debt = await dbAll("SELECT id FROM deudas WHERE id = ?", [debtId]);
-        if (debt.length === 0) {
-            return res.status(404).json({ error: 'Deuda no encontrada' });
-        }
-
-        // Obtener historial de pagos
-        const payments = await dbAll(`
-            SELECT
-                id,
-                deuda_id,
-                monto,
-                fecha_pago,
-                descripcion,
-                created_at
-            FROM pagos_deudas
-            WHERE deuda_id = ?
-            ORDER BY fecha_pago DESC, created_at DESC
-        `, [debtId]);
-
+        const debtsRepo = new DebtsRepository();
+        const payments = await debtsRepo.getPaymentHistory(debtId);
         res.json(payments);
-
     } catch (error) {
         console.error('Error obteniendo historial de pagos:', error);
+        if (error.message.includes('no encontrada')) {
+            return res.status(404).json({ error: error.message });
+        }
         res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
     }
 });
@@ -8480,9 +8419,7 @@ wss.on('connection', (ws, req) => {
 
 console.log('🔌 Servidor WebSocket configurado y listo');
 
-// Importar y registrar el endpoint optimizado para actualización de precios de deudas
-const { optimizeDebtUpdateEndpoint } = require('./optimize-debt-update');
-optimizeDebtUpdateEndpoint(app, db);
+// Endpoint optimizado para actualización de precios de deudas ya está implementado directamente en este archivo (líneas ~2487-2635)
 
 // Cerrar conexión al terminar
 process.on('SIGINT', () => {

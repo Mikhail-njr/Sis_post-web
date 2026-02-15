@@ -2256,7 +2256,7 @@
             const precioOriginalTotal = parseFloat(deuda.precio_unitario) * cantidad;
             // Precio actual total = precio_actual × cantidad
             const precioActualTotal = parseFloat(precioActual) * cantidad;
-            // Pendiente recalculado: cantidad × precio actual (recalculo solicitado)
+            // Pendiente recalculado: cantidad × precio actual (precio vigente)
             const pendienteRecalc = precioActualTotal;
             // Diferencia total = (precio_actual - precio_original) × cantidad
             const diferenciaTotal = precioActualTotal - precioOriginalTotal;

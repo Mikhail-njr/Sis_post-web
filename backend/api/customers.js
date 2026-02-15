@@ -1,7 +1,9 @@
 const express = require('express');
 const db = require('../database-sqlite');
+const DebtsRepository = require('../repositories/debts-repository');
 
 const router = express.Router();
+const debtsRepo = new DebtsRepository();
 
 /**
  * GET /api/customers
@@ -248,49 +250,43 @@ router.delete('/:id', (req, res) => {
 
 /**
  * GET /api/customers/:id/debts
- * Obtiene las deudas de un cliente
+ * Obtiene las deudas de un cliente (versión corregida usando DebtsRepository)
  */
-router.get('/:id/debts', (req, res) => {
+router.get('/:id/debts', async (req, res) => {
     const { id } = req.params;
+    const clienteId = parseInt(id);
 
-    const query = `
-        SELECT 
-            d.id,
-            d.cliente_id,
-            d.producto_id,
-            d.cantidad,
-            d.precio_unitario,
-            d.fecha,
-            d.descripcion,
-            p.nombre as producto_nombre,
-            (d.cantidad * d.precio_unitario) as monto_total
-        FROM deudas d
-        LEFT JOIN productos p ON d.producto_id = p.id
-        WHERE d.cliente_id = ? AND d.cantidad > 0
-        ORDER BY d.fecha DESC
-    `;
+    if (isNaN(clienteId)) {
+        return res.status(400).json({ 
+            success: false,
+            error: 'ID de cliente inválido'
+        });
+    }
 
-    db.all(query, [id], (err, rows) => {
-        if (err) {
-            console.error('Error al obtener deudas del cliente:', err);
-            return res.status(500).json({ 
-                error: 'Error al obtener deudas del cliente',
-                details: err.message 
-            });
-        }
-
-        // Calcular el total de deudas
-        const totalDeuda = rows.reduce((sum, deuda) => sum + (deuda.cantidad * deuda.precio_unitario), 0);
+    try {
+        // Usar el repositorio para obtener deudas con productos
+        const deudas = await debtsRepo.getDebtsByClientWithProducts(clienteId);
+        
+        // Calcular el total de deuda pendiente
+        const totalPendiente = deudas.reduce((sum, deuda) => 
+            sum + (parseFloat(deuda.monto_pendiente) || 0), 0);
 
         res.json({
             success: true,
             data: {
-                deudas: rows,
-                total: totalDeuda,
-                count: rows.length
+                deudas: deudas,
+                total: totalPendiente,
+                count: deudas.length
             }
         });
-    });
+    } catch (error) {
+        console.error('Error al obtener deudas del cliente:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Error al obtener deudas del cliente',
+            details: error.message
+        });
+    }
 });
 
 module.exports = router;
