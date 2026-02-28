@@ -1,0 +1,194 @@
+=== TEST COMPRAS CADA 3 MINUTOS ===
+
+[2025-10-24T20:09:54.150Z] 
+🎯 Iniciando test: 300 ventas/hora durante 1 hora(s)
+[2025-10-24T20:09:54.150Z] ⏱️  Ventas se ejecutarán cada 12 segundos
+
+[2025-10-24T20:10:06.155Z] 🛒 Ejecutando venta 1/300 con 1 productos
+[2025-10-24T20:10:06.196Z] ✅ Venta 1 EXITOSA: FAC-1761336606176 - $899.99 (41ms)
+[2025-10-24T20:10:18.163Z] 🛒 Ejecutando venta 2/300 con 3 productos
+[2025-10-24T20:10:18.177Z] ✅ Venta 2 EXITOSA: FAC-1761336618169 - $1989.96 (13ms)
+[2025-10-24T20:10:30.176Z] 🛒 Ejecutando venta 3/300 con 2 productos
+[2025-10-24T20:10:30.186Z] ✅ Venta 3 EXITOSA: FAC-1761336630180 - $1299.97 (10ms)
+[2025-10-24T20:10:42.187Z] 🛒 Ejecutando venta 4/300 con 2 productos
+[2025-10-24T20:10:42.222Z] ✅ Venta 4 EXITOSA: FAC-1761336642191 - $579.99 (34ms)
+[2025-10-24T20:10:54.190Z] 🛒 Ejecutando venta 5/300 con 1 productos
+[2025-10-24T20:10:54.199Z] ✅ Venta 5 EXITOSA: FAC-1761336654194 - $79.98 (9ms)
+[2025-10-24T20:11:06.190Z] 🛒 Ejecutando venta 6/300 con 3 productos
+[2025-10-24T20:11:06.201Z] ✅ Venta 6 EXITOSA: FAC-1761336666195 - $236.977 (11ms)
+[2025-10-24T20:11:18.199Z] 🛒 Ejecutando venta 7/300 con 3 productos
+[2025-10-24T20:11:18.219Z] ✅ Venta 7 EXITOSA: FAC-1761336678203 - $383.94399999999996 (19ms)
+[2025-10-24T20:11:30.205Z] 🛒 Ejecutando venta 8/300 con 2 productos
+[2025-10-24T20:11:30.214Z] ❌ Venta 8 FALLÓ: Error procesando la venta: Stock insuficiente en lotes vigentes para el producto Mouse Inalámbrico. Cantidad restante: 1. Solo se permite vender productos de lotes vigentes (fecha de vencimiento >= hoy). (8ms)
+[2025-10-24T20:11:42.217Z] 🛒 Ejecutando venta 9/300 con 3 productos
+[2025-10-24T20:11:42.231Z] ✅ Venta 9 EXITOSA: FAC-1761336702224 - $1459.95 (14ms)
+[2025-10-24T20:11:54.229Z] 🛒 Ejecutando venta 10/300 con 1 productos
+[2025-10-24T20:11:54.238Z] ✅ Venta 10 EXITOSA: FAC-1761336714234 - $143.984 (9ms)
+[2025-10-24T20:12:06.233Z] 🛒 Ejecutando venta 11/300 con 2 productos
+[2025-10-24T20:12:06.243Z] ✅ Venta 11 EXITOSA: FAC-1761336726238 - $1149.99 (9ms)
+[2025-10-24T20:12:18.233Z] 🛒 Ejecutando venta 12/300 con 1 productos
+[2025-10-24T20:12:18.241Z] ✅ Venta 12 EXITOSA: FAC-1761336738237 - $399.98 (8ms)
+[2025-10-24T20:12:30.247Z] 🛒 Ejecutando venta 13/300 con 1 productos
+[2025-10-24T20:12:30.254Z] ✅ Venta 13 EXITOSA: FAC-1761336750250 - $1000 (7ms)
+[2025-10-24T20:12:42.257Z] 🛒 Ejecutando venta 14/300 con 1 productos
+[2025-10-24T20:12:42.264Z] ✅ Venta 14 EXITOSA: FAC-1761336762260 - $249.99 (7ms)
+[2025-10-24T20:12:54.257Z] 🛒 Ejecutando venta 15/300 con 1 productos
+[2025-10-24T20:12:54.264Z] ✅ Venta 15 EXITOSA: FAC-1761336774260 - $143.984 (6ms)
+[2025-10-24T20:13:06.271Z] 🛒 Ejecutando venta 16/300 con 1 productos
+[2025-10-24T20:13:06.297Z] ✅ Venta 16 EXITOSA: FAC-1761336786275 - $124.995 (25ms)
+[2025-10-24T20:13:18.283Z] 🛒 Ejecutando venta 17/300 con 2 productos
+[2025-10-24T20:13:18.292Z] ✅ Venta 17 EXITOSA: FAC-1761336798287 - $571.992 (9ms)
+[2025-10-24T20:13:30.290Z] 🛒 Ejecutando venta 18/300 con 2 productos
+[2025-10-24T20:13:30.295Z] ❌ Venta 18 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:13:42.292Z] 🛒 Ejecutando venta 19/300 con 3 productos
+[2025-10-24T20:13:42.301Z] ✅ Venta 19 EXITOSA: FAC-1761336822295 - $1221.972 (9ms)
+[2025-10-24T20:13:54.300Z] 🛒 Ejecutando venta 20/300 con 2 productos
+[2025-10-24T20:13:54.309Z] ✅ Venta 20 EXITOSA: FAC-1761336834304 - $1839.97 (9ms)
+[2025-10-24T20:14:06.302Z] 🛒 Ejecutando venta 21/300 con 1 productos
+[2025-10-24T20:14:06.309Z] ✅ Venta 21 EXITOSA: FAC-1761336846306 - $143.984 (7ms)
+[2025-10-24T20:14:18.313Z] 🛒 Ejecutando venta 22/300 con 2 productos
+[2025-10-24T20:14:18.318Z] ❌ Venta 22 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:14:30.318Z] 🛒 Ejecutando venta 23/300 con 3 productos
+[2025-10-24T20:14:30.323Z] ❌ Venta 23 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:14:42.325Z] 🛒 Ejecutando venta 24/300 con 3 productos
+[2025-10-24T20:14:42.330Z] ❌ Venta 24 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:14:54.338Z] 🛒 Ejecutando venta 25/300 con 1 productos
+[2025-10-24T20:14:54.342Z] ❌ Venta 25 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:15:06.344Z] 🛒 Ejecutando venta 26/300 con 2 productos
+[2025-10-24T20:15:06.348Z] ❌ Venta 26 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (4ms)
+[2025-10-24T20:15:18.359Z] 🛒 Ejecutando venta 27/300 con 3 productos
+[2025-10-24T20:15:18.364Z] ❌ Venta 27 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:15:30.370Z] 🛒 Ejecutando venta 28/300 con 2 productos
+[2025-10-24T20:15:30.433Z] ✅ Venta 28 EXITOSA: FAC-1761336930373 - $571.992 (62ms)
+[2025-10-24T20:15:42.382Z] 🛒 Ejecutando venta 29/300 con 2 productos
+[2025-10-24T20:15:42.387Z] ❌ Venta 29 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (5ms)
+[2025-10-24T20:15:54.391Z] 🛒 Ejecutando venta 30/300 con 1 productos
+[2025-10-24T20:15:54.399Z] ✅ Venta 30 EXITOSA: FAC-1761336954394 - $124.995 (7ms)
+[2025-10-24T20:16:06.397Z] 🛒 Ejecutando venta 31/300 con 1 productos
+[2025-10-24T20:16:06.405Z] ✅ Venta 31 EXITOSA: FAC-1761336966401 - $39.99 (8ms)
+[2025-10-24T20:16:18.399Z] 🛒 Ejecutando venta 32/300 con 1 productos
+[2025-10-24T20:16:18.407Z] ✅ Venta 32 EXITOSA: FAC-1761336978403 - $1799.98 (8ms)
+[2025-10-24T20:16:30.404Z] 🛒 Ejecutando venta 33/300 con 3 productos
+[2025-10-24T20:16:30.409Z] ❌ Venta 33 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:16:42.408Z] 🛒 Ejecutando venta 34/300 con 1 productos
+[2025-10-24T20:16:42.413Z] ❌ Venta 34 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:16:54.411Z] 🛒 Ejecutando venta 35/300 con 3 productos
+[2025-10-24T20:16:54.417Z] ❌ Venta 35 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 2 (6ms)
+[2025-10-24T20:17:06.426Z] 🛒 Ejecutando venta 36/300 con 2 productos
+[2025-10-24T20:17:06.433Z] ❌ Venta 36 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 1 (7ms)
+[2025-10-24T20:17:18.428Z] 🛒 Ejecutando venta 37/300 con 1 productos
+[2025-10-24T20:17:18.433Z] ❌ Venta 37 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:17:30.442Z] 🛒 Ejecutando venta 38/300 con 1 productos
+[2025-10-24T20:17:30.450Z] ✅ Venta 38 EXITOSA: FAC-1761337050446 - $500 (8ms)
+[2025-10-24T20:17:42.451Z] 🛒 Ejecutando venta 39/300 con 2 productos
+[2025-10-24T20:17:42.456Z] ❌ Venta 39 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:17:54.464Z] 🛒 Ejecutando venta 40/300 con 2 productos
+[2025-10-24T20:17:54.468Z] ❌ Venta 40 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:18:06.476Z] 🛒 Ejecutando venta 41/300 con 3 productos
+[2025-10-24T20:18:06.486Z] ✅ Venta 41 EXITOSA: FAC-1761337086480 - $924.975 (10ms)
+[2025-10-24T20:18:18.475Z] 🛒 Ejecutando venta 42/300 con 1 productos
+[2025-10-24T20:18:18.483Z] ✅ Venta 42 EXITOSA: FAC-1761337098480 - $143.984 (8ms)
+[2025-10-24T20:18:30.480Z] 🛒 Ejecutando venta 43/300 con 1 productos
+[2025-10-24T20:18:30.488Z] ✅ Venta 43 EXITOSA: FAC-1761337110484 - $124.995 (7ms)
+[2025-10-24T20:18:42.491Z] 🛒 Ejecutando venta 44/300 con 2 productos
+[2025-10-24T20:18:42.497Z] ❌ Venta 44 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:18:54.493Z] 🛒 Ejecutando venta 45/300 con 3 productos
+[2025-10-24T20:18:54.498Z] ❌ Venta 45 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:19:06.502Z] 🛒 Ejecutando venta 46/300 con 2 productos
+[2025-10-24T20:19:06.506Z] ❌ Venta 46 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:19:18.507Z] 🛒 Ejecutando venta 47/300 con 2 productos
+[2025-10-24T20:19:18.511Z] ❌ Venta 47 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (4ms)
+[2025-10-24T20:19:30.520Z] 🛒 Ejecutando venta 48/300 con 2 productos
+[2025-10-24T20:19:30.525Z] ❌ Venta 48 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:19:42.533Z] 🛒 Ejecutando venta 49/300 con 3 productos
+[2025-10-24T20:19:42.540Z] ❌ Venta 49 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (6ms)
+[2025-10-24T20:19:54.539Z] 🛒 Ejecutando venta 50/300 con 3 productos
+[2025-10-24T20:19:54.544Z] ❌ Venta 50 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:20:06.551Z] 🛒 Ejecutando venta 51/300 con 1 productos
+[2025-10-24T20:20:06.558Z] ✅ Venta 51 EXITOSA: FAC-1761337206555 - $299.98 (7ms)
+[2025-10-24T20:20:18.560Z] 🛒 Ejecutando venta 52/300 con 2 productos
+[2025-10-24T20:20:18.569Z] ✅ Venta 52 EXITOSA: FAC-1761337218564 - $189.98000000000002 (9ms)
+[2025-10-24T20:20:30.574Z] 🛒 Ejecutando venta 53/300 con 2 productos
+[2025-10-24T20:20:30.579Z] ❌ Venta 53 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:20:42.576Z] 🛒 Ejecutando venta 54/300 con 1 productos
+[2025-10-24T20:20:42.581Z] ❌ Venta 54 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:20:54.591Z] 🛒 Ejecutando venta 55/300 con 3 productos
+[2025-10-24T20:20:54.601Z] ✅ Venta 55 EXITOSA: FAC-1761337254596 - $693.9540000000001 (9ms)
+[2025-10-24T20:21:06.597Z] 🛒 Ejecutando venta 56/300 con 1 productos
+[2025-10-24T20:21:06.604Z] ✅ Venta 56 EXITOSA: FAC-1761337266601 - $500 (7ms)
+[2025-10-24T20:21:18.600Z] 🛒 Ejecutando venta 57/300 con 2 productos
+[2025-10-24T20:21:18.610Z] ✅ Venta 57 EXITOSA: FAC-1761337278604 - $183.97400000000002 (9ms)
+[2025-10-24T20:21:30.614Z] 🛒 Ejecutando venta 58/300 con 1 productos
+[2025-10-24T20:21:30.622Z] ✅ Venta 58 EXITOSA: FAC-1761337290618 - $71.992 (7ms)
+[2025-10-24T20:21:42.617Z] 🛒 Ejecutando venta 59/300 con 2 productos
+[2025-10-24T20:21:42.621Z] ❌ Venta 59 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:21:54.629Z] 🛒 Ejecutando venta 60/300 con 3 productos
+[2025-10-24T20:21:54.634Z] ❌ Venta 60 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Auriculares Gaming RGB. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:22:06.635Z] 🛒 Ejecutando venta 61/300 con 1 productos
+[2025-10-24T20:22:06.644Z] ✅ Venta 61 EXITOSA: FAC-1761337326638 - $149.99 (9ms)
+[2025-10-24T20:22:18.644Z] 🛒 Ejecutando venta 62/300 con 1 productos
+[2025-10-24T20:22:18.648Z] ❌ Venta 62 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (3ms)
+[2025-10-24T20:22:30.658Z] 🛒 Ejecutando venta 63/300 con 3 productos
+[2025-10-24T20:22:30.663Z] ❌ Venta 63 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (5ms)
+[2025-10-24T20:22:42.672Z] 🛒 Ejecutando venta 64/300 con 1 productos
+[2025-10-24T20:22:42.677Z] ❌ Venta 64 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:22:54.672Z] 🛒 Ejecutando venta 65/300 con 2 productos
+[2025-10-24T20:22:54.677Z] ❌ Venta 65 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:23:06.673Z] 🛒 Ejecutando venta 66/300 con 1 productos
+[2025-10-24T20:23:06.677Z] ❌ Venta 66 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:23:18.680Z] 🛒 Ejecutando venta 67/300 con 2 productos
+[2025-10-24T20:23:18.684Z] ❌ Venta 67 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Auriculares Gaming RGB. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:23:30.687Z] 🛒 Ejecutando venta 68/300 con 1 productos
+[2025-10-24T20:23:30.695Z] ✅ Venta 68 EXITOSA: FAC-1761337410691 - $124.995 (8ms)
+[2025-10-24T20:23:42.701Z] 🛒 Ejecutando venta 69/300 con 2 productos
+[2025-10-24T20:23:42.705Z] ❌ Venta 69 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:23:54.712Z] 🛒 Ejecutando venta 70/300 con 1 productos
+[2025-10-24T20:23:54.720Z] ✅ Venta 70 EXITOSA: FAC-1761337434716 - $143.984 (8ms)
+[2025-10-24T20:24:06.727Z] 🛒 Ejecutando venta 71/300 con 2 productos
+[2025-10-24T20:24:06.732Z] ❌ Venta 71 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Auriculares Gaming RGB. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:24:18.737Z] 🛒 Ejecutando venta 72/300 con 2 productos
+[2025-10-24T20:24:18.747Z] ✅ Venta 72 EXITOSA: FAC-1761337458742 - $443.96400000000006 (10ms)
+[2025-10-24T20:24:30.741Z] 🛒 Ejecutando venta 73/300 con 3 productos
+[2025-10-24T20:24:30.745Z] ❌ Venta 73 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:24:42.745Z] 🛒 Ejecutando venta 74/300 con 1 productos
+[2025-10-24T20:24:42.752Z] ✅ Venta 74 EXITOSA: FAC-1761337482749 - $39.99 (7ms)
+[2025-10-24T20:24:54.759Z] 🛒 Ejecutando venta 75/300 con 1 productos
+[2025-10-24T20:24:54.767Z] ✅ Venta 75 EXITOSA: FAC-1761337494762 - $299.98 (7ms)
+[2025-10-24T20:25:06.767Z] 🛒 Ejecutando venta 76/300 con 3 productos
+[2025-10-24T20:25:06.772Z] ❌ Venta 76 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Auriculares Gaming RGB. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:25:18.769Z] 🛒 Ejecutando venta 77/300 con 2 productos
+[2025-10-24T20:25:18.779Z] ✅ Venta 77 EXITOSA: FAC-1761337518774 - $443.96400000000006 (9ms)
+[2025-10-24T20:25:30.781Z] 🛒 Ejecutando venta 78/300 con 2 productos
+[2025-10-24T20:25:30.785Z] ❌ Venta 78 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:25:42.793Z] 🛒 Ejecutando venta 79/300 con 2 productos
+[2025-10-24T20:25:42.797Z] ❌ Venta 79 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Impresora Multifunción. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:25:54.795Z] 🛒 Ejecutando venta 80/300 con 2 productos
+[2025-10-24T20:25:54.799Z] ❌ Venta 80 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:26:06.805Z] 🛒 Ejecutando venta 81/300 con 1 productos
+[2025-10-24T20:26:06.812Z] ✅ Venta 81 EXITOSA: FAC-1761337566809 - $124.995 (7ms)
+[2025-10-24T20:26:18.813Z] 🛒 Ejecutando venta 82/300 con 1 productos
+[2025-10-24T20:26:18.818Z] ❌ Venta 82 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:26:30.825Z] 🛒 Ejecutando venta 83/300 con 3 productos
+[2025-10-24T20:26:30.830Z] ❌ Venta 83 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:26:42.837Z] 🛒 Ejecutando venta 84/300 con 1 productos
+[2025-10-24T20:26:42.842Z] ❌ Venta 84 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:26:54.853Z] 🛒 Ejecutando venta 85/300 con 2 productos
+[2025-10-24T20:26:54.858Z] ❌ Venta 85 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Laptop HP 15.6". Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:27:06.867Z] 🛒 Ejecutando venta 86/300 con 2 productos
+[2025-10-24T20:27:06.871Z] ❌ Venta 86 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24". Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:27:18.868Z] 🛒 Ejecutando venta 87/300 con 1 productos
+[2025-10-24T20:27:18.875Z] ✅ Venta 87 EXITOSA: FAC-1761337638872 - $299.98 (7ms)
+[2025-10-24T20:27:30.870Z] 🛒 Ejecutando venta 88/300 con 3 productos
+[2025-10-24T20:27:30.874Z] ❌ Venta 88 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (4ms)
+[2025-10-24T20:27:42.880Z] 🛒 Ejecutando venta 89/300 con 2 productos
+[2025-10-24T20:27:42.884Z] ❌ Venta 89 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Mouse Inalámbrico. Disponible: 1, Solicitado: 2 (4ms)
+[2025-10-24T20:27:54.889Z] 🛒 Ejecutando venta 90/300 con 3 productos
+[2025-10-24T20:27:54.893Z] ❌ Venta 90 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (4ms)
+[2025-10-24T20:28:06.891Z] 🛒 Ejecutando venta 91/300 con 2 productos
+[2025-10-24T20:28:06.897Z] ❌ Venta 91 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Webcam HD 1080p. Disponible: 0, Solicitado: 2 (5ms)
+[2025-10-24T20:28:18.897Z] 🛒 Ejecutando venta 92/300 con 1 productos
+[2025-10-24T20:28:18.901Z] ❌ Venta 92 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Monitor Samsung 24". Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:28:30.897Z] 🛒 Ejecutando venta 93/300 con 3 productos
+[2025-10-24T20:28:30.902Z] ❌ Venta 93 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Auriculares Gaming RGB. Disponible: 0, Solicitado: 1 (4ms)
+[2025-10-24T20:28:42.897Z] 🛒 Ejecutando venta 94/300 con 2 productos
+[2025-10-24T20:28:42.902Z] ❌ Venta 94 FALLÓ: Error procesando la venta: Stock insuficiente para el producto Teclado Mecánico RGB. Disponible: 0, Solicitado: 2 (5ms)

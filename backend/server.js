@@ -1189,6 +1189,50 @@ async function initDatabase() {
             console.log('✅ Migración v16 completada');
         }
 
+        // Migración v17: agregar columna monto_pendiente a tabla deuda_productos
+        if (schemaVersion < 17) {
+            console.log('🔄 Aplicando migración de esquema v17: agregar columna monto_pendiente a deuda_productos...');
+
+            // Agregar columna monto_pendiente a tabla deuda_productos
+            const montoPendienteExists = await columnExists('deuda_productos', 'monto_pendiente');
+            if (!montoPendienteExists) {
+                await dbRun(`ALTER TABLE deuda_productos ADD COLUMN monto_pendiente REAL DEFAULT 0`);
+                console.log('✅ Columna monto_pendiente agregada a deuda_productos');
+
+                // Inicializar monto_pendiente con el subtotal para los registros existentes
+                await dbRun(`UPDATE deuda_productos SET monto_pendiente = subtotal WHERE monto_pendiente = 0`);
+                console.log('✅ Valores de monto_pendiente inicializados con subtotal');
+            }
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [17, 'Migración v17: agregar columna monto_pendiente a tabla deuda_productos']);
+            console.log('✅ Migración v17 completada');
+        }
+
+        // Migración v18: agregar columna pagado (booleano) a tabla deuda_productos
+        if (schemaVersion < 18) {
+            console.log('🔄 Aplicando migración de esquema v18: agregar columna pagado a deuda_productos...');
+
+            // Agregar columna pagado a tabla deuda_productos
+            const pagadoExists = await columnExists('deuda_productos', 'pagado');
+            if (!pagadoExists) {
+                await dbRun(`ALTER TABLE deuda_productos ADD COLUMN pagado INTEGER DEFAULT 0`);
+                console.log('✅ Columna pagado agregada a deuda_productos');
+
+                // Migrar datos: si monto_pendiente es 0 o menor, marcar como pagado = 1
+                // (asumiendo que si no debe, tiene el subtotal completo)
+                await dbRun(`UPDATE deuda_productos SET pagado = 1 WHERE monto_pendiente IS NOT NULL AND monto_pendiente <= 0`);
+                console.log('✅ Datos de pagado migrados desde monto_pendiente');
+            }
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [18, 'Migración v18: agregar columna pagado a tabla deuda_productos']);
+            console.log('✅ Migración v18 completada');
+        }
+
+
         // Verificar si hay datos de ejemplo que insertar
         const productCount = await dbAll("SELECT COUNT(*) as count FROM productos");
         if (productCount[0].count === 0) {
@@ -2065,18 +2109,22 @@ app.get('/api/debts', async (req, res) => {
                 c.nombre as cliente_nombre,
                 v.created_at as venta_fecha,
                 v.numero_factura as venta_numero_factura,
+                dp.id as deuda_producto_id,
                 dp.producto_id,
                 p.nombre as producto_nombre,
                 p.precio as precio_actual_producto,
                 dp.precio_unitario as precio_unitario,
-                dp.cantidad as producto_cantidad
+                dp.cantidad as producto_cantidad,
+                dp.subtotal as producto_subtotal,
+                dp.pagado as producto_pagado,
+                COALESCE(dp.monto_pendiente, dp.subtotal) as producto_monto_pendiente
             FROM deudas d
             JOIN clientes c ON d.cliente_id = c.id
             LEFT JOIN ventas v ON d.venta_id = v.id
             LEFT JOIN deuda_productos dp ON d.id = dp.deuda_id
             LEFT JOIN productos p ON dp.producto_id = p.id
             ${whereClause}
-            ORDER BY d.fecha_vencimiento ASC, d.created_at DESC
+            ORDER BY d.fecha_vencimiento ASC, d.created_at DESC, dp.id
         `, params);
 
         res.json(debts);
@@ -2160,8 +2208,8 @@ app.post('/api/debts', conditionalAuth, async (req, res) => {
         if (ventaItems.length > 0) {
             console.log('📦 Insertando productos de la deuda...');
             const debtProductsStmt = db.prepare(`
-                INSERT INTO deuda_productos (deuda_id, producto_id, cantidad, precio_unitario, subtotal)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO deuda_productos (deuda_id, producto_id, cantidad, precio_unitario, subtotal, pagado)
+                VALUES (?, ?, ?, ?, ?, 0)
             `);
 
             for (const item of ventaItems) {
@@ -2264,6 +2312,98 @@ app.get('/api/debts/:id/payments', async (req, res) => {
     }
 });
  
+// >>> NUEVO ENDPOINT: Pagar producto individual de una deuda
+// Usa campo booleano 'pagado' en lugar de monto_pendiente numérico
+app.post('/api/debts/:deudaId/producto/:productoId/payment', conditionalAuth, async (req, res) => {
+    const deudaId = req.params.deudaId;
+    const productoId = req.params.productoId;
+    const { monto, descripcion } = req.body;
+
+    // El monto ya no es necesario para pagar un producto específico (se paga el subtotal completo)
+    // Pero se mantiene por compatibilidad con el frontend
+
+    try {
+        // Verificar que existe el producto en la deuda
+        const deudaProducto = await dbAll(`
+            SELECT dp.*, d.cliente_id, d.monto_pendiente as deuda_monto_pendiente
+            FROM deuda_productos dp
+            JOIN deudas d ON dp.deuda_id = d.id
+            WHERE dp.deuda_id = ? AND dp.id = ?
+        `, [deudaId, productoId]);
+
+        if (deudaProducto.length === 0) {
+            return res.status(404).json({ error: 'Producto no encontrado en la deuda' });
+        }
+
+        const dp = deudaProducto[0];
+
+        // Verificar si el producto ya está pagado usando el campo booleano
+        if (dp.pagado === 1 || dp.pagado === true) {
+            return res.status(400).json({ error: 'Este producto ya está pagado' });
+        }
+
+        // Iniciar transacción
+        await dbRun("BEGIN TRANSACTION");
+
+        try {
+            // Marcar el producto como pagado usando el campo booleano
+            await dbRun(
+                "UPDATE deuda_productos SET pagado = 1 WHERE id = ?",
+                [productoId]
+            );
+
+            // Actualizar monto_pendiente de la deuda principal restando el subtotal del producto
+            const nuevoMontoPendienteDeuda = dp.deuda_monto_pendiente - dp.subtotal;
+            await dbRun(
+                "UPDATE deudas SET monto_pendiente = ? WHERE id = ?",
+                [nuevoMontoPendienteDeuda, deudaId]
+            );
+
+            // Registrar el pago en la tabla de pagos (usando el subtotal como monto)
+            await dbRun(
+                `INSERT INTO pagos_deudas (deuda_id, monto, descripcion) VALUES (?, ?, ?)`,
+                [deudaId, dp.subtotal, descripcion || `Pago de producto ID ${productoId}`]
+            );
+
+            // Verificar si la deuda está completamente pagada
+            const productosRestantes = await dbAll(`
+                SELECT COUNT(*) as count FROM deuda_productos 
+                WHERE deuda_id = ? AND (pagado IS NULL OR pagado = 0)
+            `, [deudaId]);
+
+            if (productosRestantes[0].count === 0) {
+                await dbRun(
+                    "UPDATE deudas SET estado = 'pagada', monto_pendiente = 0 WHERE id = ?",
+                    [deudaId]
+                );
+            }
+
+            await dbRun("COMMIT");
+
+            console.log(`✅ Pago de producto registrado: Deuda ${deudaId}, Producto ${productoId}, Monto ${dp.subtotal}`);
+
+            res.json({
+                success: true,
+                message: 'Producto marcado como pagado exitosamente',
+                deuda_id: deudaId,
+                producto_id: productoId,
+                monto_pagado: dp.subtotal,
+                monto_pendiente_deuda: nuevoMontoPendienteDeuda,
+                deuda_estado: productosRestantes[0].count === 0 ? 'pagada' : 'pendiente',
+                cliente_id: dp.cliente_id
+            });
+
+        } catch (error) {
+            await dbRun("ROLLBACK");
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Error registrando pago de producto:', error);
+        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
+    }
+});
+
 // >>> NUEVO ENDPOINT para calcular deuda total basado en precios actuales y cantidades
 app.get('/api/debts/:id/calcular-total', async (req, res) => {
     try {

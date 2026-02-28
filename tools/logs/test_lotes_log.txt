@@ -1,0 +1,19 @@
+=== TEST DE LOTES - 5 COMPRAS ===
+
+🚀 Starting Lotes Test - 5 Purchases
+🧪 Test 1: Checking server status...
+✅ Server OK: 11 products, 1 sales
+🔐 Test 2: Logging in with admin credentials...
+✅ Login successful, fetched 11 products
+📦 Test 3: Getting initial lotes status...
+✅ Found 6 lotes initially
+  Lote 003: 1/1 unidades
+  Lote 001: 50/50 unidades
+  Lote 004: 1/1 unidades
+  Lote 002: 50/50 unidades
+  Lote 005: 5/8 unidades
+  Lote 006: 2/2 unidades
+🛒 Test 4: Performing 5 purchases and verifying lote deduction...
+📊 Found 3 products with valid lotes out of 11 total products
+❌ Not enough products with available lotes for test. Found 3 products with valid lotes.
+   Available products: Auriculares Gaming RGB (7 stock), Router WiFi 6 (51 stock), Webcam HD 1080p (50 stock)

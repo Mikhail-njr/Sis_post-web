@@ -43,3 +43,8 @@ excluded/
 # Backup files
 *.backup
 *.backup_*
+
+# SQLite temporary files
+*.sqlite-shm
+*.sqlite-wal
+pos_database.sqlite

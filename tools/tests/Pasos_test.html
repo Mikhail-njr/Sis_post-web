@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Pruebas - Sistema POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #eee;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .info-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px;
+            border-radius: 5px;
+        }
+
+        .info-section h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .info-section p {
+            color: #856404;
+            font-size: 0.95em;
+        }
+
+        .test-section {
+            padding: 20px;
+            margin: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .test-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section h2 .icon {
+            font-size: 1.3em;
+        }
+
+        .test-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 250px;
+            gap: 15px;
+            align-items: start;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .test-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .test-checkbox {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .test-order {
+            color: #2c3e50;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .test-comment-box {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+            background: #f8f9fa;
+            transition: border-color 0.3s;
+        }
+
+        .test-comment-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .test-comment-box::placeholder {
+            color: #adb5bd;
+        }
+
+        .subsection {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+
+        .subsection h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .buttons-container {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .progress-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #28a745 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .buttons-container, .progress-container {
+                display: none;
+            }
+            .test-item {
+                break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .test-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .test-checkbox {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Guía de Pruebas</h1>
+            <h2>Sistema POS - Prototipo</h2>
+            <p>Lista de verificación completa para probar todas las funcionalidades del sistema</p>
+        </header>
+
+        <div class="info-section">
+            <h3>📋 Instrucciones</h3>
+            <p>1. Sigue cada paso en orden numerado</p>
+            <p>2. Marca el check ✓ al completar cada prueba</p>
+            <p>3. Registra cualquier observación o problema en el box de comentarios</p>
+            <p>4. Al final, usa los botones para guardar o imprimir la guía</p>
+        </div>
+
+        <!-- MÓDULO: INTERFAZ PRINCIPAL DEL POS -->
+        <div class="test-section">
+            <h2><span class="icon">🛒</span> Módulo: Interfaz Principal del POS</h2>
+            
+            <div class="subsection">
+                <h3>1.1 Carga y Visualización Inicial</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.1.1">
+                    <div class="test-order">
+                        <strong>1.1.1</strong> - Acceder a la URL del sistema POS (http://localhost:3000/index.html) y verificar que la página cargue correctamente sin errores en consola
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.1.2">
+                    <div class="test-order">
+                        <strong>1.1.2</strong> - Verificar que se muestre el título "🛒 Sistema POS - Prototipo" en la cabecera
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.1.3">
+                    <div class="test-order">
+                        <strong>1.1.3</strong> - Verificar que el reloj/hora actual se muestre en la esquina superior y se actualice cada segundo
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.1.4">
+                    <div class="test-order">
+                        <strong>1.1.4</strong> - Verificar que estén visibles los botones de: Activar Plus, Beeps, Panel de Control, Iniciar Sesión y URL ngrok
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.1.5">
+                    <div class="test-order">
+                        <strong>1.1.5</strong> - Verificar que los accesos directos al Panel de Control se muestren (Ventas, Promociones, Métricas, Productos, Lotes, Cierres, Proveedores, Operaciones)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.2 Sistema de Búsqueda de Productos</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.1">
+                    <div class="test-order">
+                        <strong>1.2.1</strong> - Escribir en el campo de búsqueda y verificar que los productos se filtren en tiempo real (o al presionar Enter)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.2">
+                    <div class="test-order">
+                        <strong>1.2.2</strong> - Probar el filtro por categoría (seleccionar una categoría del dropdown y verificar que solo aparezcan productos de esa categoría)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.3">
+                    <div class="test-order">
+                        <strong>1.2.3</strong> - Probar los checkboxes de filtro (Nombre, Código, ID) y verificar que la búsqueda funcione correctamente con cada opción
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.4">
+                    <div class="test-order">
+                        <strong>1.2.4</strong> - Verificar que el filtro "Solo Promociones" funcione (al activarlo deben mostrarse solo productos con descuentos activos)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.5">
+                    <div class="test-order">
+                        <strong>1.2.5</strong> - Verificar que los productos se muestren en una grilla con: código interno, nombre, precio, stock, categoría, estado de vigencia
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.6">
+                    <div class="test-order">
+                        <strong>1.2.6</strong> - Verificar que los productos en promoción muestren el porcentaje de descuento (ej: "50% OFF") y el precio original tachado
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.2.7">
+                    <div class="test-order">
+                        <strong>1.2.7</strong> - Verificar que productos próximos a vencer o vencidos se marquen visualmente con colores diferentes (amarillo/rojo)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.3 Carrito de Compras</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.1">
+                    <div class="test-order">
+                        <strong>1.3.1</strong> - Hacer clic en un producto y verificar que se abra el modal de selección con los detalles del producto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.2">
+                    <div class="test-order">
+                        <strong>1.3.2</strong> - En el modal, ajustar la cantidad del producto usando los botones + y - y verificar que se actualice correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.3">
+                    <div class="test-order">
+                        <strong>1.3.3</strong> - Agregar el producto al carrito y verificar que aparezca en la sección del carrito con la cantidad y subtotal correcto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.4">
+                    <div class="test-order">
+                        <strong>1.3.4</strong> - Agregar varios productos diferentes al carrito y verificar que todos aparezcan listados
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.5">
+                    <div class="test-order">
+                        <strong>1.3.5</strong> - Verificar que el total de la compra se calcule correctamente (suma de todos los subtotales)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.6">
+                    <div class="test-order">
+                        <strong>1.3.6</strong> - Probar el botón de eliminar producto (❌) en el carrito y verificar que el producto se retire correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.7">
+                    <div class="test-order">
+                        <strong>1.3.7</strong> - Probar el botón de reducir cantidad (➖) y verificar que funcione correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.3.8">
+                    <div class="test-order">
+                        <strong>1.3.8</strong> - Probar el botón "Nueva Venta" y verificar que limpie todo el carrito y reinicie el sistema
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.4 Sistema de Pagos</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.1">
+                    <div class="test-order">
+                        <strong>1.4.1</strong> - Con productos en el carrito, hacer clic en el método de pago "Efectivo" y verificar que aparezca el campo para ingresar monto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.2">
+                    <div class="test-order">
+                        <strong>1.4.2</strong> - Ingresar un monto mayor al total y verificar que se calcule el vuelto correctamente (total pagado - total a pagar)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.3">
+                    <div class="test-order">
+                        <strong>1.4.3</strong> - Probar el botón "MAX" para pagar el monto exacto del total
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.4">
+                    <div class="test-order">
+                        <strong>1.4.4</strong> - Probar todos los métodos de pago: Transferencia, Débito, Crédito (cada uno debe mostrar su campo de monto)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.5">
+                    <div class="test-order">
+                        <strong>1.4.5</strong> - Probar pagos combinados (ej: mitad efectivo, mitad transferencia) y verificar que el total pagado se sume correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.6">
+                    <div class="test-order">
+                        <strong>1.4.6</strong> - Intentar pagar sin seleccionar método de pago y verificar que muestre mensaje de error
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.7">
+                    <div class="test-order">
+                        <strong>1.4.7</strong> - Intentar pagar con monto insuficiente y verificar que muestre mensaje de error
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.8">
+                    <div class="test-order">
+                        <strong>1.4.8</strong> - Completar un pago válido y verificar que se genere la factura con número de comprobante (FAC-...)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.9">
+                    <div class="test-order">
+                        <strong>1.4.9</strong> - Verificar que la factura muestre: número de factura, fecha/hora, productos vendidos, método de pago, total, vuelto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.4.10">
+                    <div class="test-order">
+                        <strong>1.4.10</strong> - Probar el botón de imprimir factura y verificar que funcione
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.5 Cuenta Corriente (Fiado)</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.5.1">
+                    <div class="test-order">
+                        <strong>1.5.1</strong> - Seleccionar el método de pago "Cuenta Corriente" y verificar que abra el modal de selección de cliente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.5.2">
+                    <div class="test-order">
+                        <strong>1.5.2</strong> - Buscar un cliente por nombre/teléfono/DNI y verificar que el filtro funcione
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.5.3">
+                    <div class="test-order">
+                        <strong>1.5.3</strong> - Seleccionar un cliente y verificar que se associe a la venta
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.5.4">
+                    <div class="test-order">
+                        <strong>1.5.4</strong> - Completar la venta a cuenta corriente y verificar que se genere el comprobante de deuda
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.6 Sección de Últimas Facturas</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.6.1">
+                    <div class="test-order">
+                        <strong>1.6.1</strong> - Verificar que la sección "Últimas Facturas" muestre las últimas ventas realizadas
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.6.2">
+                    <div class="test-order">
+                        <strong>1.6.2</strong> - Verificar que cada factura muestre: número de factura (FAC-...), monto total, fecha y hora
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.6.3">
+                    <div class="test-order">
+                        <strong>1.6.3</strong> - Hacer clic en el botón de imprimir en una factura y verificar que funcione
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.7 Alertas de Vencimiento</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.7.1">
+                    <div class="test-order">
+                        <strong>1.7.1</strong> - Verificar que al cargar la página aparezcan las alertas de productos próximos a vencer o vencidos (modal)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.7.2">
+                    <div class="test-order">
+                        <strong>1.7.2</strong> - Verificar que el modal muestre los productos vencidos (en rojo) y los próximos a vencer (en amarillo)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.7.3">
+                    <div class="test-order">
+                        <strong>1.7.3</strong> - Cerrar el modal de alertas y verificar que funcione el botón de cerrar
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.8 Sistema de Escáner</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.8.1">
+                    <div class="test-order">
+                        <strong>1.8.1</strong> - Probar el botón "Activar Escáner" y verificar que el sistema detecte el escáner USB
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.8.2">
+                    <div class="test-order">
+                        <strong>1.8.2</strong> - Escanear un código de barras con el escáner USB y verificar que agregue el producto al carrito
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.8.3">
+                    <div class="test-order">
+                        <strong>1.8.3</strong> - Verificar que el escáner de cámara (barcode-scanner.html) funcione correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>1.9 Sistema de Sonido</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.9.1">
+                    <div class="test-order">
+                        <strong>1.9.1</strong> - Hacer clic en el botón de Beeps y verificar que se active/desactive el sonido
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="1.9.2">
+                    <div class="test-order">
+                        <strong>1.9.2</strong> - Hacer doble clic en el botón de Beeps y verificar que reproduzca una secuencia de prueba
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO: PANEL DE CONTROL (DASHBOARD) -->
+        <div class="test-section">
+            <h2><span class="icon">📊</span> Módulo: Panel de Control (Dashboard)</h2>
+            
+            <div class="subsection">
+                <h3>2.1 Acceso y Navegación</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.1.1">
+                    <div class="test-order">
+                        <strong>2.1.1</strong> - Acceder al Panel de Control desde el POS (botón "Panel de Control" o acceso directo) y verificar que cargue dashboard.html
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.1.2">
+                    <div class="test-order">
+                        <strong>2.1.2</strong> - Verificar que el Panel muestre todas las secciones: Ventas, Promociones, Métricas, Productos, Lotes, Cierres, Proveedores, Clientes, Operaciones
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.1.3">
+                    <div class="test-order">
+                        <strong>2.1.3</strong> - Hacer clic en cada sección y verificar que se expanda/colapse correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.1.4">
+                    <div class="test-order">
+                        <strong>2.1.4</strong> - Probar el botón "Ir a Caja" y verificar que regrese al POS
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.1.5">
+                    <div class="test-order">
+                        <strong>2.1.5</strong> - Probar el botón de actualizar datos del dashboard
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.2 Gestión de Productos</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.1">
+                    <div class="test-order">
+                        <strong>2.2.1</strong> - Expandir la sección "Productos" y verificar que cargue la lista de productos
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.2">
+                    <div class="test-order">
+                        <strong>2.2.2</strong> - Verificar que la tabla muestre: ID, Código, Nombre, Categoría, Precio, Stock, Lotes, Vencimiento, Código Barras
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.3">
+                    <div class="test-order">
+                        <strong>2.2.3</strong> - Probar el botón "Agregar Nuevo Producto" y verificar que abra el modal de creación
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.4">
+                    <div class="test-order">
+                        <strong>2.2.4</strong> - Crear un nuevo producto con todos los campos y verificar que se guarde correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.5">
+                    <div class="test-order">
+                        <strong>2.2.5</strong> - Hacer clic en "Editar" en un producto y verificar que abra el modal de edición con los datos cargados
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.6">
+                    <div class="test-order">
+                        <strong>2.2.6</strong> - Modificar un producto y guardar los cambios, verificar que se actualice en la lista
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.7">
+                    <div class="test-order">
+                        <strong>2.2.7</strong> - Probar el ordenamiento de productos (por stock, por ID)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.2.8">
+                    <div class="test-order">
+                        <strong>2.2.8</strong> - Probar la funcionalidad del escáner de código de barras en el formulario de producto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.3 Gestión de Ventas</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.1">
+                    <div class="test-order">
+                        <strong>2.3.1</strong> - Expandir la sección "Ventas" y verificar que cargue el historial de ventas
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.2">
+                    <div class="test-order">
+                        <strong>2.3.2</strong> - Verificar que las ventas se muestren agrupadas por factura con todos los detalles
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.3">
+                    <div class="test-order">
+                        <strong>2.3.3</strong> - Probar los filtros por fecha (fecha específica, rango de fechas)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.4">
+                    <div class="test-order">
+                        <strong>2.3.4</strong> - Probar el botón "Ver Detalles" de una factura y verificar que muestre toda la información
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.5">
+                    <div class="test-order">
+                        <strong>2.3.5</strong> - Probar el botón "Imprimir" de una factura
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.6">
+                    <div class="test-order">
+                        <strong>2.3.6</strong> - Probar el botón "Cancelar" de una venta y verificar que pida credenciales y confirme la acción
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.3.7">
+                    <div class="test-order">
+                        <strong>2.3.7</strong> - Verificar que al cancelar una venta se restaure el stock de los productos
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.4 Gestión de Promociones</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.1">
+                    <div class="test-order">
+                        <strong>2.4.1</strong> - Expandir la sección "Promociones" y verificar que cargue la lista de promociones
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.2">
+                    <div class="test-order">
+                        <strong>2.4.2</strong> - Crear una nueva promoción y verificar que se guarde correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.3">
+                    <div class="test-order">
+                        <strong>2.4.3</strong> - Expandir una promoción y verificar que muestre los productos asociados con sus descuentos
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.4">
+                    <div class="test-order">
+                        <strong>2.4.4</strong> - Modificar los descuentos de una promoción y guardar los cambios
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.5">
+                    <div class="test-order">
+                        <strong>2.4.5</strong> - Eliminar una promoción y verificar que se elimine correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.4.6">
+                    <div class="test-order">
+                        <strong>2.4.6</strong> - Probar el botón "Limpiar Duplicados" y verificar su funcionamiento
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.5 Gestión de Lotes</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.1">
+                    <div class="test-order">
+                        <strong>2.5.1</strong> - Expandir la sección "Lotes" y verificar que cargue la lista de lotes
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.2">
+                    <div class="test-order">
+                        <strong>2.5.2</strong> - Verificar que la tabla muestre: ID, Producto, N° Lote, Código Barras, Fecha Vencimiento, Cantidad Inicial, Cantidad Actual, Estado, Días Restantes
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.3">
+                    <div class="test-order">
+                        <strong>2.5.3</strong> - Probar los filtros de lotes (por producto, por estado: vigentes, próximos a vencer, vencidos, descartados)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.4">
+                    <div class="test-order">
+                        <strong>2.5.4</strong> - Crear un nuevo lote y verificar que se guarde correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.5">
+                    <div class="test-order">
+                        <strong>2.5.5</strong> - Editar un lote existente y verificar que se actualice
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.5.6">
+                    <div class="test-order">
+                        <strong>2.5.6</strong> - Probar la validación de código de barras EAN-13 al crear/editar un lote
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.6 Gestión de Proveedores</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.6.1">
+                    <div class="test-order">
+                        <strong>2.6.1</strong> - Expandir la sección "Proveedores" y verificar que cargue la lista de proveedores
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.6.2">
+                    <div class="test-order">
+                        <strong>2.6.2</strong> - Crear un nuevo proveedor con todos los campos y verificar que se guarde
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.6.3">
+                    <div class="test-order">
+                        <strong>2.6.3</strong> - Editar un proveedor existente y verificar los cambios
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.6.4">
+                    <div class="test-order">
+                        <strong>2.6.4</strong> - Eliminar un proveedor y verificar que se elimine correctamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.7 Gestión de Pedidos a Proveedores</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.7.1">
+                    <div class="test-order">
+                        <strong>2.7.1</strong> - Dentro de Proveedores, verificar que esté la sub-sección de "Pedidos a Proveedores"
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.7.2">
+                    <div class="test-order">
+                        <strong>2.7.2</strong> - Crear un nuevo pedido a proveedor y verificar que se guarde
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.7.3">
+                    <div class="test-order">
+                        <strong>2.7.3</strong> - Verificar que se puedan agregar productos al pedido
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.7.4">
+                    <div class="test-order">
+                        <strong>2.7.4</strong> - Cambiar el estado de un pedido (Pendiente → En Proceso → Entregado → Cancelado)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.7.5">
+                    <div class="test-order">
+                        <strong>2.7.5</strong> - Confirmar la llegada de productos de un pedido y verificar que se creen los lotes
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.8 Gestión de Clientes y Cuenta Corriente</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.1">
+                    <div class="test-order">
+                        <strong>2.8.1</strong> - Expandir la sección "Clientes - Cuenta Corriente" y verificar que cargue la lista de clientes
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.2">
+                    <div class="test-order">
+                        <strong>2.8.2</strong> - Crear un nuevo cliente y verificar que se guarde
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.3">
+                    <div class="test-order">
+                        <strong>2.8.3</strong> - Ver las deudas de un cliente y verificar que muestre el historial de compras a cuenta corriente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.4">
+                    <div class="test-order">
+                        <strong>2.8.4</strong> - Registrar un pago parcial o total de una deuda
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.5">
+                    <div class="test-order">
+                        <strong>2.8.5</strong> - Verificar el "Resumen de Deudas" y su exportación a CSV
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.8.6">
+                    <div class="test-order">
+                        <strong>2.8.6</strong> - Probar la actualización automática de precios de las deudas
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.9 Cierre de Caja</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.1">
+                    <div class="test-order">
+                        <strong>2.9.1</strong> - Verificar que exista la sección "Historial de Cierres" y cargue los cierres anteriores
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.2">
+                    <div class="test-order">
+                        <strong>2.9.2</strong> - Realizar un cierre de caja y verificar que calcule correctamente: dinero inicial, total ventas, total esperado, diferencia
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.3">
+                    <div class="test-order">
+                        <strong>2.9.3</strong> - Verificar que el cierre muestre el detalle por método de pago
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.4">
+                    <div class="test-order">
+                        <strong>2.9.4</strong> - Verificar que haya alerta de cierres pendientes si no se ha hecho el cierre del día
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.5">
+                    <div class="test-order">
+                        <strong>2.9.5</strong> - Probar el cierre de caja retroactivo (para fechas anteriores)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.9.6">
+                    <div class="test-order">
+                        <strong>2.9.6</strong> - Ver los detalles de un cierre histórico
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.10 Métricas de Ventas</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.10.1">
+                    <div class="test-order">
+                        <strong>2.10.1</strong> - Expandir la sección "Métricas de Ventas" y verificar que cargue los productos más vendidos
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.10.2">
+                    <div class="test-order">
+                        <strong>2.10.2</strong> - Verificar que muestre el ranking de productos con cantidad vendida
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.10.3">
+                    <div class="test-order">
+                        <strong>2.10.3</strong> - Probar el botón "Cargar Más Productos" si hay más de 10
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.11 Registro de Operaciones</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.11.1">
+                    <div class="test-order">
+                        <strong>2.11.1</strong> - Expandir la sección "Registro de Operaciones" y verificar que cargue el log de actividades
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.11.2">
+                    <div class="test-order">
+                        <strong>2.11.2</strong> - Verificar que muestre las operaciones con fecha, descripción, usuario y tipo de operación
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.11.3">
+                    <div class="test-order">
+                        <strong>2.11.3</strong> - Probar el toggle de habilitar/deshabilitar registro de actividad
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.11.4">
+                    <div class="test-order">
+                        <strong>2.11.4</strong> - Probar el botón de limpiar registro (con credenciales)
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>2.12 Gestión de Datos (Backup/Restore)</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.12.1">
+                    <div class="test-order">
+                        <strong>2.12.1</strong> - Probar "Crear Backup" y verificar que se descargue un archivo JSON con los datos
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.12.2">
+                    <div class="test-order">
+                        <strong>2.12.2</strong> - Probar "Restaurar Backup" subiendo un archivo JSON válido
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="2.12.3">
+                    <div class="test-order">
+                        <strong>2.12.3</strong> - Probar "Generar Reporte" y verificar las opciones disponibles
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO: AUTENTICACIÓN Y LICENCIA -->
+        <div class="test-section">
+            <h2><span class="icon">🔐</span> Módulo: Autenticación y Licencia</h2>
+            
+            <div class="subsection">
+                <h3>3.1 Sistema de Autenticación</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.1.1">
+                    <div class="test-order">
+                        <strong>3.1.1</strong> - Intentar acceder al Panel de Control sin estar autenticado y verificar que pida credenciales
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.1.2">
+                    <div class="test-order">
+                        <strong>3.1.2</strong> - Iniciar sesión con credenciales válidas y verificar que permita el acceso
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.1.3">
+                    <div class="test-order">
+                        <strong>3.1.3</strong> - Iniciar sesión con credenciales incorrectas y verificar que muestre mensaje de error
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.1.4">
+                    <div class="test-order">
+                        <strong>3.1.4</strong> - Cerrar sesión y verificar que se requiera autenticación nuevamente
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>3.2 Sistema de Licencia</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.2.1">
+                    <div class="test-order">
+                        <strong>3.2.1</strong> - Verificar el estado de la licencia en el Panel de Control
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.2.2">
+                    <div class="test-order">
+                        <strong>3.2.2</strong> - Verificar el estado de la licencia en el POS (botón "Activar Plus")
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="3.2.3">
+                    <div class="test-order">
+                        <strong>3.2.3</strong> - Verificar que muestre alertas cuando la licencia está por expirar
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO: FUNCIONALIDADES ADICIONALES -->
+        <div class="test-section">
+            <h2><span class="icon">⚙️</span> Módulo: Funcionalidades Adicionales</h2>
+            
+            <div class="subsection">
+                <h3>4.1 ngrok y Acceso Remoto</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="4.1.1">
+                    <div class="test-order">
+                        <strong>4.1.1</strong> - Hacer clic en "URL ngrok" y verificar que muestre la URL pública si está activa
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="4.1.2">
+                    <div class="test-order">
+                        <strong>4.1.2</strong> - Verificar que se pueda iniciar ngrok desde el sistema si no está activo
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>4.2 Soporte Técnico</h3>
+                
+                <div class="test-item">
+                    <input type="checkbox" class="test-checkbox" data-test="4.2.1">
+                    <div class="test-order">
+                        <strong>4.2.1</strong> - Acceder a "Soporte Técnico" desde el Panel de Control y verificar la información de contacto
+                    </div>
+                    <textarea class="test-comment-box" placeholder="Comentarios, errores encontrados o observaciones..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMEN Y BOTONES -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;">0%</div>
+            </div>
+            <div class="progress-text">
+                <span id="progressText">0 de 0 pruebas completadas</span>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button class="btn btn-primary" onclick="saveProgress()">
+                💾 Guardar Progreso
+            </button>
+            <button class="btn btn-secondary" onclick="resetForm()">
+                🔄 Reiniciar Formulario
+            </button>
+            <button class="btn btn-success" onclick="window.print()">
+                🖨️ Imprimir Guía
+            </button>
+        </div>
+
+        <footer>
+            <p>🛡️ Sistema POS - Guía de Pruebas v1.0</p>
+            <p>© 2024 Sistema POS. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Contador de progreso
+        const checkboxes = document.querySelectorAll('.test-checkbox');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        function updateProgress() {
+            const checked = document.querySelectorAll('.test-checkbox:checked').length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '%';
+            progressText.textContent = checked + ' de ' + total + ' pruebas completadas';
+            
+            // Guardar en localStorage
+            saveToLocalStorage();
+        }
+        
+        // Event listeners para checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateProgress);
+        });
+        
+        // Guardar en localStorage
+        function saveToLocalStorage() {
+            const data = {};
+            checkboxes.forEach((checkbox, index) => {
+                const testId = checkbox.getAttribute('data-test');
+                data[testId] = {
+                    checked: checkbox.checked,
+                    comment: checkbox.closest('.test-item').querySelector('.test-comment-box').value
+                };
+            });
+            localStorage.setItem('pos_test_progress', JSON.stringify(data));
+        }
+        
+        // Cargar desde localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('pos_test_progress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                checkboxes.forEach(checkbox => {
+                    const testId = checkbox.getAttribute('data-test');
+                    if (data[testId]) {
+                        checkbox.checked = data[testId].checked;
+                        if (data[testId].comment) {
+                            checkbox.closest('.test-item').querySelector('.test-comment-box').value = data[testId].comment;
+                        }
+                    }
+                });
+                updateProgress();
+            }
+        }
+        
+        // Guardar progreso (download)
+        function saveProgress() {
+            const data = {};
+            checkboxes.forEach((checkbox, index) => {
+                const testId = checkbox.getAttribute('data-test');
+                data[testId] = {
+                    checked: checkbox.checked,
+                    comment: checkbox.closest('.test-item').querySelector('.test-comment-box').value
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'pos_test_progress_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+        
+        // Reiniciar formulario
+        function resetForm() {
+            if (confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.closest('.test-item').querySelector('.test-comment-box').value = '';
+                });
+                localStorage.removeItem('pos_test_progress');
+                updateProgress();
+            }
+        }
+        
+        // Guardar comentarios al escribir
+        document.querySelectorAll('.test-comment-box').forEach(textarea => {
+            textarea.addEventListener('input', saveToLocalStorage);
+        });
+        
+        // Inicializar
+        loadFromLocalStorage();
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -506,6 +506,11 @@ input:checked + .slider:before {
     text-transform: uppercase;
 }
 
+.status-badge.success {
+    background: #28a745;
+    color: white;
+}
+
 .status-pending {
     background: #fff3cd;
     color: #856404;

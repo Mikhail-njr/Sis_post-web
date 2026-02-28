@@ -206,6 +206,7 @@ class DebtsRepository {
           dp.cantidad,
           dp.precio_unitario,
           dp.subtotal,
+          dp.pagado as producto_pagado,
           p.precio as precio_actual
         FROM deudas d
         JOIN deuda_productos dp ON d.id = dp.deuda_id
@@ -233,6 +234,9 @@ class DebtsRepository {
             });
           }
 
+          // Usar el campo booleano pagado para determinar estado
+          const estaPagado = row.producto_pagado === 1 || row.producto_pagado === true;
+
           debtsMap.get(row.id).productos.push({
             producto_id: row.producto_id,
             producto_nombre: row.producto_nombre,
@@ -240,7 +244,8 @@ class DebtsRepository {
             cantidad: row.cantidad,
             precio_unitario: row.precio_unitario,
             subtotal: row.subtotal,
-            precio_actual: row.precio_actual
+            precio_actual: row.precio_actual,
+            pagado: estaPagado
           });
         });
 
@@ -534,12 +539,14 @@ class DebtsRepository {
 
   /**
    * Registrar un pago para una deuda específica
+   * Ahora funciona marcando productos como 'pagado' en lugar de decrementar monto_pendiente
    * @param {number} deudaId - ID de la deuda
-   * @param {number} monto - Monto del pago
+   * @param {number} monto - Monto del pago (informativo, ya que se paga por producto)
    * @param {string} descripcion - Descripción opcional del pago
+   * @param {Array} productosAPagar - Array de IDs de productos a pagar (opcional)
    * @returns {Promise} - Deuda actualizada y registro del pago
    */
-  async registerPayment(deudaId, monto, descripcion = '') {
+  async registerPayment(deudaId, monto, descripcion = '', productosAPagar = null) {
     const db = this.db;
 
     return new Promise((resolve, reject) => {
@@ -568,13 +575,14 @@ class DebtsRepository {
                 return reject(new Error('Solo se pueden registrar pagos en deudas pendientes o vencidas'));
               }
 
-              // Calcular el monto actual basado en precio actual del producto × cantidad
-              // Unimos con la tabla productos para obtener el precio vigente
+              // Obtener los productos de la deuda con su estado de pagado
               db.all(
-                `SELECT dp.cantidad, p.precio as precio_producto 
+                `SELECT dp.id as deuda_producto_id, dp.producto_id, dp.cantidad, dp.precio_unitario, 
+                        dp.subtotal, p.precio as precio_producto, dp.pagado
                  FROM deuda_productos dp 
                  JOIN productos p ON dp.producto_id = p.id 
-                 WHERE dp.deuda_id = ?`,
+                 WHERE dp.deuda_id = ?
+                 ORDER BY dp.id`,
                 [deudaId],
                 (err, productos) => {
                   if (err) {
@@ -582,84 +590,118 @@ class DebtsRepository {
                     return reject(err);
                   }
 
-                  // Calcular total actual: suma de (precio actual del producto × cantidad)
-                  const montoActualCalculado = productos.reduce((sum, p) => {
-                    return sum + (parseFloat(p.precio_producto || 0) * parseFloat(p.cantidad || 0));
-                  }, 0);
+                  if (!productos || productos.length === 0) {
+                    db.run('ROLLBACK');
+                    return reject(new Error('No hay productos asociados a esta deuda'));
+                  }
 
-                  // Obtener total de pagos ya realizados
-                  db.all(
-                    `SELECT COALESCE(SUM(monto), 0) as total_pagado FROM pagos_deudas WHERE deuda_id = ?`,
-                    [deudaId],
-                    (err, pagosResult) => {
-                      if (err) {
-                        db.run('ROLLBACK');
-                        return reject(err);
-                      }
+                  // Filtrar productos pendientes (no pagados)
+                  const productosPendientes = productos.filter(p => p.pagado !== 1 && p.pagado !== true);
 
-                      const totalPagado = parseFloat(pagosResult[0]?.total_pagado || 0);
-                      const montoPendienteActual = parseFloat((montoActualCalculado - totalPagado).toFixed(2));
+                  // Si se especifican productos a pagar, usar esos; sino pagar todos los pendientes
+                  let productosAMarcar;
+                  if (productosAPagar && productosAPagar.length > 0) {
+                    productosAMarcar = productosPendientes.filter(p => productosAPagar.includes(p.producto_id));
+                  } else {
+                    // Si no se especifican productos, pagar todos los pendientes
+                    productosAMarcar = productosPendientes;
+                  }
 
-                      // Verificar que el monto no exceda el pendiente (basado en precios actuales)
-                      if (monto > montoPendienteActual) {
-                        db.run('ROLLBACK');
-                        return reject(new Error(`El monto del pago (${monto}) no puede ser mayor al monto pendiente (${montoPendienteActual})`));
-                      }
+                  if (productosAMarcar.length === 0) {
+                    db.run('ROLLBACK');
+                    return reject(new Error('No hay productos pendientes por pagar'));
+                  }
 
-                      // Calcular nuevo monto pendiente
-                      const nuevoMontoPendiente = parseFloat((montoPendienteActual - monto).toFixed(2));
-                      const nuevoEstado = nuevoMontoPendiente === 0 ? 'pagada' : 'pendiente';
+                  // Calcular el monto total de los productos a pagar
+                  const montoTotalAPagar = productosAMarcar.reduce((sum, p) => sum + p.subtotal, 0);
 
-                      // Actualizar la deuda
-                      db.run(
-                        'UPDATE deudas SET monto_pendiente = ?, estado = ?, updated_at = ? WHERE id = ?',
-                        [nuevoMontoPendiente, nuevoEstado, new Date().toISOString(), deudaId],
-                        (err) => {
-                          if (err) {
-                            db.run('ROLLBACK');
-                            return reject(err);
-                          }
+                  // Marcar los productos como pagados
+                  let productosActualizados = 0;
+                  const totalProductos = productosAMarcar.length;
 
-                          // Registrar el pago en el historial
-                          const descripcionPago = descripcion || `Pago registrado - Monto pendiente restante: ${nuevoMontoPendiente.toFixed(2)}`;
-                          db.run(
-                            'INSERT INTO pagos_deudas (deuda_id, monto, descripcion) VALUES (?, ?, ?)',
-                            [deudaId, monto, descripcionPago],
-                            (err) => {
+                  productosAMarcar.forEach((producto) => {
+                    db.run(
+                      'UPDATE deuda_productos SET pagado = 1 WHERE id = ?',
+                      [producto.deuda_producto_id],
+                      (err) => {
+                        if (err) {
+                          db.run('ROLLBACK');
+                          return reject(err);
+                        }
+
+                        productosActualizados++;
+
+                        if (productosActualizados === totalProductos) {
+                          // Todos los productos actualizados, verificar si la deuda está completamente pagada
+                          db.all(
+                            `SELECT COUNT(*) as pendientes FROM deuda_productos 
+                             WHERE deuda_id = ? AND (pagado IS NULL OR pagado = 0)`,
+                            [deudaId],
+                            (err, result) => {
                               if (err) {
                                 db.run('ROLLBACK');
                                 return reject(err);
                               }
 
-                              // Confirmar transacción
-                              db.run('COMMIT', (err) => {
-                                if (err) return reject(err);
+                              const tienePendientes = result[0].pendientes > 0;
+                              const nuevoEstado = tienePendientes ? 'pendiente' : 'pagada';
+                              const nuevoMontoPendiente = tienePendientes ? debt.monto_pendiente - montoTotalAPagar : 0;
 
-                                // Obtener la deuda actualizada
-                                db.get(
-                                  'SELECT * FROM deudas WHERE id = ?',
-                                  [deudaId],
-                                  (err, updatedDebt) => {
-                                    if (err) return reject(err);
-
-                                    resolve({
-                                      success: true,
-                                      debt: updatedDebt,
-                                      pago: {
-                                        monto: monto,
-                                        restante: nuevoMontoPendiente,
-                                        completado: nuevoMontoPendiente === 0
-                                      }
-                                    });
+                              db.run(
+                                'UPDATE deudas SET monto_pendiente = ?, estado = ?, updated_at = ? WHERE id = ?',
+                                [nuevoMontoPendiente, nuevoEstado, new Date().toISOString(), deudaId],
+                                (err) => {
+                                  if (err) {
+                                    db.run('ROLLBACK');
+                                    return reject(err);
                                   }
-                                );
-                              });
+
+                                  // Registrar el pago en el historial
+                                  const descripcionPago = descripcion || `Pago registrado - ${productosAMarcar.length} producto(s) marcado(s) como pagado(s)`;
+                                  db.run(
+                                    'INSERT INTO pagos_deudas (deuda_id, monto, descripcion) VALUES (?, ?, ?)',
+                                    [deudaId, montoTotalAPagar, descripcionPago],
+                                    (err) => {
+                                      if (err) {
+                                        db.run('ROLLBACK');
+                                        return reject(err);
+                                      }
+
+                                      // Confirmar transacción
+                                      db.run('COMMIT', (err) => {
+                                        if (err) return reject(err);
+
+                                        // Obtener la deuda actualizada
+                                        db.get(
+                                          'SELECT * FROM deudas WHERE id = ?',
+                                          [deudaId],
+                                          (err, updatedDebt) => {
+                                            if (err) return reject(err);
+
+                                            resolve({
+                                              success: true,
+                                              cliente_id: updatedDebt.cliente_id,
+                                              debt: updatedDebt,
+                                              pago: {
+                                                monto: montoTotalAPagar,
+                                                productos_pagados: productosAMarcar.length,
+                                                restante: nuevoMontoPendiente,
+                                                completado: nuevoMontoPendiente === 0
+                                              }
+                                            });
+                                          }
+                                        );
+                                      });
+                                    }
+                                  );
+                                }
+                              );
                             }
                           );
                         }
-                      );
-                    }
-                  );
+                      }
+                    );
+                  });
                 }
               );
             }

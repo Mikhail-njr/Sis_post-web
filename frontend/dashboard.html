@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3693,7 +3693,7 @@
             }
         }
 
-        // Función para mostrar deudas del cliente en el modal
+        // Función para mostrar deudas del cliente en el modal (Agrupada por Factura)
         function displayClientDebts(deudas) {
             const content = document.getElementById('clientDebtsContent');
 
@@ -3707,32 +3707,74 @@
                 return;
             }
 
-            // Calcular totales
-            const totalPendiente = deudas.reduce((sum, deuda) => sum + parseFloat(deuda.monto_pendiente || 0), 0);
-            const deudasPendientes = deudas.filter(d => d.estado === 'pendiente').length;
-            const deudasVencidas = deudas.filter(d => d.estado === 'vencida').length;
+            // ========== AGRUPAR DEUDAS POR FACTURA ==========
+            const facturasAgrupadas = {};
+            
+            deudas.forEach(deuda => {
+                const numFactura = deuda.venta_numero_factura || 'SIN_FACTURA';
+                
+                if (!facturasAgrupadas[numFactura]) {
+                    facturasAgrupadas[numFactura] = {
+                        fecha: deuda.venta_fecha,
+                        productos: [],
+                        totalPendiente: 0,
+                        tienePendiente: false
+                    };
+                }
+                
+                const cantidad = deuda.producto_cantidad || 1;
+                let precioActual;
+                let nombreProducto;
+                
+                // Verificar si el producto existe en productosActuales
+                if (productosActuales && productosActuales[deuda.producto_id]) {
+                    const producto = productosActuales[deuda.producto_id];
+                    precioActual = producto.precio;
+                    nombreProducto = producto.nombre;
+                } else {
+                    precioActual = deuda.precio_actual_producto;
+                    nombreProducto = deuda.producto_nombre;
+                }
+                
+                const pendienteItem = (parseFloat(precioActual) || 0) * cantidad;
+                
+                facturasAgrupadas[numFactura].productos.push({
+                    ...deuda,
+                    precioActualDisplay: precioActual,
+                    nombreProductoDisplay: nombreProducto
+                });
+                facturasAgrupadas[numFactura].totalPendiente += pendienteItem;
+                if (parseFloat(deuda.monto_pendiente || 0) > 0) {
+                    facturasAgrupadas[numFactura].tienePendiente = true;
+                }
+            });
+
+            // Calcular totales generales
+            const totalPendiente = Object.values(facturasAgrupadas).reduce((sum, f) => sum + f.totalPendiente, 0);
+            const facturasPendientes = Object.values(facturasAgrupadas).filter(f => f.tienePendiente).length;
+            const facturasTotales = Object.keys(facturasAgrupadas).length;
 
             let deudasHtml = `
                 <div class="debts-summary">
-                    <h4>Resumen de Deudas</h4>
+                    <h4>Resumen de Cuenta Corriente</h4>
                     <div class="debts-summary-grid">
                         <div class="summary-card">
                             <strong>Total Pendiente:</strong>
                             <div class="summary-value positive">${formatCurrency(totalPendiente)}</div>
                         </div>
                         <div class="summary-card">
-                            <strong>Deudas Pendientes:</strong>
-                            <div class="summary-value warning">${deudasPendientes}</div>
+                            <strong>Facturas Pendientes:</strong>
+                            <div class="summary-value warning">${facturasPendientes} de ${facturasTotales}</div>
                         </div>
                         <div class="summary-card">
-                            <strong>Deudas Vencidas:</strong>
-                            <div class="summary-value danger">${deudasVencidas}</div>
+                            <strong>Total Facturas:</strong>
+                            <div class="summary-value info">${facturasTotales}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="debts-details">
-                    <h4>Detalles de Deudas</h4>
+                    <h4>Detalles por Factura</h4>
                     <div class="table-container">
                         <table class="debts-table">
                             <thead>
@@ -3753,66 +3795,71 @@
                             <tbody>
                 `;
 
-            deudas.forEach((deuda, index) => {
-                const fechaVencimiento = deuda.fecha_vencimiento ? new Date(deuda.fecha_vencimiento).toLocaleDateString('es-AR') : '-';
-                const estadoClass = deuda.estado === 'vencida' ? 'vencido' : deuda.estado === 'pendiente' ? 'proximo-vencer' : 'vigente';
-                const estadoText = deuda.estado === 'vencida' ? 'Vencida' : deuda.estado === 'pendiente' ? 'Pendiente' : 'Pagada';
+            // Iterar sobre las facturas agrupadas
+            Object.keys(facturasAgrupadas).sort().forEach(numFactura => {
+                const factura = facturasAgrupadas[numFactura];
+                const fechaFormateada = factura.fecha ? new Date(factura.fecha).toLocaleDateString('es-AR') : '-';
+                const cantidadProductos = factura.productos.length;
 
-                // Obtener precio actual del producto
-                let precioActual;
-                let nombreProducto;
-                const cantidad = deuda.producto_cantidad || 1;
+                // Renderizar cada producto de esta factura
+                factura.productos.forEach((deuda, idx) => {
+                    const fechaVencimiento = deuda.fecha_vencimiento ? new Date(deuda.fecha_vencimiento).toLocaleDateString('es-AR') : '-';
+                    const productoEstadoClass = deuda.producto_pagado === 1 || deuda.producto_pagado === true ? 'vigente' : deuda.estado === 'vencida' ? 'vencido' : deuda.estado === 'pendiente' ? 'proximo-vencer' : 'vigente';
+                    const productoEstadoText = deuda.producto_pagado === 1 || deuda.producto_pagado === true ? 'Pagado' : deuda.estado === 'vencida' ? 'Vencida' : 'Pendiente';
 
-                // Verificar si el producto existe en productosActuales
-                if (productosActuales && productosActuales[deuda.producto_id]) {
-                    // Si el producto existe, usar el precio actual del producto
-                    const producto = productosActuales[deuda.producto_id];
-                    precioActual = producto.precio;
-                    nombreProducto = producto.nombre;
-                } else {
-                    // Si el producto no existe, usar el precio actual de la deuda
-                    precioActual = deuda.precio_actual_producto;
-                    nombreProducto = deuda.producto_nombre;
-                }
+                    const precioActual = deuda.precioActualDisplay;
+                    const nombreProducto = deuda.nombreProductoDisplay;
+                    const cantidad = deuda.producto_cantidad || 1;
+                    const precioOriginal = deuda.precio_unitario;
+                    const montoPendiente = parseFloat(deuda.monto_pendiente || 0);
 
-                const precioOriginal = deuda.precio_unitario;
+                    // CÁLCULOS CON CANTIDAD
+                    const precioOriginalTotal = parseFloat(precioOriginal) * cantidad;
+                    // Mantener precioActualTotal para cálculos de diferencia
+                    const precioActualTotal = parseFloat(precioActual) * cantidad;
+                    // Usar el monto_pendiente real de la base de datos para el pendiente
+                    const pendienteRecalc = deuda.producto_monto_pendiente || precioActualTotal;
+                    const diferenciaTotal = precioActualTotal - precioOriginalTotal;
 
-                // CÁLCULOS CORRECTOS CON CANTIDAD
-                // Precio original total = precio_unitario × cantidad
-                const precioOriginalTotal = parseFloat(precioOriginal) * cantidad;
-                // Precio actual total = precio_actual × cantidad
-                const precioActualTotal = parseFloat(precioActual) * cantidad;
-                // Pendiente recalculado: cantidad × precio actual (recalculo solicitado)
-                const pendienteRecalc = precioActualTotal;
-                // Diferencia total = (precio_actual - precio_original) × cantidad
-                const diferenciaTotal = precioActualTotal - precioOriginalTotal;
+                    let precioActualDisplay = formatCurrency(precioActualTotal);
+                    let diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
+                    let diferenciaClass = diferenciaTotal > 0 ? 'danger' : diferenciaTotal < 0 ? 'success' : 'neutral';
 
-                let precioActualDisplay = formatCurrency(precioActualTotal);
-                let diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
-                let diferenciaClass = diferenciaTotal > 0 ? 'danger' : diferenciaTotal < 0 ? 'success' : 'neutral';
+                    // Primera fila de la factura - mostrar número y fecha solo en la primera fila
+                    const isFirstRow = idx === 0;
 
-                deudasHtml += `
-                    <tr>
-                        <td>${deuda.venta_numero_factura || '-'}</td>
-                        <td>${deuda.venta_fecha ? new Date(deuda.venta_fecha).toLocaleDateString('es-AR') : '-'}</td>
-                        <td>${nombreProducto}</td>
-                        <td>${cantidad}</td>
-                        <td>${formatCurrency(precioOriginalTotal)}</td>
-                        <td>${precioActualDisplay}</td>
-                        <td class="${diferenciaClass}">${diferenciaDisplay}</td>
-                        <td class="${pendienteRecalc > 0 ? 'danger' : 'success'}">${formatCurrency(pendienteRecalc)}</td>
-                        <td>${fechaVencimiento}</td>
-                        <td><span class="status-badge ${estadoClass}">${estadoText}</span></td>
-                        <td>
-                            ${parseFloat(deuda.monto_pendiente || 0) > 0 ? `
-                                <button class="action-button success" onclick="registerPayment(${deuda.id}, ${precioActualTotal}, '${deuda.venta_numero_factura || ''}')">Pagar</button>
-                                <button class="action-button info" onclick="showPaymentHistory(${deuda.id})">Historial</button>
-                            ` : `
-                                <span class="status-badge success">Pagada</span>
-                            `}
-                        </td>
-                    </tr>
-                `;
+                    // Si es la primera fila, mostrar factura y fecha; si no, dejar celdas vacías
+                    const facturaCell = isFirstRow ? `<td rowspan="${cantidadProductos}"><strong>${numFactura}</strong></td>` : '';
+                    const fechaCell = isFirstRow ? `<td rowspan="${cantidadProductos}">${fechaFormateada}</td>` : '';
+                    
+                    // El botón de pagar aparece en la primera fila y corresponde al TOTAL de la deuda
+                    // Verificar el estado de pagado del producto
+                    const estaPagado = deuda.producto_pagado === 1 || deuda.producto_pagado === true;
+                    const accionesHtml = estaPagado ? 
+                        `<span class="status-badge success" style="font-size: 11px; padding: 3px 6px;">✓ Pagado</span>` :
+                        (deuda.deuda_producto_id ? `
+                            <button class="action-button success" style="font-size: 11px; padding: 3px 6px; margin: 2px;" 
+                                onclick="registerProductPayment(${deuda.id}, ${deuda.deuda_producto_id}, ${deuda.producto_monto_pendiente || pendienteRecalc}, '${numFactura}')">
+                                ${(deuda.producto_monto_pendiente || pendienteRecalc) > 0 ? 'Pagar ' + formatCurrency(deuda.producto_monto_pendiente || pendienteRecalc) : 'Pagado'}
+                            </button>
+                        ` : '');
+
+                    deudasHtml += `
+                        <tr>
+                            ${facturaCell}
+                            ${fechaCell}
+                            <td>${nombreProducto}</td>
+                            <td>${cantidad}</td>
+                            <td>${formatCurrency(precioOriginalTotal)}</td>
+                            <td>${precioActualDisplay}</td>
+                            <td class="${diferenciaClass}">${diferenciaDisplay}</td>
+                            <td class="${pendienteRecalc > 0 ? 'danger' : 'success'}">${formatCurrency(pendienteRecalc)}</td>
+                            <td>${fechaVencimiento}</td>
+                            <td><span class="status-badge ${productoEstadoClass}">${productoEstadoText}</span></td>
+                            <td>${accionesHtml}</td>
+                        </tr>
+                    `;
+                });
             });
 
             deudasHtml += `
@@ -3825,9 +3872,12 @@
             content.innerHTML = deudasHtml;
         }
 
-        // Función para registrar pago de deuda
-        async function registerPayment(deudaId, montoPendiente, numeroFactura) {
-            const montoPago = parseFloat(prompt(`Ingrese el monto a pagar para la factura ${numeroFactura} (Pendiente: ${formatCurrency(montoPendiente)}):`, montoPendiente));
+
+
+        async function registerProductPayment(deudaId, deudaProductoId, montoPendiente, numeroFactura) {
+            console.log('DEBUG registerProductPayment - deudaId:', deudaId, 'productoId:', deudaProductoId, 'monto:', montoPendiente, 'factura:', numeroFactura);
+            
+            const montoPago = parseFloat(prompt(`Ingrese el monto a pagar para el producto (Pendiente: ${formatCurrency(montoPendiente)}):`, montoPendiente));
 
             if (isNaN(montoPago) || montoPago <= 0) {
                 alert('Monto inválido');
@@ -3835,7 +3885,7 @@
             }
 
             if (montoPago > montoPendiente) {
-                alert('El monto a pagar no puede ser mayor al monto pendiente');
+                alert('El monto a pagar no puede ser mayor al monto pendiente del producto');
                 return;
             }
 
@@ -3845,7 +3895,7 @@
                     headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
                 }
 
-                const response = await fetch(`${window.ApiClient.API_BASE}/debts/${deudaId}/payment`, {
+                const response = await fetch(`${window.ApiClient.API_BASE}/debts/${deudaId}/producto/${deudaProductoId}/payment`, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({
@@ -3864,11 +3914,19 @@
                 }
 
                 const result = await response.json();
-                alert('Pago registrado exitosamente');
-                viewClientDebts(result.cliente_id); // Recargar deudas del cliente
+                console.log('DEBUG payment result:', result);
+                alert('Pago de producto registrado exitosamente');
+                
+                // Recargar las deudas del cliente después del pago exitoso
+                if (result.cliente_id) {
+                    viewClientDebts(result.cliente_id);
+                } else {
+                    console.error('No se pudo obtener el cliente_id para recargar');
+                    location.reload();
+                }
 
             } catch (error) {
-                console.error('Error registrando pago:', error);
+                console.error('Error registrando pago de producto:', error);
                 alert('Error al registrar pago: ' + error.message);
             }
         }
