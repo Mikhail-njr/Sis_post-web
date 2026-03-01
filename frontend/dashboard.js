@@ -2265,8 +2265,17 @@
                         <tbody>
         `;
 
-        // Iterar sobre las facturas agrupadas
-        Object.keys(facturasAgrupadas).sort().forEach(numFactura => {
+        // Iterar sobre las facturas agrupadas (las más nuevas primero)
+        // Ordenar por número de factura en orden descendente (las más nuevas primero)
+        // Usar ordenamiento numérico para manejar correctamente FAC-1, FAC-2, FAC-10, etc.
+        const facturasOrdenadas = Object.keys(facturasAgrupadas).sort((a, b) => {
+            // Extraer el número de factura para ordenamiento numérico correcto
+            const numA = parseInt(a.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.replace(/\D/g, '')) || 0;
+            return numB - numA; // Orden descendente (mayor a menor = más nuevo primero)
+        });
+        
+        facturasOrdenadas.forEach(numFactura => {
             const factura = facturasAgrupadas[numFactura];
             const fechaFormateada = factura.fecha ? new Date(factura.fecha).toLocaleDateString('es-AR') : '-';
             const primerProducto = factura.productos[0];

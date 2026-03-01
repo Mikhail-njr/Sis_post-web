@@ -1,4 +1,0 @@
-{
-  "query": "app.get(\"/api/",
-  "limit": 100
-}
