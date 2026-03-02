@@ -2294,7 +2294,7 @@
                 precio: parseFloat(document.getElementById('addPrecio').value),
                 stock: parseInt(document.getElementById('addStock').value),
                 categoria: document.getElementById('addCategoria').value.trim(),
-                barcode: document.getElementById('addBarcode').value.trim()
+                codigo_barras: document.getElementById('addBarcode').value.trim()
             };
 
             // Validaciones básicas
@@ -3775,6 +3775,31 @@
 
                 <div class="debts-details">
                     <h4>Detalles por Factura</h4>
+                    
+                    <!-- Filtros -->
+                    <div class="debts-filters" style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <select id="filterInvoice" onchange="filterDebtsTable()" style="width: 100%; padding: 10px; border: 1px solid #555; border-radius: 4px; background: #3d3d3d; color: #ffffff; font-size: 14px;">
+                                <option value="">📋 Todas las Facturas</option>
+                                ${Object.keys(facturasAgrupadas).sort((a, b) => {
+                                    const fechaA = facturasAgrupadas[a].fecha ? new Date(facturasAgrupadas[a].fecha).getTime() : 0;
+                                    const fechaB = facturasAgrupadas[b].fecha ? new Date(facturasAgrupadas[b].fecha).getTime() : 0;
+                                    return fechaB - fechaA;
+                                }).map(numFactura => `<option value="${numFactura}">${numFactura}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <select id="filterStatus" onchange="filterDebtsTable()" style="width: 100%; padding: 10px; border: 1px solid #555; border-radius: 4px; background: #3d3d3d; color: #ffffff; font-size: 14px;">
+                                <option value="">📊 Todos los Estados</option>
+                                <option value="Pendiente">⚠️ Pendientes</option>
+                                <option value="Pagado">✅ Pagadas</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <button onclick="clearDebtsFilters()" style="background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 14px;">Limpiar Filtros</button>
+                        </div>
+                    </div>
+                    
                     <div class="table-container">
                         <table class="debts-table">
                             <thead>
@@ -3795,8 +3820,15 @@
                             <tbody>
                 `;
 
-            // Iterar sobre las facturas agrupadas
-            Object.keys(facturasAgrupadas).sort().forEach(numFactura => {
+            // Iterar sobre las facturas agrupadas (las más nuevas primero)
+            // Ordenar por fecha en orden descendente (más reciente primero)
+            const facturasOrdenadas = Object.keys(facturasAgrupadas).sort((a, b) => {
+                const fechaA = facturasAgrupadas[a].fecha ? new Date(facturasAgrupadas[a].fecha).getTime() : 0;
+                const fechaB = facturasAgrupadas[b].fecha ? new Date(facturasAgrupadas[b].fecha).getTime() : 0;
+                return fechaB - fechaA; // Orden descendente (más reciente primero)
+            });
+            
+            facturasOrdenadas.forEach(numFactura => {
                 const factura = facturasAgrupadas[numFactura];
                 const fechaFormateada = factura.fecha ? new Date(factura.fecha).toLocaleDateString('es-AR') : '-';
                 const cantidadProductos = factura.productos.length;
@@ -3934,6 +3966,85 @@
         // Función para cerrar modal de deudas
         function closeClientDebtsModal() {
             closeModal('clientDebtsModal');
+        }
+
+        // Función para filtrar la tabla de deudas
+        function filterDebtsTable() {
+            const filterInvoice = document.getElementById('filterInvoice')?.value || '';
+            const filterStatus = document.getElementById('filterStatus')?.value || '';
+            const table = document.querySelector('.debts-table');
+            
+            if (!table) return;
+            
+            // Encontrar el índice de la columna "Estado" dinámicamente
+            const headerRow = table.querySelector('thead tr');
+            const headers = Array.from(headerRow.querySelectorAll('th'));
+            const estadoIndex = headers.findIndex(h => h.textContent.trim() === 'Estado');
+            
+            const rows = table.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach((row) => {
+                // Find the actual invoice cell (may not be cells[0] due to rowspan)
+                let invoiceCellValue = '';
+                let statusCellValue = '';
+                
+                // Check all cells to find invoice and status
+                const cells = row.cells;
+                for (let i = 0; i < cells.length; i++) {
+                    const cellText = cells[i].textContent.trim();
+                    // If this cell has rowspan and contains an invoice number, it's the invoice cell
+                    if (cells[i].rowSpan > 1 && cellText.match(/^FAC-/)) {
+                        invoiceCellValue = cellText;
+                    }
+                    // If this is the Estado column (by position or by header)
+                    if (estadoIndex >= 0 && i === estadoIndex) {
+                        statusCellValue = cellText;
+                    }
+                }
+                
+                // Fallback: check cells[0] for invoice if not found
+                if (!invoiceCellValue && cells[0]) {
+                    invoiceCellValue = cells[0].textContent.trim();
+                }
+                
+                // For status, also check all cells for status badges
+                if (!statusCellValue) {
+                    for (let i = 0; i < cells.length; i++) {
+                        const cellText = cells[i].textContent.trim();
+                        if (cellText === 'Pendiente' || cellText === 'Pagado' || cellText === 'Vencida') {
+                            statusCellValue = cellText;
+                            break;
+                        }
+                    }
+                }
+                
+                // Para el filtro de factura, hacer coincidencia exacta
+                const matchesInvoice = filterInvoice === '' || invoiceCellValue.includes(filterInvoice);
+                
+                // Para el filtro de estado, verificar si contiene el texto del estado
+                const matchesStatus = filterStatus === '' || 
+                    (filterStatus === 'Pendiente' && (statusCellValue.includes('Pendiente'))) ||
+                    (filterStatus === 'Pagado' && (statusCellValue.includes('Pagado') || statusCellValue.includes('Pagada') || statusCellValue.includes('Vigente')));
+                
+                if (matchesInvoice && matchesStatus) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Función para limpiar los filtros
+        function clearDebtsFilters() {
+            const filterInvoice = document.getElementById('filterInvoice');
+            const filterStatus = document.getElementById('filterStatus');
+            
+            if (filterInvoice) filterInvoice.value = '';
+            if (filterStatus) filterStatus.value = '';
+            
+            filterDebtsTable();
         }
 
         // Función para mostrar historial de pagos de una deuda
