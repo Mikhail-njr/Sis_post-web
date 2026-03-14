@@ -1683,6 +1683,7 @@
                     </div>
                     <div style="text-align: right;">
                         <div style="font-weight: bold; font-size: 1.1em; ${item.tiene_descuento ? 'color: #e74c3c;' : ''}">${formatCurrency(subtotal)}</div>
+                        <button class="increase-item-btn" data-product-id="${item.id}" style="font-size: 14px; padding: 2px 6px; margin-top: 4px;">➕</button>
                         <button class="decrease-item-btn" data-product-id="${item.id}" style="font-size: 14px; padding: 2px 6px; margin-top: 4px;">➖</button>
                         <button class="remove-item-btn" data-product-id="${item.id}" style="font-size: 14px; padding: 2px 6px; margin-top: 4px;">❌</button>
                     </div>
@@ -1726,6 +1727,18 @@
             } else {
                 console.log(`Error: No se encontró el producto con ID ${productId} en el carrito.`);
                 showAlert('❌ Error al reducir la cantidad', 'error');
+            }
+        }
+
+        function increaseFromCart(productId) {
+            const item = cart.find(item => String(item.id) === String(productId));
+            if (item) {
+                item.cantidad += 1;
+                showAlert('➕ Cantidad incrementada', 'success');
+                updateCart();
+            } else {
+                console.log(`Error: No se encontró el producto con ID ${productId} en el carrito.`);
+                showAlert('❌ Error al incrementar la cantidad', 'error');
             }
         }
 
@@ -2542,6 +2555,9 @@
                 } else if (event.target.classList.contains('decrease-item-btn')) {
                     const productId = event.target.dataset.productId;
                     decreaseFromCart(productId);
+                } else if (event.target.classList.contains('increase-item-btn')) {
+                    const productId = event.target.dataset.productId;
+                    increaseFromCart(productId);
                 }
             });
 
