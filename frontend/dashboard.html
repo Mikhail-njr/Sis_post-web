@@ -56,23 +56,37 @@
                 <button id="refresh-dashboard-btn" class="btn btn-secondary" onclick="DashboardCache.refresh()" style="font-size: 14px; padding: 8px 16px;" title="Actualizar datos del dashboard">
                     🔄 Actualizar
                 </button>
+                <!-- Botón de Notificaciones -->
+                <div style="position: relative;">
+                    <button id="notificationsBtn" class="btn btn-secondary" onclick="toggleNotifications()" style="font-size: 14px; padding: 8px 16px; position: relative;" title="Ver notificaciones">
+                        🔔 Notificaciones
+                    </button>
+                    <span id="notificationsBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold;">0</span>
+                </div>
                 <div id="cache-status" style="font-size: 12px; color: #666;"></div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
-                <!-- Alertas de Cierres Pendientes -->
-                <div id="pendingClosuresAlert" style="display: none; padding: 12px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 2px solid #ffc107; border-radius: 8px; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">⚠️</span>
-                        <div>
-                            <strong style="color: #856404;">Cierres de Caja Pendientes</strong>
-                            <div id="pendingClosuresMessage" style="font-size: 14px; margin-top: 2px;"></div>
+            <!-- Alerta de Cierres Pendientes (oculta, ahora se muestra en modal de notificaciones) -->
+            <div id="pendingClosuresAlert" style="display: none;"></div>
+        </div>
+
+        <!-- Modal de Notificaciones (fuera del contenedor principal para.superposición correcta) -->
+        <div id="notificationsModal" class="edit-modal" style="display: none; z-index: 10000;">
+                    <div class="edit-form" style="max-width: 700px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #444; margin-bottom: 15px;">
+                            <h3 style="margin: 0; color: #e4e9ee;">🔔 Centro de Notificaciones</h3>
+                            <button onclick="toggleNotifications()" style="background: none; border: none; color: #e4e9ee; font-size: 24px; cursor: pointer;">×</button>
                         </div>
-                        <button onclick="dismissPendingAlert()" style="margin-left: auto; background: none; border: none; font-size: 18px; cursor: pointer; color: #856404;">×</button>
-                    </div>
-                    <div style="margin-top: 8px;">
-                        <button onclick="showRetroactiveClosure()" class="btn" style="font-size: 12px; padding: 6px 12px; background: #ffc107; color: #212529; border: 1px solid #ffc107;">
-                            Realizar Cierre Retroactivo
-                        </button>
+                        <div id="notificationsContent" style="flex: 1; overflow-y: auto; padding: 10px;">
+                            <!-- Las notificaciones se cargarán aquí -->
+                        </div>
+                        <div style="padding-top: 15px; border-top: 1px solid #444; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                            <button onclick="markAllNotificationsRead()" class="btn btn-secondary" style="font-size: 14px; padding: 8px 16px;">
+                                ✅ Marcar todo como leído
+                            </button>
+                            <button onclick="toggleNotifications()" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;">
+                                Cerrar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2916,8 +2930,215 @@
             }
         }
 
+        // Función para mostrar modal de backup selectivo
+        function showBackupModal() {
+            const modalContent = `
+                <div class="edit-form" style="max-width: 650px;">
+                    <h3 style="margin-bottom: 20px; color: #1976d2;">💾 Crear Backup Selectivo</h3>
+                    <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                        Selecciona qué datos deseas incluir en el backup. Se creará un archivo JSON con la información seleccionada.
+                    </p>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold;">Seleccionar datos a respaldar:</label>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #1976d2;">
+                                    <input type="checkbox" id="backupProductos" checked style="margin-right: 10px; transform: scale(1.2);">
+                                    📦 Productos
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Inventario completo del sistema
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #4caf50;">
+                                    <input type="checkbox" id="backupClientes" checked style="margin-right: 10px; transform: scale(1.2);">
+                                    👥 Clientes
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Clientes y cuenta corriente
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #f44336;">
+                                    <input type="checkbox" id="backupDeudas" checked style="margin-right: 10px; transform: scale(1.2);">
+                                    💳 Deudas
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Deudas de clientes
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #2196f3;">
+                                    <input type="checkbox" id="backupVentas" checked style="margin-right: 10px; transform: scale(1.2);">
+                                    📊 Ventas
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Registro histórico de ventas
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #ff9800;">
+                                    <input type="checkbox" id="backupProveedores" style="margin-right: 10px; transform: scale(1.2);">
+                                    🏢 Proveedores
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Datos de proveedores
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #9c27b0;">
+                                    <input type="checkbox" id="backupPedidos" style="margin-right: 10px; transform: scale(1.2);">
+                                    📋 Pedidos
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Pedidos a proveedores
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #4caf50;">
+                                    <input type="checkbox" id="backupPromociones" style="margin-right: 10px; transform: scale(1.2);">
+                                    🎯 Promociones
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Promociones activas e inactivas
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #607d8b;">
+                                    <input type="checkbox" id="backupCategorias" style="margin-right: 10px; transform: scale(1.2);">
+                                    🏷️ Categorías
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Categorías de productos
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #795548;">
+                                    <input type="checkbox" id="backupLotes" style="margin-right: 10px; transform: scale(1.2);">
+                                    📦 Lotes
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Control de lotes y vencimientos
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #ff5722;">
+                                    <input type="checkbox" id="backupCierres" checked style="margin-right: 10px; transform: scale(1.2);">
+                                    💰 Cierres de Caja
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Historial de cierres
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #00bcd4;">
+                                    <input type="checkbox" id="backupLog" style="margin-right: 10px; transform: scale(1.2);">
+                                    📝 Registro de Operaciones
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Historial de operaciones
+                                </p>
+                            </div>
+
+                            <div style="border: 2px solid #030303; border-radius: 8px; padding: 12px; background: #fafafa;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #9e9e9e;">
+                                    <input type="checkbox" id="backupStats" style="margin-right: 10px; transform: scale(1.2);">
+                                    📈 Estadísticas
+                                </label>
+                                <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                    Estadísticas generales
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+                        <strong style="color: #1565c0;">💡 Consejo:</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; color: #1565c0;">
+                            Selecciona solo los módulos que necesitas para crear backups más pequeños y rápidos.
+                        </p>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeBackupModal()">Cancelar</button>
+                        <button type="button" class="btn" style="background: #1976d2; color: white;" onclick="executeBackupWithOptions()">
+                            💾 Crear Backup
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const modal = createModal('edit-modal', modalContent);
+
+            // Función para cerrar modal
+            window.closeBackupModal = function() {
+                modal.remove();
+            };
+        }
+
+        // Función para ejecutar backup con las opciones seleccionadas
+        async function executeBackupWithOptions() {
+            // Obtener las opciones seleccionadas
+            const backupOptions = {
+                productos: document.getElementById('backupProductos').checked,
+                clientes: document.getElementById('backupClientes').checked,
+                deudas: document.getElementById('backupDeudas').checked,
+                ventas: document.getElementById('backupVentas').checked,
+                proveedores: document.getElementById('backupProveedores').checked,
+                pedidos: document.getElementById('backupPedidos').checked,
+                promociones: document.getElementById('backupPromociones').checked,
+                categorias: document.getElementById('backupCategorias').checked,
+                lotes: document.getElementById('backupLotes').checked,
+                cierres: document.getElementById('backupCierres').checked,
+                log: document.getElementById('backupLog').checked,
+                stats: document.getElementById('backupStats').checked
+            };
+
+            // Verificar que al menos una opción esté seleccionada
+            const hasSelection = Object.values(backupOptions).some(checked => checked);
+            if (!hasSelection) {
+                alert('Debes seleccionar al menos un módulo para respaldar');
+                return;
+            }
+
+            // Cerrar el modal
+            window.closeBackupModal();
+
+            // Llamar a createBackup con las opciones
+            createBackup(backupOptions);
+        }
+
         // Función para crear backup de datos
-        async function createBackup() {
+        async function createBackup(backupOptions = null) {
+            // Si no hay opciones, usar todas por defecto (compatibilidad con versiones anteriores)
+            const options = backupOptions || {
+                productos: true,
+                clientes: true,
+                deudas: true,
+                ventas: true,
+                proveedores: true,
+                pedidos: true,
+                promociones: true,
+                categorias: true,
+                lotes: true,
+                cierres: true,
+                log: true,
+                stats: true
+            };
+
             // Pedir credenciales primero
             const username = prompt('Usuario:');
             const password = prompt('Contraseña:');
@@ -2926,7 +3147,21 @@
                 return;
             }
 
-            if (!confirm('¿Desea crear una copia de respaldo de todos los datos del sistema? Esto incluirá productos, ventas, proveedores, promociones y cierres de caja.')) {
+            const modulesList = [];
+            if (options.productos) modulesList.push('productos');
+            if (options.clientes) modulesList.push('clientes');
+            if (options.deudas) modulesList.push('deudas');
+            if (options.ventas) modulesList.push('ventas');
+            if (options.proveedores) modulesList.push('proveedores');
+            if (options.pedidos) modulesList.push('pedidos');
+            if (options.promociones) modulesList.push('promociones');
+            if (options.categorias) modulesList.push('categorías');
+            if (options.lotes) modulesList.push('lotes');
+            if (options.cierres) modulesList.push('cierres de caja');
+            if (options.log) modulesList.push('registro de operaciones');
+            if (options.stats) modulesList.push('estadísticas');
+
+            if (!confirm('¿Desea crear una copia de respaldo de los siguientes módulos?\n\n' + modulesList.join('\n - ') + '\n\n¿Continuar?')) {
                 return;
             }
 
@@ -2936,7 +3171,7 @@
                 const headers = { 'Content-Type': 'application/json' };
                 headers['Authorization'] = 'Basic ' + btoa(username + ':' + password);
 
-                // Recolectar todos los datos importantes
+                // Recolectar datos según las opciones seleccionadas
                 const backupData = {
                     timestamp: new Date().toISOString(),
                     version: '1.0',
@@ -2944,95 +3179,174 @@
                 };
 
                 // Productos
-                try {
-                    const productsRes = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
-                    if (productsRes.ok) {
-                        backupData.data.products = await productsRes.json();
+                if (options.productos) {
+                    try {
+                        const productsRes = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
+                        if (productsRes.ok) {
+                            backupData.data.products = await productsRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up products:', e);
+                        backupData.data.products = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up products:', e);
-                    backupData.data.products = [];
+                }
+
+                // Clientes
+                if (options.clientes) {
+                    try {
+                        const customersRes = await fetch(`${window.ApiClient.API_BASE}/customers`, { headers });
+                        if (customersRes.ok) {
+                            backupData.data.customers = await customersRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up customers:', e);
+                        backupData.data.customers = [];
+                    }
+                }
+
+                // Deudas
+                if (options.deudas) {
+                    try {
+                        const debtsRes = await fetch(`${window.ApiClient.API_BASE}/debts`, { headers });
+                        if (debtsRes.ok) {
+                            backupData.data.debts = await debtsRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up debts:', e);
+                        backupData.data.debts = [];
+                    }
                 }
 
                 // Ventas
-                try {
-                    const salesRes = await fetch(`${window.ApiClient.API_BASE}/sales`, { headers });
-                    if (salesRes.ok) {
-                        backupData.data.sales = await salesRes.json();
+                if (options.ventas) {
+                    try {
+                        const salesRes = await fetch(`${window.ApiClient.API_BASE}/sales`, { headers });
+                        if (salesRes.ok) {
+                            backupData.data.sales = await salesRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up sales:', e);
+                        backupData.data.sales = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up sales:', e);
-                    backupData.data.sales = [];
                 }
 
                 // Proveedores
-                try {
-                    const suppliersRes = await fetch(`${window.ApiClient.API_BASE}/suppliers`, { headers });
-                    if (suppliersRes.ok) {
-                        backupData.data.suppliers = await suppliersRes.json();
+                if (options.proveedores) {
+                    try {
+                        const suppliersRes = await fetch(`${window.ApiClient.API_BASE}/suppliers`, { headers });
+                        if (suppliersRes.ok) {
+                            backupData.data.suppliers = await suppliersRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up suppliers:', e);
+                        backupData.data.suppliers = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up suppliers:', e);
-                    backupData.data.suppliers = [];
+                }
+
+                // Pedidos a proveedores
+                if (options.pedidos) {
+                    try {
+                        const ordersRes = await fetch(`${window.ApiClient.API_BASE}/supplier-orders`, { headers });
+                        if (ordersRes.ok) {
+                            backupData.data.supplier_orders = await ordersRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up supplier orders:', e);
+                        backupData.data.supplier_orders = [];
+                    }
                 }
 
                 // Promociones
-                try {
-                    const promotionsRes = await fetch(`${window.ApiClient.API_BASE}/promotions`, { headers });
-                    if (promotionsRes.ok) {
-                        const promotions = await promotionsRes.json();
-                        // Obtener detalles completos de cada promoción
-                        backupData.data.promotions = [];
-                        for (const promo of promotions) {
-                            try {
-                                const detailRes = await fetch(`${window.ApiClient.API_BASE}/promotions/${promo.id}`, { headers });
-                                if (detailRes.ok) {
-                                    const detail = await detailRes.json();
-                                    backupData.data.promotions.push(detail);
-                                } else {
+                if (options.promociones) {
+                    try {
+                        const promotionsRes = await fetch(`${window.ApiClient.API_BASE}/promotions`, { headers });
+                        if (promotionsRes.ok) {
+                            const promotions = await promotionsRes.json();
+                            // Obtener detalles completos de cada promoción
+                            backupData.data.promotions = [];
+                            for (const promo of promotions) {
+                                try {
+                                    const detailRes = await fetch(`${window.ApiClient.API_BASE}/promotions/${promo.id}`, { headers });
+                                    if (detailRes.ok) {
+                                        const detail = await detailRes.json();
+                                        backupData.data.promotions.push(detail);
+                                    } else {
+                                        backupData.data.promotions.push(promo);
+                                    }
+                                } catch (e) {
                                     backupData.data.promotions.push(promo);
                                 }
-                            } catch (e) {
-                                backupData.data.promotions.push(promo);
                             }
                         }
+                    } catch (e) {
+                        console.warn('Error backing up promotions:', e);
+                        backupData.data.promotions = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up promotions:', e);
-                    backupData.data.promotions = [];
+                }
+
+                // Categorías
+                if (options.categorias) {
+                    try {
+                        const categoriesRes = await fetch(`${window.ApiClient.API_BASE}/categories`, { headers });
+                        if (categoriesRes.ok) {
+                            backupData.data.categories = await categoriesRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up categories:', e);
+                        backupData.data.categories = [];
+                    }
+                }
+
+                // Lotes
+                if (options.lotes) {
+                    try {
+                        const lotesRes = await fetch(`${window.ApiClient.API_BASE}/lotes`, { headers });
+                        if (lotesRes.ok) {
+                            backupData.data.lotes = await lotesRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up lotes:', e);
+                        backupData.data.lotes = [];
+                    }
                 }
 
                 // Cierres de caja
-                try {
-                    const cierresRes = await fetch(`${window.ApiClient.API_BASE}/cierres`, { headers });
-                    if (cierresRes.ok) {
-                        backupData.data.cierres_caja = await cierresRes.json();
+                if (options.cierres) {
+                    try {
+                        const cierresRes = await fetch(`${window.ApiClient.API_BASE}/cierres`, { headers });
+                        if (cierresRes.ok) {
+                            backupData.data.cierres_caja = await cierresRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up cierres:', e);
+                        backupData.data.cierres_caja = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up cierres:', e);
-                    backupData.data.cierres_caja = [];
                 }
 
                 // Registro de operaciones
-                try {
-                    const operationsRes = await fetch(`${window.ApiClient.API_BASE}/operations-log?limit=10000`, { headers });
-                    if (operationsRes.ok) {
-                        backupData.data.operations_log = await operationsRes.json();
+                if (options.log) {
+                    try {
+                        const operationsRes = await fetch(`${window.ApiClient.API_BASE}/operations-log?limit=10000`, { headers });
+                        if (operationsRes.ok) {
+                            backupData.data.operations_log = await operationsRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up operations log:', e);
+                        backupData.data.operations_log = [];
                     }
-                } catch (e) {
-                    console.warn('Error backing up operations log:', e);
-                    backupData.data.operations_log = [];
                 }
 
                 // Estadísticas generales
-                try {
-                    const statsRes = await fetch(`${window.ApiClient.API_BASE}/stats`, { headers });
-                    if (statsRes.ok) {
-                        backupData.data.stats = await statsRes.json();
+                if (options.stats) {
+                    try {
+                        const statsRes = await fetch(`${window.ApiClient.API_BASE}/stats`, { headers });
+                        if (statsRes.ok) {
+                            backupData.data.stats = await statsRes.json();
+                        }
+                    } catch (e) {
+                        console.warn('Error backing up stats:', e);
+                        backupData.data.stats = {};
                     }
-                } catch (e) {
-                    console.warn('Error backing up stats:', e);
-                    backupData.data.stats = {};
                 }
 
                 // Crear archivo JSON y descargarlo
@@ -5534,7 +5848,7 @@
             const action = document.getElementById('dataActionSelect').value;
             switch(action) {
                 case 'backup':
-                    createBackup();
+                    showBackupModal();
                     break;
                 case 'restore':
                     document.getElementById('backupFileInput').click();
@@ -7405,12 +7719,286 @@
             } catch (error) {
                 console.error('Error verificando cierres pendientes:', error);
             }
+            
+            // También cargar el contador de notificaciones para el badge
+            if (typeof loadNotificationsCount === 'function') {
+                loadNotificationsCount();
+            }
         }
 
         // Función para descartar alerta de cierres pendientes
         function dismissPendingAlert() {
             document.getElementById('pendingClosuresAlert').style.display = 'none';
         }
+
+        // ==========================================
+        // SISTEMA DE NOTIFICACIONES CENTRALIZADO
+        // ==========================================
+        
+        let notificationsData = {
+            cierresPendientes: 0,
+            productosVencidos: [],
+            productosProximosVencer: [],
+            read: false
+        };
+
+        // Función para alternar el modal de notificaciones
+        function toggleNotifications() {
+            const modal = document.getElementById('notificationsModal');
+            if (modal.style.display === 'none' || !modal.style.display) {
+                modal.style.display = 'flex';
+                loadAllNotifications();
+            } else {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Función para cargar todas las notificaciones
+        async function loadAllNotifications() {
+            const content = document.getElementById('notificationsContent');
+            content.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">🔄 Cargando notificaciones...</div>';
+            
+            let html = '';
+            let totalNotifications = 0;
+
+            // 1. Notificaciones de Cierres Pendientes
+            try {
+                const closuresResponse = await fetch('/api/pending-closures', {
+                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                });
+                const closuresData = await closuresResponse.json();
+                
+                if (closuresData.has_pending_closures) {
+                    totalNotifications++;
+                    html += `
+                        <div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 24px;">⚠️</span>
+                                <strong style="color: #856404; font-size: 16px;">Cierres de Caja Pendientes</strong>
+                                <span style="background: #ffc107; color: #212529; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">${closuresData.pending_count || '?'}</span>
+                            </div>
+                            <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px;">${closuresData.message || 'Hay cierres de caja pendientes'}</p>
+                            <button onclick="showRetroactiveClosure(); toggleNotifications();" class="btn" style="font-size: 12px; padding: 6px 12px; background: #ffc107; color: #212529; border: 1px solid #ffc107;">
+                                📋 Realizar Cierre Retroactivo
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error cargando cierres pendientes:', error);
+            }
+
+            // 2. Notificaciones de Productos Vencidos y Próximos a Vencer
+            try {
+                const productsResponse = await fetch('/api/products', {
+                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                });
+                const products = await productsResponse.json();
+                
+                const expiredProducts = products.filter(p => p.estado_vencimiento === 'vencido');
+                const expiringSoonProducts = products.filter(p => p.estado_vencimiento === 'proximo_vencer');
+                
+                // Guardar datos para el badge
+                notificationsData.productosVencidos = expiredProducts;
+                notificationsData.productosProximosVencer = expiringSoonProducts;
+
+                if (expiredProducts.length > 0 || expiringSoonProducts.length > 0) {
+                    totalNotifications += expiredProducts.length + expiringSoonProducts.length;
+                    
+                    html += `<div style="margin-bottom: 20px;">`;
+                    
+                    // Productos Vencidos
+                    if (expiredProducts.length > 0) {
+                        html += `
+                            <div style="padding: 15px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <span style="font-size: 24px;">🗑️</span>
+                                    <strong style="color: #721c24; font-size: 16px;">Productos Vencidos</strong>
+                                    <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">${expiredProducts.length}</span>
+                                </div>
+                                <div style="max-height: 150px; overflow-y: auto;">
+                                    <table style="width: 100%; font-size: 12px; color: #721c24;">
+                                        <tr style="border-bottom: 1px solid #f5c6cb;">
+                                            <th style="text-align: left; padding: 4px;">Producto</th>
+                                            <th style="text-align: left; padding: 4px;">Código</th>
+                                            <th style="text-align: left; padding: 4px;">Venció</th>
+                                        </tr>
+                                        ${expiredProducts.slice(0, 10).map(p => `
+                                            <tr style="border-bottom: 1px solid #f5c6cb;">
+                                                <td style="padding: 4px;">${p.nombre}</td>
+                                                <td style="padding: 4px;">${p.codigo}</td>
+                                                <td style="padding: 4px;">${new Date(p.fecha_vencimiento).toLocaleDateString('es-AR')}</td>
+                                            </tr>
+                                        `).join('')}
+                                        ${expiredProducts.length > 10 ? `<tr><td colspan="3" style="padding: 4px; text-align: center; font-style: italic;">... y ${expiredProducts.length - 10} más</td></tr>` : ''}
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Productos Próximos a Vencer
+                    if (expiringSoonProducts.length > 0) {
+                        html += `
+                            <div style="padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <span style="font-size: 24px;">⏰</span>
+                                    <strong style="color: #856404; font-size: 16px;">Productos Próximos a Vencer</strong>
+                                    <span style="background: #ffc107; color: #212529; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">${expiringSoonProducts.length}</span>
+                                </div>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    <table style="width: 100%; font-size: 12px; color: #856404;">
+                                        <tr style="border-bottom: 1px solid #ffeeba;">
+                                            <th style="text-align: left; padding: 4px;">Producto</th>
+                                            <th style="text-align: left; padding: 4px;">Código</th>
+                                            <th style="text-align: left; padding: 4px;">Vence</th>
+                                            <th style="text-align: left; padding: 4px;">Días</th>
+                                        </tr>
+                                        ${expiringSoonProducts.slice(0, 15).map(p => `
+                                            <tr style="border-bottom: 1px solid #ffeeba;">
+                                                <td style="padding: 4px;">${p.nombre}</td>
+                                                <td style="padding: 4px;">${p.codigo}</td>
+                                                <td style="padding: 4px;">${new Date(p.fecha_vencimiento).toLocaleDateString('es-AR')}</td>
+                                                <td style="padding: 4px; font-weight: bold;">${p.dias_para_vencer}</td>
+                                            </tr>
+                                        `).join('')}
+                                        ${expiringSoonProducts.length > 15 ? `<tr><td colspan="4" style="padding: 4px; text-align: center; font-style: italic;">... y ${expiringSoonProducts.length - 15} más</td></tr>` : ''}
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `</div>`;
+                }
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+            }
+
+            // 3. Notificaciones de Stock Bajo (si hay productos con stock bajo)
+            try {
+                const productsResponse = await fetch('/api/products', {
+                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                });
+                const products = await productsResponse.json();
+                
+                const lowStockProducts = products.filter(p => p.stock <= 5 && p.stock > 0);
+                const outOfStockProducts = products.filter(p => p.stock === 0);
+                
+                if (outOfStockProducts.length > 0 || lowStockProducts.length > 0) {
+                    totalNotifications += outOfStockProducts.length + lowStockProducts.length;
+                    
+                    html += `<div style="margin-bottom: 20px;">`;
+                    
+                    if (outOfStockProducts.length > 0) {
+                        html += `
+                            <div style="padding: 15px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <span style="font-size: 24px;">🚫</span>
+                                    <strong style="color: #721c24; font-size: 16px;">Productos Sin Stock</strong>
+                                    <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">${outOfStockProducts.length}</span>
+                                </div>
+                                <div style="max-height: 100px; overflow-y: auto; font-size: 12px; color: #721c24;">
+                                    ${outOfStockProducts.slice(0, 5).map(p => `<div>• ${p.nombre} (${p.codigo})</div>`).join('')}
+                                    ${outOfStockProducts.length > 5 ? `<div style="font-style: italic;">... y ${outOfStockProducts.length - 5} más</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (lowStockProducts.length > 0) {
+                        html += `
+                            <div style="padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <span style="font-size: 24px;">📦</span>
+                                    <strong style="color: #856404; font-size: 16px;">Stock Bajo (≤5 unidades)</strong>
+                                    <span style="background: #ffc107; color: #212529; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">${lowStockProducts.length}</span>
+                                </div>
+                                <div style="max-height: 100px; overflow-y: auto; font-size: 12px; color: #856404;">
+                                    ${lowStockProducts.slice(0, 5).map(p => `<div>• ${p.nombre} (${p.codigo}) - Stock: ${p.stock}</div>`).join('')}
+                                    ${lowStockProducts.length > 5 ? `<div style="font-style: italic;">... y ${lowStockProducts.length - 5} más</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `</div>`;
+                }
+            } catch (error) {
+                console.error('Error cargando stock:', error);
+            }
+
+            // Si no hay notificaciones
+            if (html === '') {
+                html = `
+                    <div style="text-align: center; padding: 40px; color: #28a745;">
+                        <span style="font-size: 48px;">✅</span>
+                        <p style="font-size: 18px; margin-top: 15px;">¡Todo al día!</p>
+                        <p style="color: #666; font-size: 14px;">No hay notificaciones pendientes.</p>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+            updateNotificationsBadge(totalNotifications);
+        }
+
+        // Función para actualizar el badge de notificaciones
+        function updateNotificationsBadge(count) {
+            const badge = document.getElementById('notificationsBadge');
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Función para marcar todas las notificaciones como leídas
+        function markAllNotificationsRead() {
+            notificationsData.read = true;
+            updateNotificationsBadge(0);
+            showAlert('Todas las notificaciones marcadas como leídas', 'success');
+        }
+
+        // Función para cargar el contador de notificaciones (para el badge)
+        async function loadNotificationsCount() {
+            try {
+                let totalCount = 0;
+
+                // Verificar cierres pendientes
+                try {
+                    const closuresResponse = await fetch('/api/pending-closures', {
+                        headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                    });
+                    const closuresData = await closuresResponse.json();
+                    if (closuresData.has_pending_closures) {
+                        totalCount += closuresData.pending_count || 1;
+                    }
+                } catch (e) {}
+
+                // Verificar productos próximos a vencer
+                try {
+                    const productsResponse = await fetch('/api/products', {
+                        headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                    });
+                    const products = await productsResponse.json();
+                    const expiredProducts = products.filter(p => p.estado_vencimiento === 'vencido');
+                    const expiringSoonProducts = products.filter(p => p.estado_vencimiento === 'proximo_vencer');
+                    const lowStockProducts = products.filter(p => p.stock <= 5);
+                    
+                    totalCount += expiredProducts.length + expiringSoonProducts.length + lowStockProducts.length;
+                } catch (e) {}
+
+                updateNotificationsBadge(totalCount);
+            } catch (error) {
+                console.error('Error cargando contador de notificaciones:', error);
+            }
+        }
+
+        // ==========================================
+        // FIN DEL SISTEMA DE NOTIFICACIONES
+        // ==========================================
 
         // Función para mostrar modal de cierre retroactivo
         function showRetroactiveClosure() {

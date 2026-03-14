@@ -3224,19 +3224,28 @@ app.get('/api/products', async (req, res) => {
                 CASE WHEN pi.descuento_porcentaje > 0 THEN ROUND(p.precio * (1 - pi.descuento_porcentaje / 100), 2) ELSE p.precio END as precio_con_descuento,
                 COALESCE(SUM(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual ELSE 0 END), 0) as stock_calculado,
                 COUNT(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN 1 END) as cantidad_lotes,
-                MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) as proximo_vencimiento,
+                -- Obtener la fecha maxima de vencimiento de lotes NO vencidos (vigentes o proximos a vencer)
+                COALESCE(
+                    MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END),
+                    MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)
+                ) as proximo_vencimiento,
+                -- Verificar si hay lotes vigentes con stock (no vencidos)
                 CASE
-                      WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) < date('now', '-3 hours') THEN 'tiene_vencidos'
-                      WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
-                      ELSE 'vigente'
-                  END as estado_vencimiento,
-                  CASE
-                      WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) IS NULL THEN NULL
-                      WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) < date('now', '-3 hours') THEN
-                          -CAST((JULIANDAY(date('now', '-3 hours')) - JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END))) AS INTEGER)
-                      ELSE
-                          CAST((JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)) - JULIANDAY(date('now', '-3 hours'))) AS INTEGER)
-                  END as dias_para_vencer,
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual END) > 0 THEN
+                        CASE
+                            WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
+                            ELSE 'vigente'
+                        END
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) >= date('now', '-3 hours') THEN 'proximo_vencer'
+                    ELSE 'tiene_vencidos'
+                END as estado_vencimiento,
+                CASE
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END) IS NOT NULL THEN
+                        CAST((JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END)) - JULIANDAY(date('now', '-3 hours'))) AS INTEGER)
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) IS NOT NULL THEN
+                        -CAST((JULIANDAY(date('now', '-3 hours')) - JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END))) AS INTEGER)
+                    ELSE NULL
+                END as dias_para_vencer,
                   -- Campos calculados de ganancia (usando costo_unitario del lote más reciente)
                   MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.costo_unitario END) as costo_lote_mas_reciente,
                   CASE
@@ -3512,18 +3521,27 @@ app.get('/api/products/search', async (req, res) => {
                 CASE WHEN pi.descuento_porcentaje > 0 THEN ROUND(p.precio * (1 - pi.descuento_porcentaje / 100), 2) ELSE p.precio END as precio_con_descuento,
                 COALESCE(SUM(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual ELSE 0 END), 0) as stock,
                 COUNT(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN 1 END) as cantidad_lotes,
-                MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) as proximo_vencimiento,
+                -- Obtener la fecha maxima de vencimiento de lotes NO vencidos (vigentes o proximos a vencer)
+                COALESCE(
+                    MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END),
+                    MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)
+                ) as proximo_vencimiento,
+                -- Verificar si hay lotes vigentes con stock (no vencidos)
                 CASE
-                   WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) < date('now', '-3 hours') THEN 'vencido'
-                   WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
-                   ELSE 'vigente'
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual END) > 0 THEN
+                        CASE
+                            WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
+                            ELSE 'vigente'
+                        END
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) >= date('now', '-3 hours') THEN 'proximo_vencer'
+                    ELSE 'vencido'
                 END as estado_vencimiento,
                 CASE
-                    WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) IS NULL THEN NULL
-                    WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) < date('now', '-3 hours') THEN
-                        -CAST((JULIANDAY(date('now', '-3 hours')) - JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END))) AS INTEGER)
-                    ELSE
-                        CAST((JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)) - JULIANDAY(date('now', '-3 hours'))) AS INTEGER)
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END) IS NOT NULL THEN
+                        CAST((JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END)) - JULIANDAY(date('now', '-3 hours'))) AS INTEGER)
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) IS NOT NULL THEN
+                        CAST((JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)) - JULIANDAY(date('now', '-3 hours'))) AS INTEGER)
+                    ELSE NULL
                 END as dias_para_vencer
             FROM productos p
             LEFT JOIN promocion_items pi ON p.id = pi.producto_id
@@ -3644,12 +3662,21 @@ app.get('/api/products/with-discounts', async (req, res) => {
                 COALESCE(pi.descuento_porcentaje, 0) as descuento_porcentaje,
                 CASE WHEN pi.descuento_porcentaje > 0 THEN 1 ELSE 0 END as en_promocion,
                 CASE WHEN pi.descuento_porcentaje > 0 THEN ROUND(p.precio * (1 - pi.descuento_porcentaje / 100), 2) ELSE p.precio END as precio_con_descuento,
-                COALESCE(SUM(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now') THEN l.cantidad_actual ELSE 0 END), 0) as stock,
-                MIN(l.fecha_vencimiento) as proximo_vencimiento,
+                COALESCE(SUM(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual ELSE 0 END), 0) as stock,
+                -- Obtener la fecha maxima de vencimiento de lotes NO vencidos (vigentes o proximos a vencer)
+                COALESCE(
+                    MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END),
+                    MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END)
+                ) as proximo_vencimiento,
+                -- Verificar si hay lotes vigentes con stock (no vencidos)
                 CASE
-                    WHEN MIN(l.fecha_vencimiento) < date('now', '-3 hours') THEN 'tiene_vencidos'
-                    WHEN MIN(l.fecha_vencimiento) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
-                    ELSE 'vigente'
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual END) > 0 THEN
+                        CASE
+                            WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.fecha_vencimiento END) <= date('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
+                            ELSE 'vigente'
+                        END
+                    WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN l.fecha_vencimiento END) >= date('now', '-3 hours') THEN 'proximo_vencer'
+                    ELSE 'tiene_vencidos'
                 END as estado_vencimiento
             FROM productos p
             LEFT JOIN promocion_items pi ON p.id = pi.producto_id
@@ -7858,18 +7885,27 @@ app.get('/api/dashboard-data', async (req, res) => {
                     p.id, p.codigo, p.nombre, p.precio, p.categoria, p.codigo_barras,
                     COALESCE(SUM(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual ELSE 0 END), 0) as stock,
                     COUNT(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN 1 END) as cantidad_lotes,
-                    MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) as proximo_vencimiento,
+                    -- Obtener la fecha maxima de vencimiento de lotes NO vencidos (vigentes o proximos a vencer)
+                    COALESCE(
+                        MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN DATE(l.fecha_vencimiento) END),
+                        MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END)
+                    ) as proximo_vencimiento,
+                    -- Verificar si hay lotes vigentes con stock (no vencidos)
                     CASE
-                        WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) < DATE('now', '-3 hours') THEN 'tiene_vencidos'
-                        WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) <= DATE('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
-                        ELSE 'vigente'
+                        WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN l.cantidad_actual END) > 0 THEN
+                            CASE
+                                WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN DATE(l.fecha_vencimiento) END) <= DATE('now', '+7 days', '-3 hours') THEN 'proximo_vencer'
+                                ELSE 'vigente'
+                            END
+                        WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) >= DATE('now', '-3 hours') THEN 'proximo_vencer'
+                        ELSE 'tiene_vencidos'
                     END as estado_vencimiento,
                     CASE
-                        WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) IS NULL THEN NULL
-                        WHEN MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) < DATE('now', '-3 hours') THEN
-                            -CAST((JULIANDAY(DATE('now', '-3 hours')) - JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END))) AS INTEGER)
-                        ELSE
-                            CAST((JULIANDAY(MIN(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END)) - JULIANDAY(DATE('now', '-3 hours'))) AS INTEGER)
+                        WHEN MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN DATE(l.fecha_vencimiento) END) IS NOT NULL THEN
+                            CAST((JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND DATE(l.fecha_vencimiento) >= DATE('now', '-3 hours') THEN DATE(l.fecha_vencimiento) END)) - JULIANDAY(DATE('now', '-3 hours'))) AS INTEGER)
+                        WHEN MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END) IS NOT NULL THEN
+                            -CAST((JULIANDAY(DATE('now', '-3 hours')) - JULIANDAY(MAX(CASE WHEN l.estado = 'activo' AND l.cantidad_actual > 0 THEN DATE(l.fecha_vencimiento) END))) AS INTEGER)
+                        ELSE NULL
                     END as dias_para_vencer
                 FROM productos p
                 LEFT JOIN lotes l ON p.id = l.producto_id AND l.estado = 'activo'

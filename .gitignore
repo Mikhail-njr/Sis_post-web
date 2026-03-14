@@ -28,6 +28,19 @@ yarn-error.log*
 
 # Temporary files
 tmp/
+
+# Database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Index files
+code-analysis/*.db
+code-analysis/code-index.db
+
+# System files
+backend/sysdata.dat
+*.dat
 temp/
 
 # Large model files (except config)

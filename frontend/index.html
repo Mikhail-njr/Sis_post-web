@@ -647,7 +647,6 @@
                     </select>
                     <button onclick="searchProducts()">Buscar</button>
                     <button id="barcodeScanBtn" onclick="toggleUSBScanner()" style="background: #17a2b8; color: white;">📱 Activar Escáner</button>
-                    <button onclick="window.location.href='barcode-scanner.html'" style="background: #17a2b8; color: white;">📱 Escáner Avanzado</button>
                     <button id="promotionFilterBtn" onclick="togglePromotionFilter()" style="background: #ff6b6b; color: white;">🎉 Solo Promociones</button>
                 </div>
 
@@ -777,20 +776,6 @@
           <button type="button" onclick="closeClienteSelectorModal()" style="padding:10px 20px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer;">Cancelar</button>
         </div>
       </div>
-    </div>
-
-    <!-- Modal de alertas de vencimiento -->
-    <div id="expirationAlertsModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <span class="close">&times;</span>
-            <h2>⚠️ Alertas de Vencimiento</h2>
-            <div id="expirationAlertsContent">
-                <!-- Alertas se mostrarán aquí -->
-            </div>
-            <div class="lote-buttons">
-                <button id="closeExpirationAlertsBtn" class="btn btn-secondary">Cerrar</button>
-            </div>
-        </div>
     </div>
 
 
@@ -2768,88 +2753,6 @@
         window.loadCustomers = loadCustomers;
         window.selectCustomer = selectCustomer;
         window.updateCustomerInfo = updateCustomerInfo;
-
-        // Funciones para alertas de vencimiento
-        async function checkExpirationAlerts() {
-            try {
-                const headers = { 'Content-Type': 'application/json' };
-                if (authCredentials) {
-                    headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-                }
-
-                const res = await fetch(`${API_BASE}/products`, { headers });
-                if (res.status === 401) return; // No mostrar alertas si no está autenticado
-
-                const products = await res.json();
-                const expiredProducts = products.filter(p => p.estado_vencimiento === 'vencido');
-                const expiringSoonProducts = products.filter(p => p.estado_vencimiento === 'proximo_vencer');
-
-                if (expiredProducts.length > 0 || expiringSoonProducts.length > 0) {
-                    showExpirationAlerts(expiredProducts, expiringSoonProducts);
-                }
-            } catch (error) {
-                console.error('Error checking expiration alerts:', error);
-            }
-        }
-
-        function showExpirationAlerts(expired, expiringSoon) {
-            const modal = document.getElementById('expirationAlertsModal');
-            const content = document.getElementById('expirationAlertsContent');
-
-            let html = '';
-
-            if (expired.length > 0) {
-                html += '<h3 style="color: #dc3545;">⚠️ Productos Vencidos</h3>';
-                html += '<ul>';
-                expired.forEach(product => {
-                    html += `<li style="color: #dc3545; margin-bottom: 5px;">
-                        <strong>${product.nombre}</strong> (${product.codigo}) -
-                        Venció el ${new Date(product.fecha_vencimiento).toLocaleDateString('es-AR')}
-                    </li>`;
-                });
-                html += '</ul><br>';
-            }
-
-            if (expiringSoon.length > 0) {
-                html += '<h3 style="color: #ffc107;">⏰ Productos Próximos a Vencer</h3>';
-                html += '<ul>';
-                expiringSoon.forEach(product => {
-                    html += `<li style="color: #ffc107; margin-bottom: 5px;">
-                        <strong>${product.nombre}</strong> (${product.codigo}) -
-                        Vence en ${product.dias_para_vencer} días (${new Date(product.fecha_vencimiento).toLocaleDateString('es-AR')})
-                    </li>`;
-                });
-                html += '</ul>';
-            }
-
-            content.innerHTML = html;
-            modal.style.display = 'flex';
-        }
-
-        // Event listener para cerrar modal de alertas
-        document.getElementById('closeExpirationAlertsBtn').addEventListener('click', function() {
-            document.getElementById('expirationAlertsModal').style.display = 'none';
-        });
-
-        document.getElementById('expirationAlertsModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-
-        // Verificar alertas de vencimiento al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            // ... existing code ...
-
-            // Verificar alertas de vencimiento después de cargar productos
-            setTimeout(checkExpirationAlerts, 2000);
-
-            // No reproducir sonido automáticamente (bloqueado por navegador)
-            // El usuario debe hacer clic manualmente en el botón de sonido
-
-            // Inicializar detección de escáner USB
-            initUSBScannerDetection();
-        });
 
 
         // Variable global para rastrear el estado del escáner
