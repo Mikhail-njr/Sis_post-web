@@ -1,0 +1,18 @@
+<!-- Sección de Promociones -->
+        <div id="promociones-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">🎉 Promociones</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openCreatePromotionModal()" style="font-size: 14px; padding: 10px 20px; background: #28a745;">
+                        ➕ Crear Promoción
+                    </button>
+                    <button class="btn btn-secondary" onclick="cleanDuplicatePromotions()" style="font-size: 14px; padding: 10px 20px; background: #ff6b6b; color: white; margin-left: 10px;" title="Limpia productos que están en múltiples promociones">
+                        🧹 Limpiar Duplicados
+                    </button>
+                </div>
+                <div class="loading">Cargando promociones...</div>
+                <div id="promociones-container" style="display:none;"></div>
+            </div>

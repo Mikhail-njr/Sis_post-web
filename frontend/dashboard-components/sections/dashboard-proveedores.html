@@ -1,0 +1,59 @@
+<!-- Sección de Proveedores -->
+        <div id="proveedores-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">🏢 Proveedores</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary btn-spacing" onclick="openAddSupplierModal()">
+                        ➕ Agregar Proveedor
+                    </button>
+                    <button class="btn btn-secondary btn-spacing" onclick="toggleProveedoresTable()">
+                        👁️ Mostrar/Ocultar Tabla
+                    </button>
+                </div>
+                <div class="loading">Cargando proveedores...</div>
+                <table id="proveedores-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Proveedor</th>
+                            <th>Nombre de Contacto</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Productos/Servicios</th>
+                            <th>Cond. de Pago</th>
+                            <th>Estatus</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <!-- Sub-sección de Pedidos a Proveedores -->
+                <div style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+                    <h3 style="color: #f3f5f7; margin-bottom: 15px;">📋 Pedidos a Proveedores</h3>
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-primary btn-spacing" onclick="openCreateOrderModal()">
+                            ➕ Crear Nuevo Pedido
+                        </button>
+                    </div>
+                    <div class="loading" id="orders-loading">Cargando pedidos...</div>
+                    <table id="pedidos-table" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Número de Pedido</th>
+                                <th>Proveedor</th>
+                                <th>Fecha Pedido</th>
+                                <th>Fecha de Entrega</th>
+                                <th>Estado</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>

@@ -1,0 +1,66 @@
+<!-- Modal de crear promoción -->
+        <div id="createPromotionModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 800px; width: 95%;">
+                <h3 style="margin-bottom: 20px; color: #f0f3f7;">🎉 Crear Nueva Promoción</h3>
+                <form id="createPromotionForm">
+
+                    <div class="form-group">
+                        <label for="promotionTitle">Título de la Promoción:</label>
+                        <div style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <input type="text" id="promotionTitle" required placeholder="Ej: Semana de Descuentos" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;">
+                            </div>
+                            <div style="position: relative;">
+                                <button type="button" id="iconSelectorBtn" class="btn btn-secondary" style="padding: 10px 15px; font-size: 16px; min-width: 60px; display: flex; align-items: center; justify-content: center;">
+                                    <span id="selectedIconDisplay">🎉</span>
+                                    <span style="margin-left: 5px;">▼</span>
+                                </button>
+                                <div id="iconDropdown" style="display: none; position: absolute; top: 100%; left: auto; right: 0; background: white; border: 2px solid #e1e7f2; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 250px; overflow-y: auto;">
+                                    <div style="padding: 10px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 1px solid #dee2e6;">
+                                        <small style="color: #666; font-weight: bold;">Selecciona un icono:</small>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px;">
+                                        <!-- Celebración y Eventos -->
+                                        <button type="button" class="icon-option" data-icon="🎉" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Fiesta">🎉</button>
+                                        <button type="button" class="icon-option" data-icon="🎊" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Confeti">🎊</button>
+                                        <button type="button" class="icon-option" data-icon="🎁" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Regalo">🎁</button>
+                                        <button type="button" class="icon-option" data-icon="🏆" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Trofeo">🏆</button>
+
+                                        <!-- Dinero y Ofertas -->
+                                        <button type="button" class="icon-option" data-icon="💰" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Dinero">💰</button>
+                                        <button type="button" class="icon-option" data-icon="💸" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Billetes Volando">💸</button>
+                                        <button type="button" class="icon-option" data-icon="🏷️" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Etiqueta">🏷️</button>
+                                        <button type="button" class="icon-option" data-icon="📉" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Descuento">📉</button>
+
+                                        <!-- Energía y Acción -->
+                                        <button type="button" class="icon-option" data-icon="🔥" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Fuego">🔥</button>
+                                        <button type="button" class="icon-option" data-icon="⚡" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Rayo">⚡</button>
+                                        <button type="button" class="icon-option" data-icon="💥" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Explosión">💥</button>
+                                        <button type="button" class="icon-option" data-icon="🚀" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Cohete">🚀</button>
+
+                                        <!-- Estrellas y Brillo -->
+                                        <button type="button" class="icon-option" data-icon="⭐" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Estrella">⭐</button>
+                                        <button type="button" class="icon-option" data-icon="🌟" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Estrella Brillante">🌟</button>
+                                        <button type="button" class="icon-option" data-icon="✨" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Brillo">✨</button>
+                                        <button type="button" class="icon-option" data-icon="💎" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Diamante">💎</button>
+
+                                        <!-- Comunicación y Marketing -->
+                                        <button type="button" class="icon-option" data-icon="📢" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Anuncio">📢</button>
+                                        <button type="button" class="icon-option" data-icon="📣" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Megáfono">📣</button>
+                                        <button type="button" class="icon-option" data-icon="🎯" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Diana">🎯</button>
+                                        <button type="button" class="icon-option" data-icon="🎪" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Circo">🎪</button>
+
+                                        <!-- Creatividad y Arte -->
+                                        <button type="button" class="icon-option" data-icon="🎨" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Arte">🎨</button>
+                                        <button type="button" class="icon-option" data-icon="🎭" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Teatro">🎭</button>
+                                        <button type="button" class="icon-option" data-icon="🌈" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Arcoíris">🌈</button>
+                                        <button type="button" class="icon-option" data-icon="🎶" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Música">🎶</button>
+
+                                        <!-- Temporada y Eventos Especiales -->
+                                        <button type="button" class="icon-option" data-icon="🎄" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Navidad">🎄</button>
+                                        <button type="button" class="icon-option" data-icon="🥂" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Brindis">🥂</button>
+                                        <button type="button" class="icon-option" data-icon="🍾" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Champán">🍾</button>
+                                        <button type="button" class="icon-option" data-icon="🎂" style="font-size: 20px; padding: 8px; border: 2px solid #030303; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s;" title="Pastel">🎂</button>
+                                    </div>
+                                </div>
+                            </div>

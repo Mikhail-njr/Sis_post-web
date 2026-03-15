@@ -1,0 +1,48 @@
+<!-- Modal de opciones de reporte -->
+        <div id="reportOptionsModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 500px; width: 90%;">
+                <h3 style="margin-bottom: 20px; color: #f2f4f7;">📊 Opciones del Reporte</h3>
+                <p style="margin-bottom: 20px; color: #f3c3c3; font-size: 14px;">Seleccione las secciones que desea incluir en el reporte:</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeFacturas" checked style="margin-right: 10px;">
+                        🧾 <strong>Facturas</strong> - Detalle de todas las ventas realizadas
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeCierres" checked style="margin-right: 10px;">
+                        📋 <strong>Cierres de Caja</strong> - Historial de cierres de caja
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeProductos" checked style="margin-right: 10px;">
+                        📦 <strong>Productos</strong> - Lista de productos disponibles
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeProveedores" style="margin-right: 10px;">
+                        🏢 <strong>Proveedores</strong> - Información de proveedores
+                    </label>
+
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeLotes" style="margin-right: 10px;">
+                        📅 <strong>Lotes</strong> - Control de lotes y vencimientos
+                    </label>
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="includeCuentasCorrientes" style="margin-right: 10px;">
+                        👥 <strong>Cuentas Corrientes</strong> - Estado de deudas de clientes
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                    <button type="button" onclick="selectAllSections()" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 10px;">Seleccionar Todo</button>
+                    <button type="button" onclick="deselectAllSections()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Deseleccionar Todo</button>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeReportOptionsModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="generateSelectedReport()">Generar Reporte</button>
+                </div>
+            </div>
+        </div>

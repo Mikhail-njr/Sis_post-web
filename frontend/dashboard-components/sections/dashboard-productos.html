@@ -1,0 +1,37 @@
+<!-- Sección de Productos -->
+        <div id="productos-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📦 Productos Disponibles</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div class="margin-bottom-20">
+                    <button class="btn btn-primary btn-spacing" onclick="openAddProductModal()">
+                        ➕ Agregar Nuevo Producto
+                    </button>
+                </div>
+                <div class="margin-bottom-20">
+                    <button class="btn btn-secondary" onclick="alert('Usa Ctrl+F para buscar en la página')">🔍 Buscar</button>
+                    <button id="sortBtn" class="btn btn-secondary margin-left-10" onclick="toggleSortMode()">📊 Stock ↓</button>
+                </div>
+                <div class="loading">Cargando productos...</div>
+                <table id="productos-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Seleccionar</th>
+                            <th>ID</th>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Lotes</th>
+                            <th>Vencimiento</th>
+                            <th>Código Barras</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>

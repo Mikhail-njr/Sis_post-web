@@ -1,0 +1,149 @@
+<!-- Modal de editar proveedor -->
+        <div id="editSupplierModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #f4f7fa;">✏️ Editar Proveedor</h3>
+                <form id="editSupplierForm">
+                    <input type="hidden" id="editSupplierId">
+
+                    <div class="form-group">
+                        <label for="editNombreProveedor">Nombre del Proveedor:</label>
+                        <input type="text" id="editNombreProveedor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editNombreContacto">Nombre de Contacto:</label>
+                        <input type="text" id="editNombreContacto">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTelefono">Teléfono:</label>
+                        <input type="tel" id="editTelefono">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEmail">Email:</label>
+                        <input type="email" id="editEmail">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductosServicios">Productos/Servicios:</label>
+                        <textarea id="editProductosServicios" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCondicionesPago">Condiciones de Pago:</label>
+                        <input type="text" id="editCondicionesPago">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEstatus">Estatus:</label>
+                        <select id="editEstatus">
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editNotas">Notas:</label>
+                        <textarea id="editNotas" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditSupplierModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de agregar cliente -->
+        <div id="addClientModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">➕ Agregar Nuevo Cliente</h3>
+                <form id="addClientForm">
+                    <div class="form-group">
+                        <label for="addClientNombre">Nombre del Cliente:</label>
+                        <input type="text" id="addClientNombre" required placeholder="Ej: Juan Pérez">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addClientTelefono">Teléfono:</label>
+                        <input type="tel" id="addClientTelefono" placeholder="Ej: +54 343 456-7890">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addClientDni">DNI:</label>
+                        <input type="text" id="addClientDni" placeholder="Ej: 12.345.678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addClientDireccion">Dirección:</label>
+                        <input type="text" id="addClientDireccion" placeholder="Ej: Av. Siempre Viva 123">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addClientNota">Nota:</label>
+                        <textarea id="addClientNota" placeholder="Información adicional" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddClientModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Cliente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de editar cliente -->
+        <div id="editClientModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">✏️ Editar Cliente</h3>
+                <form id="editClientForm">
+                    <input type="hidden" id="editClientId">
+
+                    <div class="form-group">
+                        <label for="editClientNombre">Nombre del Cliente:</label>
+                        <input type="text" id="editClientNombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientTelefono">Teléfono:</label>
+                        <input type="tel" id="editClientTelefono">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientDni">DNI:</label>
+                        <input type="text" id="editClientDni">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientDireccion">Dirección:</label>
+                        <input type="text" id="editClientDireccion">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientNota">Nota:</label>
+                        <textarea id="editClientNota" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditClientModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de deudas del cliente -->
+        <div id="clientDebtsModal" class="edit-modal">
+            <div class="edit-form client-debts-form" style="max-width: 1300px;">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">💳 Deudas del Cliente</h3>
+                <div id="clientDebtsContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeClientDebtsModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>

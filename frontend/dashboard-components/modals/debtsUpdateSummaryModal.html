@@ -1,0 +1,13 @@
+<!-- Modal de resumen de actualización de precios de deudas -->
+        <div id="debtsUpdateSummaryModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 600px;">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">💰 Resumen de Actualización de Precios de Deudas</h3>
+                <div id="debtsUpdateSummaryContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="closeDebtsUpdateSummaryModal()">Aceptar</button>
+                    <button type="button" class="btn btn-secondary" id="rollbackBtn" onclick="rollbackDebtsUpdate()" style="display: none;">↶ Deshacer Cambios</button>
+                </div>
+            </div>
+        </div>

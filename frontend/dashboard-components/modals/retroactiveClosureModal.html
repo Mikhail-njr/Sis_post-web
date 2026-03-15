@@ -1,0 +1,24 @@
+<!-- Modal de Cierre Retroactivo -->
+        <div id="retroactiveClosureModal" class="edit-modal" style="display: none;">
+            <div class="edit-form" style="max-width: 500px;">
+                <h3 style="margin-bottom: 20px; color: #e9edf1;">📅 Cierre de Caja Retroactivo</h3>
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                    Selecciona la fecha para la que deseas realizar el cierre de caja.
+                </p>
+
+                <div class="form-group">
+                    <label for="retroFecha" style="display: block; margin-bottom: 5px; font-weight: 500;">Fecha del Cierre:</label>
+                    <input type="date" id="retroFecha" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="retroDineroInicial" style="display: block; margin-bottom: 5px; font-weight: 500;">Dinero Inicial:</label>
+                    <input type="number" id="retroDineroInicial" step="0.01" min="0" placeholder="500.00" style="width: 100%; padding: 10px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;" required>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="calculateRetroactiveClosure()">Calcular Cierre Retroactivo</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeRetroactiveModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>

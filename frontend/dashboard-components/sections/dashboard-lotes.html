@@ -1,0 +1,40 @@
+<!-- Sección de Lotes -->
+        <div id="lotes-section" class="dashboard-section collapsed">
+            <h2 class="section-header">
+                <span class="section-title">📅 Control de Lotes y Vencimientos</span>
+                <span class="section-icon">▶</span>
+            </h2>
+            <div class="section-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary btn-spacing" onclick="openCreateLoteModal()">
+                        ➕ Crear Nuevo Lote
+                    </button>
+                    <button class="btn btn-secondary btn-spacing margin-left-10" onclick="loadLotesReport()">
+                        📊 Reporte de Lotes
+                    </button>
+                </div>
+
+                <!-- Filtros de lotes -->
+                <div style="margin-bottom: 20px; padding: 15px; background: #24507c; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <h4 style="margin: 0 0 15px 0; color: #feffff;">🔍 Filtrar Lotes</h4>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="lote-filter" style="font-weight: 500; color: white;">Producto:</label>
+                            <select id="lote-filter" style="padding: 8px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;">
+                                <option value="">Todos los productos</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="lote-status-filter" style="font-weight: 500; color: white;">Estado:</label>
+                            <select id="lote-status-filter" style="padding: 8px; border: 2px solid #030303; border-radius: 6px; font-size: 14px;">
+                                <option value="">Todos</option>
+                                <option value="vigente">Vigentes</option>
+                                <option value="proximo_vencer">Próximos a vencer</option>
+                                <option value="vencido">Vencidos</option>
+                                <option value="descartado">Descartado</option>
+                            </select>
+                        </div>
+                        <button id="filter-lotes-btn" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;">🔍 Filtrar</button>
+                        <button id="clear-lote-filter-btn" class="btn btn-secondary" style="font-size: 14px; padding: 8px 16px;">🗑️ Limpiar</button>
+                    </div>
+                </div>

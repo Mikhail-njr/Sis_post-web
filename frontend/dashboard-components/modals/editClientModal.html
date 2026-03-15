@@ -1,0 +1,52 @@
+<!-- Modal de editar cliente -->
+        <div id="editClientModal" class="edit-modal">
+            <div class="edit-form">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">✏️ Editar Cliente</h3>
+                <form id="editClientForm">
+                    <input type="hidden" id="editClientId">
+
+                    <div class="form-group">
+                        <label for="editClientNombre">Nombre del Cliente:</label>
+                        <input type="text" id="editClientNombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientTelefono">Teléfono:</label>
+                        <input type="tel" id="editClientTelefono">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientDni">DNI:</label>
+                        <input type="text" id="editClientDni">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientDireccion">Dirección:</label>
+                        <input type="text" id="editClientDireccion">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClientNota">Nota:</label>
+                        <textarea id="editClientNota" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditClientModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de deudas del cliente -->
+        <div id="clientDebtsModal" class="edit-modal">
+            <div class="edit-form client-debts-form" style="max-width: 1300px;">
+                <h3 style="margin-bottom: 20px; color: #f5f7fb;">💳 Deudas del Cliente</h3>
+                <div id="clientDebtsContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeClientDebtsModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>

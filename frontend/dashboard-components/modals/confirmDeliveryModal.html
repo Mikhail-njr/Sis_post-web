@@ -1,0 +1,47 @@
+<!-- Modal de Confirmación de Llegada de Productos -->
+        <div id="confirmDeliveryModal" class="edit-modal">
+            <div class="edit-form" style="max-width: 900px;">
+                <h3 style="margin-bottom: 20px; color: #ffffff;">📦 Confirmar Llegada de Productos</h3>
+                <p style="margin-bottom: 20px; color: #f39797; font-size: 14px;">
+                    Confirme las cantidades recibidas y agregue información de lotes. Los números de lote se generarán automáticamente.
+                </p>
+
+                <div id="deliveryOrderInfo" style="margin-bottom: 20px; padding: 15px; background: #2c3135; border-radius: 8px; display: none;">
+                    <h4 style="margin: 0 0 10px 0; color: #e8edf1;">Información del Pedido</h4>
+                    <p id="deliveryOrderDetails" style="margin: 0; font-size: 14px;"></p>
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 15px; background: #3d4a5a; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #e8edf1;">Fecha de Entrega Real</h4>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="actualDeliveryDate" style="font-size: 14px; color: #e8edf1;">Fecha de llegada:</label>
+                        <input type="date" id="actualDeliveryDate" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <small style="color: #cccccc; font-size: 12px;">Deja vacío para usar hoy como fecha de entrega</small>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #ffffff; margin-bottom: 15px;">Items del Pedido</h4>
+                    <div id="deliveryItemsContainer" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px;">
+                        <!-- Los items se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #e8ecf0; margin-bottom: 15px;">➕ Items Extra del Proveedor</h4>
+                    <div style="margin-bottom: 10px;">
+                        <button type="button" class="btn btn-secondary" onclick="addExtraItem()" style="font-size: 14px; padding: 8px 16px;">
+                            ➕ Agregar Item Extra
+                        </button>
+                    </div>
+                    <div id="extraItemsContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; background: #f8f9fa;">
+                        <!-- Los items extra se agregarán aquí -->
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="confirmDelivery()">✅ Confirmar Llegada y Crear Lotes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeConfirmDeliveryModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>

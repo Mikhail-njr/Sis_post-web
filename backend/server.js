@@ -318,7 +318,8 @@ async function initDatabase() {
                     cantidad_ventas INTEGER NOT NULL,
                     tipo_cierre TEXT DEFAULT 'normal',
                     notas TEXT,
-                    numero_cierre_dia INTEGER DEFAULT 1
+                    numero_cierre_dia INTEGER DEFAULT 1,
+                    ultima_venta_id INTEGER
                 )`
             },
             {
@@ -4603,6 +4604,18 @@ app.post('/api/close-register-preview', async (req, res) => {
 // Ruta para confirmar y guardar cierre de caja (modificada para usar total_esperado del frontend)
 app.post('/api/close-register-confirm', async (req, res) => {
     try {
+        // Verificar y agregar columna ultima_venta_id si no existe (migración de emergencia)
+        try {
+            const columnExists = await dbAll("PRAGMA table_info(cierres_caja)");
+            const hasUltimaVentaId = columnExists.some(col => col.name === 'ultima_venta_id');
+            if (!hasUltimaVentaId) {
+                await dbRun(`ALTER TABLE cierres_caja ADD COLUMN ultima_venta_id INTEGER`);
+                console.log('✅ Columna ultima_venta_id agregada (migración de emergencia)');
+            }
+        } catch (migError) {
+            console.warn('⚠️ Error en migración de emergencia:', migError.message);
+        }
+
         const {
             fecha,
             fecha_cierre,
