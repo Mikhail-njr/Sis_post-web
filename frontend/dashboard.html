@@ -10,6 +10,7 @@
     <script src="../shared/auth.js"></script>
     <script src="../shared/api-client.js"></script>
     <script src="openConfirmDeliveryModal.js"></script>
+    <script src="dashboard.js"></script>
     <script src="cierre-caja-functions.js"></script>
     <script>
         // Event listener para el botón de cierre de caja
@@ -90,47 +91,50 @@
                     </div>
                 </div>
 
-                <!-- Operaciones del Día -->
-                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px; border: 1px solid #bbdefb;">
-                    <span style="font-weight: bold; color: #1976d2; font-size: 14px;">🧮 Operaciones:</span>
-                    <button id="closeRegisterBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #1976d2; color: white;">
-                        Cierre de Caja
-                    </button>
-                    <button id="returnToPOSBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #1976d2; color: white;" onclick="returnToPOS()">
-                        🏪 Ir a Caja
-                    </button>
-                </div>
+                <!-- Barra de Acciones Principales -->
+                <div style="display: flex; align-items: center; gap: 15px; padding: 12px 15px; background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 10px; border: 1px solid #ccc; flex-wrap: wrap;">
+                    
+                    <!-- Operaciones -->
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #e3f2fd; border-radius: 8px; border: 1px solid #bbdefb;">
+                        <span style="font-weight: bold; color: #1976d2; font-size: 13px;">🧮</span>
+                        <button id="closeRegisterBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #1976d2; color: white;">
+                            Cierre de Caja
+                        </button>
+                        <button id="returnToPOSBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #1976d2; color: white;" onclick="returnToPOS()">
+                            🏪 Ir a Caja
+                        </button>
+                    </div>
 
-                <!-- Gestión de Datos -->
-                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff3e0; border-radius: 8px; border: 1px solid #ffcc02;">
-                    <span style="font-weight: bold; color: #f57c00; font-size: 14px;">💾 Datos:</span>
-                    <select id="dataActionSelect" style="padding: 8px; border: 2px solid #030303; border-radius: 6px; font-size: 14px; background: white;">
-                        <option value="">Seleccionar acción...</option>
-                        <option value="backup">💾 Crear Backup</option>
-                        <option value="restore">📤 Restaurar Backup</option>
-                        <option value="report">📧 Generar Reporte</option>
-                        <option value="reset">🔄 Resetear Datos</option>
-                    </select>
-                    <button id="executeDataActionBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #ff9800; color: white;" onclick="executeDataAction()" disabled>
-                        Ejecutar
-                    </button>
-                    <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="restoreBackup(this)">
-                </div>
+                    <!-- Datos -->
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fff3e0; border-radius: 8px; border: 1px solid #ffcc02;">
+                        <span style="font-weight: bold; color: #f57c00; font-size: 13px;">💾</span>
+                        <select id="dataActionSelect" style="padding: 6px; border: 2px solid #ff9800; border-radius: 6px; font-size: 13px; background: white; min-width: 140px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="backup">💾 Crear Backup</option>
+                            <option value="restore">📤 Restaurar Backup</option>
+                            <option value="report">📧 Generar Reporte</option>
+                            <option value="reset">🔄 Resetear Datos</option>
+                        </select>
+                        <button id="executeDataActionBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #ff9800; color: white;" onclick="executeDataAction()" disabled>
+                            Ejecutar
+                        </button>
+                        <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="restoreBackup(this)">
+                    </div>
 
-
-                <!-- Soporte y Sistema -->
-                <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e8f5e8; border-radius: 8px; border: 1px solid #c8e6c9;">
-                    <span style="font-weight: bold; color: #388e3c; font-size: 14px;">🛠️ Sistema:</span>
-                    <select id="systemActionSelect" style="padding: 8px; border: 2px solid #030303; border-radius: 6px; font-size: 14px; background: white;">
-                        <option value="">Seleccionar acción...</option>
-                        <option value="support">📞 Soporte Técnico</option>
-                        <option value="session">🔐 Gestionar Sesión</option>
-                        <option value="license">⭐ Estado de Licencia</option>
-                        <option value="settings">⚙️ Configuraciones</option>
-                    </select>
-                    <button id="executeSystemActionBtn" class="btn" style="font-size: 14px; padding: 8px 16px; background: #4caf50; color: white;" onclick="executeSystemAction()" disabled>
-                        Ejecutar
-                    </button>
+                    <!-- Sistema -->
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #e8f5e8; border-radius: 8px; border: 1px solid #c8e6c9;">
+                        <span style="font-weight: bold; color: #388e3c; font-size: 13px;">🛠️</span>
+                        <select id="systemActionSelect" style="padding: 6px; border: 2px solid #4caf50; border-radius: 6px; font-size: 13px; background: white; min-width: 140px;">
+                            <option value="">Seleccionar...</option>
+                            <option value="support">📞 Soporte Técnico</option>
+                            <option value="session">🔐 Gestionar Sesión</option>
+                            <option value="license">⭐ Estado de Licencia</option>
+                            <option value="settings">⚙️ Configuraciones</option>
+                        </select>
+                        <button id="executeSystemActionBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #4caf50; color: white;" onclick="executeSystemAction()" disabled>
+                            Ejecutar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -5822,9 +5826,9 @@
                 const indicator = document.getElementById('license-indicator');
 
                 if (data.activated) {
-                    indicator.innerHTML = '<span style="color: #28a745;">✅ Licencia Activada - Características Premium Disponibles</span>';
+                    indicator.innerHTML = '<span style="color: #28a745;">✅ Plus Activado - Características Plus Disponibles</span>';
                 } else {
-                    indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Licencia - Características Limitadas</span>';
+                    indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Plus - Características Limitadas</span>';
                 }
             } catch (error) {
                 console.error('Error loading license status:', error);

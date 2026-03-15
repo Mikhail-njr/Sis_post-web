@@ -18,6 +18,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .back-btn-corner {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn-corner:hover {
+            transform: translateY(-2px);
+            background: #5a6268;
         }
 
         .activation-container {
@@ -112,6 +136,23 @@
             transform: none;
         }
 
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: #5a6268;
+        }
+
         .button-group {
             display: flex;
             justify-content: center;
@@ -167,9 +208,10 @@
     <script src="script.js"></script>
 </head>
 <body>
+    <a href="/index.html" class="back-btn-corner">⬅️ Volver al POS</a>
     <div class="activation-container">
         <div class="logo">🛒</div>
-        <h1 class="title">Sistema POS - Activación de Características Premium</h1>
+        <h1 class="title">Sistema POS - Activación de Características Plus</h1>
 
         <form id="activationForm">
             <div class="form-group">
@@ -195,7 +237,7 @@
         <div class="message" id="message"></div>
 
         <div class="footer">
-            <p><strong>Características Premium que se activan:</strong></p>
+            <p><strong>Características Plus que se activan:</strong></p>
             <ul style="text-align: left; margin: 10px 0;">
                 <li>📊 Generación de reportes avanzados</li>
                 <li>🎉 Más de 3 promociones activas</li>

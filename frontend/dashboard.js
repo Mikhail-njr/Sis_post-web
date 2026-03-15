@@ -78,6 +78,9 @@
         if (!response.ok) throw new Error('Error al obtener productos');
         return await response.json();
     }
+    
+    // Exponer fetchProductsData al ámbito global
+    window.fetchProductsData = fetchProductsData;
 
     let globalProductosData = []; // Variable global para almacenar datos de productos
     let productosActuales = {}; // Mapa id -> producto para facilitar búsquedas desde modales/diagnósticos
@@ -199,6 +202,27 @@
                     loading.textContent = 'Error al cargar pedidos. Asegúrate de que el servidor esté activo.';
                 }
             }
+        }
+
+        // Fetch de proveedores para la tabla
+        try {
+            // Verificar si fetchSuppliers está disponible
+            if (typeof fetchSuppliers === 'function') {
+                await fetchSuppliers();
+                console.log('✅ Tabla de proveedores cargada');
+            } else {
+                console.warn('⚠️ fetchSuppliers no está disponible todavía');
+            }
+        } catch (error) {
+            console.error('Error fetching suppliers table:', error);
+        }
+
+        // Forzar expandir la sección de proveedores si está colapsada para mostrar la tabla
+        const proveedoresSection = document.querySelector('#proveedores-section');
+        if (proveedoresSection && proveedoresSection.classList.contains('collapsed')) {
+            proveedoresSection.classList.remove('collapsed');
+            const icon = proveedoresSection.querySelector('.section-icon');
+            if (icon) icon.textContent = '▼';
         }
 
         // Fetch de registro de operaciones
@@ -2148,45 +2172,77 @@
                 headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
             }
 
-            // Obtener deudas del cliente
-            const response = await fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers });
-            if (response.status === 401) {
+            // Obtener datos del cliente y deudas en paralelo
+            const [clienteResponse, debtsResponse] = await Promise.all([
+                fetch(`${window.ApiClient.API_BASE}/clientes/${clienteId}`, { headers }),
+                fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers })
+            ]);
+
+            if (clienteResponse.status === 401 || debtsResponse.status === 401) {
                 isLoggedIn = false;
                 updateUIBasedOnAuth();
                 throw new Error('Autenticación requerida');
             }
-            if (!response.ok) throw new Error('Error al obtener deudas');
+            if (!clienteResponse.ok) throw new Error('Error al obtener datos del cliente');
+            if (!debtsResponse.ok) throw new Error('Error al obtener deudas');
 
-            const deudas = await response.json();
+            const cliente = await clienteResponse.json();
+            const deudas = await debtsResponse.json();
 
             // DIAGNÓSTICO: Log de deudas obtenidas
+            console.log('🔍 [viewClientDebts] Cliente:', cliente);
             console.log('🔍 [viewClientDebts] Deudas obtenidas:', deudas.length);
-            console.log('🔍 [viewClientDebts] Deudas con precios:', deudas.map(d => ({
-                producto: d.producto_nombre,
-                precio_unitario: d.precio_unitario,
-                precio_actual: d.precio_actual_producto,
-                cantidad: d.producto_cantidad
-            })));
 
-            displayClientDebts(deudas);
+            displayClientDebts(deudas, cliente);
             document.getElementById('clientDebtsModal').classList.add('show');
 
         } catch (error) {
             console.error('Error obteniendo deudas del cliente:', error);
             alert('Error al cargar deudas del cliente: ' + error.message);
         }
-    }
-
-
+    // Función para mostrar las deudas del cliente
+    function displayClientDebts(deudas, cliente) {
         const content = document.getElementById('clientDebtsContent');
 
+        // Si no hay deudas, mostrar solo los datos del cliente
         if (!deudas || deudas.length === 0) {
-            content.innerHTML = `
+            const clienteInfo = cliente ? `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px;">
+                    <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
+                            <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 40px; color: #666; margin-top: 20px;">
+                    <h4 style="color: #ffffff;">No hay deudas registradas</h4>
+                    <p>Este cliente no tiene deudas pendientes en este momento.</p>
+                </div>
+            ` : `
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <h4 style="color: #ffffff;">No hay deudas registradas</h4>
                     <p>Este cliente no tiene deudas pendientes en este momento.</p>
                 </div>
             `;
+            content.innerHTML = clienteInfo;
             return;
         }
 
@@ -2224,21 +2280,53 @@
         const facturasPendientes = Object.values(facturasAgrupadas).filter(f => f.tienePendiente).length;
         const facturasTotales = Object.keys(facturasAgrupadas).length;
 
+        // Datos del cliente para mostrar
+        const clienteInfo = cliente ? `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                        <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
+                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                        <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
+                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                        <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
+                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                        <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
+                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
+                        <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
+                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
         let deudasHtml = `
-            <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h4 style="margin: 0 0 15px 0; color: #ffffff;">Resumen de Cuenta Corriente</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                        <strong style="color: #ffffff;">Total Pendiente:</strong>
-                        <div style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
-                    </div>
-                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                        <strong style="color: #ffffff;">Facturas Pendientes:</strong>
-                        <div style="font-size: 18px; font-weight: bold; color: #ffc107; margin-top: 5px;">${facturasPendientes} de ${facturasTotales}</div>
-                    </div>
-                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                        <strong style="color: #ffffff;">Total Facturas:</strong>
-                        <div style="font-size: 18px; font-weight: bold; color: #17a2b8; margin-top: 5px;">${facturasTotales}</div>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                ${clienteInfo}
+                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 15px 0; color: #ffffff;">💳 Resumen de Cuenta Corriente</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                            <strong style="color: #ffffff;">Total Pendiente:</strong>
+                            <div style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
+                        </div>
+                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                            <strong style="color: #ffffff;">Facturas Pendientes:</strong>
+                            <div style="font-size: 18px; font-weight: bold; color: #ffc107; margin-top: 5px;">${facturasPendientes} de ${facturasTotales}</div>
+                        </div>
+                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                            <strong style="color: #ffffff;">Total Facturas:</strong>
+                            <div style="font-size: 18px; font-weight: bold; color: #17a2b8; margin-top: 5px;">${facturasTotales}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3891,9 +3979,9 @@
             const indicator = document.getElementById('license-indicator');
 
             if (data.activated) {
-                indicator.innerHTML = '<span style="color: #28a745;">✅ Licencia Activada - Características Premium Disponibles</span>';
+                indicator.innerHTML = '<span style="color: #28a745;">✅ Plus Activado - Características Plus Disponibles</span>';
             } else {
-                indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Licencia - Características Limitadas</span>';
+                indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Plus - Características Limitadas</span>';
             }
         } catch (error) {
             console.error('Error loading license status:', error);
@@ -6165,6 +6253,16 @@
             if (sectionElement && sectionElement.classList.contains('dashboard-section')) {
                 // Expandir la sección
                 sectionElement.classList.remove('collapsed');
+                // Actualizar el ícono
+                const icon = sectionElement.querySelector('.section-icon');
+                if (icon) icon.textContent = '▼';
+                
+                // Si es la sección de proveedores, cargar los proveedores
+                if (hash === 'proveedores-section') {
+                    if (typeof fetchSuppliers === 'function') {
+                        fetchSuppliers();
+                    }
+                }
                 // Scroll hacia la sección
                 sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }

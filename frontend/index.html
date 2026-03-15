@@ -2630,7 +2630,7 @@
         // Función para verificar estado de licencia y actualizar botón
         async function checkLicenseStatus() {
             try {
-                const response = await fetch('/api/license-status');
+                const response = await fetch(`${window.ApiClient.API_BASE}/license-status`);
                 const data = await response.json();
 
                 const activateBtn = document.getElementById('activateBtn');

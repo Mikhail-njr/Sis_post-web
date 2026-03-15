@@ -710,8 +710,12 @@ function displaySuppliersTable(suppliers) {
     }
 
     if (suppliers && suppliers.length > 0) {
+        // Forzar mostrar la tabla cuando hay datos, ignorando el estado anterior
         table.style.display = 'table';
-        if (loading) loading.style.display = 'none';
+        if (loading) {
+            loading.textContent = '';
+            loading.style.display = 'none';
+        }
 
         const tbody = table.querySelector('tbody');
         tbody.innerHTML = '';
