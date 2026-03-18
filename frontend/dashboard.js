@@ -57,16 +57,29 @@
     // Función centralizada para obtener productos
     async function fetchProductsData() {
         // Usar función centralizada para headers de autenticación
-        const headers = window.ApiClient.getBasicAuthHeaders();
+        // Usar apiRequest centralizado que maneja 401 automáticamente
+        return await window.ApiClient.apiRequest('/products', { method: 'GET' });
+    }
 
-        const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
+    // Función helper para manejar respuestas HTTP con manejo automático de 401
+    // Esta función centraliza el manejo de errores de autenticación
+    async function fetchWithAuth(url, options = {}) {
+        const headers = { 'Content-Type': 'application/json', ...options.headers };
+        
+        const response = await fetch(url, { headers, ...options });
+        
         if (response.status === 401) {
             isLoggedIn = false;
             updateUIBasedOnAuth();
             throw new Error('Autenticación requerida');
         }
-        if (!response.ok) throw new Error('Error al obtener productos');
-        return await response.json();
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+        }
+        
+        return response.json();
     }
 
     let globalProductosData = []; // Variable global para almacenar datos de productos
@@ -382,17 +395,8 @@
         console.log('DEBUG: Stack trace:', new Error().stack);
 
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            // Obtener datos del producto
-            const response = await fetch(`${window.ApiClient.API_BASE}/products/${productId}`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener producto');
-
-            const product = await response.json();
+            // Usar apiRequest centralizado
+            const product = await window.ApiClient.apiRequest(`/products/${productId}`, { method: 'GET' });
 
             // Llenar el formulario con los datos actuales
             document.getElementById('editProductId').value = product.id;
