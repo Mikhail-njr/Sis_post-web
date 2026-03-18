@@ -1967,18 +1967,8 @@
     // Función para editar cliente
     async function editClient(clienteId) {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener cliente');
-
-            const cliente = await response.json();
+            // Usar apiRequest centralizado
+            const cliente = await window.ApiClient.apiRequest(`/customers/${clienteId}`, { method: 'GET' });
 
             // Llenar el formulario con los datos actuales
             document.getElementById('editClientId').value = cliente.id;
@@ -2091,19 +2081,8 @@
     // Función para ver deudas del cliente
     async function viewClientDebts(clienteId) {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-
-            // Obtener deudas del cliente
-            const response = await fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener deudas');
-
-            const deudas = await response.json();
+            // Usar apiRequest centralizado
+            const deudas = await window.ApiClient.apiRequest(`/debts?cliente_id=${clienteId}`, { method: 'GET' });
 
             // DIAGNÓSTICO: Log de deudas obtenidas
             console.log('🔍 [viewClientDebts] Deudas obtenidas:', deudas.length);
@@ -2689,19 +2668,8 @@
     // Función para mostrar resumen de deudas por cliente
     async function showDebtsSummary() {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-
-            // Obtener clientes con deudas
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers?with_debts=true`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener resumen de deudas');
-
-            const data = await response.json();
+            // Usar apiRequest centralizado
+            const data = await window.ApiClient.apiRequest('/customers?with_debts=true', { method: 'GET' });
             // Response puede ser paginado con .clientes o un array simple
             const clientes = data.clientes || data;
 
@@ -3927,17 +3895,8 @@
     // Función para cargar proveedores en el select del pedido
     async function loadSuppliersForOrder() {
         try {
-            // Siempre cargar desde API para asegurar datos actualizados
-            const headers = { 'Content-Type': 'application/json' };
-            
-            const response = await fetch(`${window.ApiClient.API_BASE}/suppliers`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener proveedores');
-            const suppliers = await response.json();
+            // Usar apiRequest centralizado
+            const suppliers = await window.ApiClient.apiRequest('/suppliers', { method: 'GET' });
 
             // Actualizar datos globales
             globalSuppliersData = suppliers;
@@ -4382,18 +4341,8 @@
     // Función para cargar productos más vendidos
     async function loadTopProducts(limit = 10) {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-
-            const response = await fetch(`${window.ApiClient.API_BASE}/stats?limit=${limit}`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Network response for stats was not ok');
-
-            const stats = await response.json();
+            // Usar apiRequest centralizado
+            const stats = await window.ApiClient.apiRequest(`/stats?limit=${limit}`, { method: 'GET' });
 
             // Mostrar los productos más vendidos
             displayTopProducts(stats.top_products);
