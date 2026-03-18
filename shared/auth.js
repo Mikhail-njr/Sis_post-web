@@ -9,18 +9,37 @@ if (typeof isLoggedIn === 'undefined') {
 // Cargar credenciales del almacenamiento al iniciar
 function loadAuthFromStorage() {
     const stored = sessionStorage.getItem('authCredentials');
+    console.log('🔍 [AUTH DEBUG] loadAuthFromStorage llamado');
+    console.log('🔍 [AUTH DEBUG] sessionStorage disponible:', typeof sessionStorage !== 'undefined');
     if (stored) {
-        authCredentials = JSON.parse(stored);
-        isLoggedIn = true;
+        try {
+            authCredentials = JSON.parse(stored);
+            isLoggedIn = true;
+            console.log('✅ [AUTH DEBUG] Sesión cargada desde sessionStorage:', authCredentials);
+        } catch (e) {
+            console.error('❌ [AUTH DEBUG] Error al parsear credenciales:', e);
+            sessionStorage.removeItem('authCredentials');
+        }
+    } else {
+        console.log('⚠️ [AUTH DEBUG] No hay credenciales en sessionStorage');
+    }
+    
+    // Llamar a updateUIBasedOnAuth si existe (para actualizar la UI con el estado de sesión correcto)
+    if (typeof updateUIBasedOnAuth === 'function') {
+        console.log('🔍 [AUTH DEBUG] Llamando updateUIBasedOnAuth desde loadAuthFromStorage');
+        updateUIBasedOnAuth();
     }
 }
 
 // Guardar credenciales en almacenamiento
 function saveAuthToStorage() {
+    console.log('🔍 [AUTH DEBUG] saveAuthToStorage llamado');
     if (authCredentials) {
         sessionStorage.setItem('authCredentials', JSON.stringify(authCredentials));
+        console.log('✅ [AUTH DEBUG] Credenciales guardadas en sessionStorage:', authCredentials);
     } else {
         sessionStorage.removeItem('authCredentials');
+        console.log('⚠️ [AUTH DEBUG] Credenciales eliminadas de sessionStorage');
     }
 }
 
@@ -281,7 +300,9 @@ function getAuthHeaders() {
 
 // Inicializar autenticación al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 [AUTH DEBUG] DOMContentLoaded disparado - cargando sesión...');
     loadAuthFromStorage();
+    console.log('🔍 [AUTH DEBUG] Estado después de loadAuthFromStorage: isLoggedIn =', isLoggedIn);
 });
 
 // Función auxiliar para verificar autenticación en respuestas 401

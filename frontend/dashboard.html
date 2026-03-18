@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../shared/auth.js"></script>
     <script src="../shared/api-client.js"></script>
+    <script src="auth-integration.js"></script>
     <script src="openConfirmDeliveryModal.js"></script>
     <script src="dashboard.js"></script>
     <script src="cierre-caja-functions.js"></script>
@@ -102,6 +103,14 @@
                         </button>
                         <button id="returnToPOSBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #1976d2; color: white;" onclick="returnToPOS()">
                             🏪 Ir a Caja
+                        </button>
+                    </div>
+
+                    <!-- Administración -->
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f3e5f5; border-radius: 8px; border: 1px solid #ce93d8;">
+                        <span style="font-weight: bold; color: #7b1fa2; font-size: 13px;">👥</span>
+                        <button class="btn" style="font-size: 13px; padding: 6px 12px; background: #6f42c1; color: white;" onclick="openUserManagementModal()">
+                            Gestión de Usuarios
                         </button>
                     </div>
 
@@ -673,6 +682,9 @@
                     </button>
                     <button class="btn btn-secondary" onclick="cleanDuplicatePromotions()" style="font-size: 14px; padding: 10px 20px; background: #ff6b6b; color: white; margin-left: 10px;" title="Limpia productos que están en múltiples promociones">
                         🧹 Limpiar Duplicados
+                    </button>
+                    <button class="btn btn-secondary" onclick="openUserManagementModal()" style="font-size: 14px; padding: 10px 20px; background: #6f42c1; color: white; margin-left: 10px;" title="Gestionar usuarios del sistema">
+                        👥 Usuarios
                     </button>
                 </div>
                 <div class="loading">Cargando promociones...</div>
@@ -1723,17 +1735,17 @@
             return await response.json();
         }
         
-        let globalProductosData = []; // Variable global para almacenar datos de productos
-        let productosActuales = {}; // Mapa id -> producto para facilitar búsquedas desde modales/diagnósticos
-        let currentSortMode = 1; // 0: Stock asc, 1: Stock desc, 2: ID asc
-        let globalSuppliersData = []; // Variable global para almacenar datos de proveedores
-        let globalLotesData = []; // Variable global para almacenar datos de lotes
-        let currentTopProductsLimit = 10; // Límite actual de productos más vendidos mostrados
+        globalProductosData = []; // Variable global para almacenar datos de productos
+        productosActuales = {}; // Mapa id -> producto para facilitar búsquedas desde modales/diagnósticos
+        currentSortMode = 1; // 0: Stock asc, 1: Stock desc, 2: ID asc
+        globalSuppliersData = []; // Variable global para almacenar datos de proveedores
+        globalLotesData = []; // Variable global para almacenar datos de lotes
+        currentTopProductsLimit = 10; // Límite actual de productos más vendidos mostrados
 
         async function fetchAndDisplayData() {
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + btoa('admin:pos123')
+                
             };
             if (authCredentials) {
                 headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
@@ -2034,7 +2046,7 @@
         }
 
         // Variables para el estado de edición
-        let selectedProductId = null;
+        selectedProductId = null;
 
         // Función para editar producto
         async function editProduct(productId) {
@@ -2428,8 +2440,8 @@
 
 
         // Variables para promociones
-        let selectedPromotionProducts = [];
-        let allProducts = [];
+        selectedPromotionProducts = [];
+        allProducts = [];
 
         // Función para cargar promociones
         async function loadPromotions() {
@@ -3982,27 +3994,28 @@
                     headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
                 }
 
-                // Obtener deudas del cliente
-                const response = await fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers });
-                if (response.status === 401) {
+                // Obtener datos del cliente y deudas en paralelo
+                const [clienteResponse, debtsResponse] = await Promise.all([
+                    fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, { headers }),
+                    fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers })
+                ]);
+
+                if (clienteResponse.status === 401 || debtsResponse.status === 401) {
                     isLoggedIn = false;
                     updateUIBasedOnAuth();
                     throw new Error('Autenticación requerida');
                 }
-                if (!response.ok) throw new Error('Error al obtener deudas');
+                if (!clienteResponse.ok) throw new Error('Error al obtener datos del cliente');
+                if (!debtsResponse.ok) throw new Error('Error al obtener deudas');
 
-                const deudas = await response.json();
-                
+                const cliente = await clienteResponse.json();
+                const deudas = await debtsResponse.json();
+
                 // DIAGNÓSTICO: Log de deudas obtenidas
+                console.log('🔍 [viewClientDebts] Cliente:', cliente);
                 console.log('🔍 [viewClientDebts] Deudas obtenidas:', deudas.length);
-                console.log('🔍 [viewClientDebts] Deudas con precios:', deudas.map(d => ({
-                    producto: d.producto_nombre,
-                    precio_unitario: d.precio_unitario,
-                    precio_actual: d.precio_actual_producto,
-                    cantidad: d.producto_cantidad
-                })));
-                
-                displayClientDebts(deudas);
+
+                displayClientDebts(deudas, cliente);
                 document.getElementById('clientDebtsModal').classList.add('show');
 
             } catch (error) {
@@ -4012,16 +4025,47 @@
         }
 
         // Función para mostrar deudas del cliente en el modal (Agrupada por Factura)
-        function displayClientDebts(deudas) {
+        function displayClientDebts(deudas, cliente) {
             const content = document.getElementById('clientDebtsContent');
 
             if (!deudas || deudas.length === 0) {
-                content.innerHTML = `
+                const clienteInfo = cliente ? `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                                <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
+                                <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                                <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
+                                <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                                <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
+                                <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                                <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
+                                <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
+                                <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
+                                <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 40px; color: #666; margin-top: 20px;">
+                        <h4 style="color: #ffffff;">No hay deudas registradas</h4>
+                        <p>Este cliente no tiene deudas pendientes en este momento.</p>
+                    </div>
+                ` : `
                     <div style="text-align: center; padding: 40px; color: #666;">
                         <h4 style="color: #ffffff;">No hay deudas registradas</h4>
                         <p>Este cliente no tiene deudas pendientes en este momento.</p>
                     </div>
                 `;
+                content.innerHTML = clienteInfo;
                 return;
             }
 
@@ -4072,21 +4116,53 @@
             const facturasPendientes = Object.values(facturasAgrupadas).filter(f => f.tienePendiente).length;
             const facturasTotales = Object.keys(facturasAgrupadas).length;
 
+            // Datos del cliente para mostrar
+            const clienteInfo = cliente ? `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
+                            <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
+                            <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
+                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+
             let deudasHtml = `
-                <div class="debts-summary">
-                    <h4>Resumen de Cuenta Corriente</h4>
-                    <div class="debts-summary-grid">
-                        <div class="summary-card">
-                            <strong>Total Pendiente:</strong>
-                            <div class="summary-value positive">${formatCurrency(totalPendiente)}</div>
-                        </div>
-                        <div class="summary-card">
-                            <strong>Facturas Pendientes:</strong>
-                            <div class="summary-value warning">${facturasPendientes} de ${facturasTotales}</div>
-                        </div>
-                        <div class="summary-card">
-                            <strong>Total Facturas:</strong>
-                            <div class="summary-value info">${facturasTotales}</div>
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                    ${clienteInfo}
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">💳 Resumen de Cuenta Corriente</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #ffd700; font-size: 12px;">Total Pendiente:</strong>
+                                <div style="color: #28a745; font-size: 16px; font-weight: bold; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #ffd700; font-size: 12px;">Facturas Pendientes:</strong>
+                                <div style="color: #ffc107; font-size: 16px; font-weight: bold; margin-top: 5px;">${facturasPendientes} de ${facturasTotales}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #ffd700; font-size: 12px;">Total Facturas:</strong>
+                                <div style="color: #17a2b8; font-size: 16px; font-weight: bold; margin-top: 5px;">${facturasTotales}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4175,12 +4251,10 @@
                     let diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
                     let diferenciaClass = diferenciaTotal > 0 ? 'danger' : diferenciaTotal < 0 ? 'success' : 'neutral';
 
-                    // Primera fila de la factura - mostrar número y fecha solo en la primera fila
-                    const isFirstRow = idx === 0;
-
-                    // Si es la primera fila, mostrar factura y fecha; si no, dejar celdas vacías
-                    const facturaCell = isFirstRow ? `<td rowspan="${cantidadProductos}"><strong>${numFactura}</strong></td>` : '';
-                    const fechaCell = isFirstRow ? `<td rowspan="${cantidadProductos}">${fechaFormateada}</td>` : '';
+                    // Mostrar siempre la información de la factura y fecha en cada fila
+                    // Esto evita problemas con rowspan cuando hay filas ocultas
+                    const facturaCell = `<td><strong>${numFactura}</strong></td>`;
+                    const fechaCell = `<td>${fechaFormateada}</td>`;
                     
                     // El botón de pagar aparece en la primera fila y corresponde al TOTAL de la deuda
                     // Verificar el estado de pagado del producto
@@ -4195,7 +4269,7 @@
                         ` : '');
 
                     deudasHtml += `
-                        <tr>
+                        <tr data-invoice="${numFactura}">
                             ${facturaCell}
                             ${fechaCell}
                             <td>${nombreProducto}</td>
@@ -4292,6 +4366,8 @@
             const filterStatus = document.getElementById('filterStatus')?.value || '';
             const table = document.querySelector('.debts-table');
             
+            console.log('DEBUG filterDebtsTable - filterInvoice:', filterInvoice);
+            
             if (!table) return;
             
             // Encontrar el índice de la columna "Estado" dinámicamente
@@ -4300,30 +4376,41 @@
             const estadoIndex = headers.findIndex(h => h.textContent.trim() === 'Estado');
             
             const rows = table.querySelectorAll('tbody tr');
+            console.log('DEBUG filterDebtsTable - Total rows:', rows.length);
             let visibleCount = 0;
             
-            rows.forEach((row) => {
-                // Find the actual invoice cell (may not be cells[0] due to rowspan)
-                let invoiceCellValue = '';
+            rows.forEach((row, rowIndex) => {
+                //优先使用 data-invoice 属性获取发票号码
+                let invoiceCellValue = row.getAttribute('data-invoice') || '';
                 let statusCellValue = '';
-                
-                // Check all cells to find invoice and status
                 const cells = row.cells;
-                for (let i = 0; i < cells.length; i++) {
-                    const cellText = cells[i].textContent.trim();
-                    // If this cell has rowspan and contains an invoice number, it's the invoice cell
-                    if (cells[i].rowSpan > 1 && cellText.match(/^FAC-/)) {
-                        invoiceCellValue = cellText;
-                    }
-                    // If this is the Estado column (by position or by header)
-                    if (estadoIndex >= 0 && i === estadoIndex) {
-                        statusCellValue = cellText;
-                    }
-                }
                 
-                // Fallback: check cells[0] for invoice if not found
-                if (!invoiceCellValue && cells[0]) {
-                    invoiceCellValue = cells[0].textContent.trim();
+                console.log('DEBUG filterDebtsTable - Row', rowIndex, 'data-invoice:', invoiceCellValue);
+                
+                // 如果没有 data-invoice，回退到旧的逻辑
+                if (!invoiceCellValue) {
+                    // Find the actual invoice cell (may not be cells[0] due to rowspan)
+                    // Check all cells to find invoice and status
+                    console.log('DEBUG filterDebtsTable - Row', rowIndex, 'cells.length:', cells.length);
+                    
+                    for (let i = 0; i < cells.length; i++) {
+                        const cellText = cells[i].textContent.trim();
+                        console.log('DEBUG filterDebtsTable - Row', rowIndex, 'cell', i, 'text:', cellText.substring(0, 30), 'rowspan:', cells[i].rowSpan);
+                        // If this cell has rowspan and contains an invoice number, it's the invoice cell
+                        if (cells[i].rowSpan > 1 && cellText.match(/^FAC-/)) {
+                            invoiceCellValue = cellText;
+                        }
+                        // If this is the Estado column (by position or by header)
+                        if (estadoIndex >= 0 && i === estadoIndex) {
+                            statusCellValue = cellText;
+                        }
+                    }
+                    
+                    // Fallback: check cells[0] for invoice if not found
+                    if (!invoiceCellValue && cells[0]) {
+                        invoiceCellValue = cells[0].textContent.trim();
+                        console.log('DEBUG filterDebtsTable - Row', rowIndex, 'fallback invoiceCellValue:', invoiceCellValue);
+                    }
                 }
                 
                 // For status, also check all cells for status badges
@@ -4340,6 +4427,8 @@
                 // Para el filtro de factura, hacer coincidencia exacta
                 const matchesInvoice = filterInvoice === '' || invoiceCellValue.includes(filterInvoice);
                 
+                console.log('DEBUG filterDebtsTable - Row', rowIndex, 'invoiceCellValue:', invoiceCellValue, 'matchesInvoice:', matchesInvoice);
+                
                 // Para el filtro de estado, verificar si contiene el texto del estado
                 const matchesStatus = filterStatus === '' || 
                     (filterStatus === 'Pendiente' && (statusCellValue.includes('Pendiente'))) ||
@@ -4352,6 +4441,7 @@
                     row.style.display = 'none';
                 }
             });
+            console.log('DEBUG filterDebtsTable - visibleCount:', visibleCount);
         }
 
         // Función para limpiar los filtros
@@ -5015,7 +5105,7 @@
         }
 
         // Variable global para almacenar los cierres
-        let globalCierresData = [];
+        globalCierresData = [];
 
         // Función para cargar historial de cierres de caja
         async function loadCierres() {
@@ -7768,7 +7858,7 @@
             // 1. Notificaciones de Cierres Pendientes
             try {
                 const closuresResponse = await fetch('/api/pending-closures', {
-                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                    headers: {  }
                 });
                 const closuresData = await closuresResponse.json();
                 
@@ -7795,7 +7885,7 @@
             // 2. Notificaciones de Productos Vencidos y Próximos a Vencer
             try {
                 const productsResponse = await fetch('/api/products', {
-                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                    headers: {  }
                 });
                 const products = await productsResponse.json();
                 
@@ -7882,7 +7972,7 @@
             // 3. Notificaciones de Stock Bajo (si hay productos con stock bajo)
             try {
                 const productsResponse = await fetch('/api/products', {
-                    headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                    headers: {  }
                 });
                 const products = await productsResponse.json();
                 
@@ -7973,7 +8063,7 @@
                 // Verificar cierres pendientes
                 try {
                     const closuresResponse = await fetch('/api/pending-closures', {
-                        headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                        headers: {  }
                     });
                     const closuresData = await closuresResponse.json();
                     if (closuresData.has_pending_closures) {
@@ -7984,7 +8074,7 @@
                 // Verificar productos próximos a vencer
                 try {
                     const productsResponse = await fetch('/api/products', {
-                        headers: { 'Authorization': 'Basic ' + btoa('admin:pos123') }
+                        headers: {  }
                     });
                     const products = await productsResponse.json();
                     const expiredProducts = products.filter(p => p.estado_vencimiento === 'vencido');
@@ -8031,7 +8121,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Basic ' + btoa('admin:pos123')
+                        
                     },
                     body: JSON.stringify({
                         fechaEspecifica: fecha,
@@ -8224,7 +8314,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': 'Basic ' + btoa('admin:pos123')
+                            
                         },
                         body: JSON.stringify(selectedResets)
                     });
@@ -8480,6 +8570,88 @@
                 behavior: 'smooth'
             });
         }
+    </script>
+
+    <!-- Modal de gestión de usuarios -->
+    <div id="userManagementModal" class="edit-modal" style="display: none;">
+        <div class="edit-form" style="max-width: 700px; background: linear-gradient(145deg, #1e1e2e, #2a2a3e); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            
+            <!-- Encabezado -->
+            <div style="background: linear-gradient(90deg, #4CAF50, #45a049); padding: 20px; border-radius: 12px 12px 0 0; margin: -20px -20px 20px -20px;">
+                <h3 style="margin: 0; color: white; font-size: 22px;">👥 Gestión de Usuarios</h3>
+            </div>
+            
+            <!-- Lista de usuarios -->
+            <div id="userList" style="max-height: 280px; overflow-y: auto; margin-bottom: 20px; background: #16161e; border-radius: 8px; padding: 10px;">
+                <p style="color: #aaa; text-align: center; padding: 20px;">Cargando usuarios...</p>
+            </div>
+
+            <!-- Botón para agregar nuevo usuario -->
+            <button type="button" class="btn btn-primary" onclick="showAddUserForm()" style="margin-bottom: 15px; background: linear-gradient(90deg, #2196F3, #1976D2); border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                ➕ Agregar Usuario
+            </button>
+
+            <!-- Formulario para agregar/editar usuario (oculto por defecto) -->
+            <div id="userForm" style="display: none; border: 1px solid #3a3a4e; border-radius: 8px; padding: 20px; background: #1a1a28; margin-top: 15px;">
+                <h4 id="userFormTitle" style="color: #4CAF50; margin: 0 0 20px 0; font-size: 18px; border-bottom: 1px solid #3a3a4e; padding-bottom: 10px;">Nuevo Usuario</h4>
+                <form id="userFormElement">
+                    <input type="hidden" id="editUserId">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="username" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Usuario *</label>
+                            <input type="text" id="username" required style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Contraseña <span id="passwordHint" style="color: #f39c12; font-size: 11px;">(requerido)</span></label>
+                            <input type="password" id="password" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="nombreCompleto" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Nombre Completo</label>
+                        <input type="text" id="nombreCompleto" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="email" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Email</label>
+                            <input type="email" id="email" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rol" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Rol *</label>
+                            <select id="rol" required style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                                <option value="admin">👑 Administrador</option>
+                                <option value="cajero">💰 Cajero</option>
+                                <option value="invitado">👤 Invitado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="hideUserForm()" style="background: #616161; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="userSubmitBtn" style="background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Crear Usuario</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="button-group" style="margin-top: 20px; text-align: center;">
+                <button type="button" class="btn btn-secondary" onclick="closeUserManagementModal()" style="background: #f44336; color: white; border: none; padding: 12px 40px; border-radius: 6px; cursor: pointer; font-weight: 600;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="user-management.js"></script>
+    <script>
+        // Cerrar modal al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('userManagementModal');
+            if (modal && e.target === modal) {
+                closeUserManagementModal();
+            }
+        });
     </script>
 
 </body>

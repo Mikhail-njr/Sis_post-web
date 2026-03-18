@@ -5,12 +5,85 @@
  * de autenticación basado en base de datos.
  */
 
+// ============================================
+// DECLARACIONES DE VARIABLES GLOBALES
+// Usamos window para evitar conflictos con otras declaraciones
+// ============================================
+
+// Inicializar credenciales si no existen (pueden haber sido definidas por shared/auth.js)
+if (typeof window.authCredentials === 'undefined') {
+    window.authCredentials = null;
+}
+if (typeof window.currentUser === 'undefined') {
+    window.currentUser = null;
+}
+
+// Log para debugging
+console.log('🔐 auth-integration.js inicializado');
+console.log('🔐 authCredentials:', window.authCredentials);
+
+// Cargar desde sessionStorage si existe
+try {
+    const stored = sessionStorage.getItem('authCredentials');
+    if (stored && !window.authCredentials) {
+        window.authCredentials = JSON.parse(stored);
+        console.log('🔐 Credenciales cargadas desde sessionStorage');
+    }
+} catch (e) {
+    console.error('Error cargando credenciales:', e);
+}
+
+// ============================================
+// INTERCEPTADOR GLOBAL DE FETCH
+// Agrega automáticamente credenciales a todas las llamadas API
+// Esto elimina la necesidad del código duplicado en dashboard.js
+// ============================================
+
+// Guardar el fetch original
+globalThis._originalFetch = window.fetch;
+
+// Sobrescribir fetch para agregar credenciales automáticamente
+window.fetch = async function(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+    };
+    
+    // Agregar credenciales si existen (usar window para acceder a la variable global)
+    const creds = window.authCredentials;
+    if (creds && creds.username && creds.password) {
+        headers['Authorization'] = 'Basic ' + btoa(creds.username + ':' + creds.password);
+    }
+    
+    // Combinar opciones
+    const mergedOptions = {
+        ...options,
+        headers
+    };
+    
+    const response = await globalThis._originalFetch(url, mergedOptions);
+    
+    // Manejar respuesta 401 - credenciales inválidas
+    if (response.status === 401) {
+        console.log('🔐 Credenciales inválidas o expiradas');
+        // Limpiar credenciales
+        window.authCredentials = null;
+        window.currentUser = null;
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.removeItem('authCredentials');
+            sessionStorage.removeItem('currentUser');
+        }
+    }
+    
+    return response;
+};
+
 // Extender el ApiClient para incluir autenticación
 window.ApiClient = window.ApiClient || {};
 
-// Almacenar credenciales de autenticación
-let authCredentials = null;
-let currentUser = null;
+// Sincronizar con window (ya que shared/auth.js puede haberlas definido)
+window.authCredentials = window.authCredentials || null;
+window.currentUser = window.currentUser || null;
 
 // Extender el ApiClient con métodos de autenticación
 window.ApiClient.login = async function(username, password) {
@@ -34,17 +107,17 @@ window.ApiClient.login = async function(username, password) {
         const data = await response.json();
         
         // Almacenar token JWT y usuario
-        authCredentials = {
+        window.authCredentials = {
             token: data.token,
             username: username
         };
         
         // Almacenar información del usuario
-        currentUser = data.user;
+        window.currentUser = data.user;
         
         // Guardar en sessionStorage para mayor seguridad
-        sessionStorage.setItem('authCredentials', JSON.stringify(authCredentials));
-        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        sessionStorage.setItem('authCredentials', JSON.stringify(window.authCredentials));
+        sessionStorage.setItem('currentUser', JSON.stringify(window.currentUser));
         
         return data;
     } catch (error) {
@@ -57,7 +130,7 @@ window.ApiClient.login = async function(username, password) {
 window.ApiClient.logout = async function() {
     try {
         // Llamar al endpoint de logout del backend
-        if (authCredentials && authCredentials.token) {
+        if (window.authCredentials && window.authCredentials.token) {
             await fetch(`${window.ApiClient.API_BASE}/api/auth/logout`, {
                 method: 'POST',
                 headers: {
@@ -70,8 +143,8 @@ window.ApiClient.logout = async function() {
     }
     
     // Limpiar credenciales y usuario
-    authCredentials = null;
-    currentUser = null;
+    window.authCredentials = null;
+    window.currentUser = null;
     sessionStorage.removeItem('authCredentials');
     sessionStorage.removeItem('currentUser');
     
@@ -83,12 +156,12 @@ window.ApiClient.logout = async function() {
 
 // Método para obtener el usuario actual
 window.ApiClient.getCurrentUser = function() {
-    return currentUser;
+    return window.currentUser;
 };
 
 // Método para verificar si el usuario está autenticado
 window.ApiClient.isAuthenticated = function() {
-    return authCredentials !== null && currentUser !== null;
+    return window.authCredentials !== null && window.currentUser !== null;
 };
 
 // Método para obtener headers de autenticación
@@ -97,11 +170,47 @@ window.ApiClient.getAuthHeaders = function() {
         'Content-Type': 'application/json'
     };
     
-    if (authCredentials && authCredentials.token) {
-        headers['Authorization'] = 'Bearer ' + authCredentials.token;
+    // Usar Basic Auth en lugar de Bearer token
+    if (window.authCredentials && window.authCredentials.username && window.authCredentials.password) {
+        headers['Authorization'] = 'Basic ' + btoa(window.authCredentials.username + ':' + window.authCredentials.password);
     }
     
     return headers;
+};
+
+// ============================================
+// FUNCIONES CENTRALIZADAS PARA ELIMINAR CÓDIGO DUPLICADO
+// ============================================
+
+/**
+ * Función centralizada para crear headers con Basic Auth
+ * Reemplaza ~50+ lugares con código duplicado en el frontend
+ * @returns {Object} Headers con autenticación Basic
+ */
+window.ApiClient.getBasicAuthHeaders = function() {
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    if (window.authCredentials && window.authCredentials.username && window.authCredentials.password) {
+        headers['Authorization'] = 'Basic ' + btoa(window.authCredentials.username + ':' + window.authCredentials.password);
+    }
+    
+    return headers;
+};
+
+/**
+ * Función auxiliar para obtener headers con credenciales específicas
+ * Útil para operaciones que requieren credenciales diferentes
+ * @param {string} username - Nombre de usuario
+ * @param {string} password - Contraseña
+ * @returns {Object} Headers con autenticación Basic
+ */
+window.ApiClient.getBasicAuthHeadersFor = function(username, password) {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + btoa(username + ':' + password)
+    };
 };
 
 // Método para verificar permisos del usuario

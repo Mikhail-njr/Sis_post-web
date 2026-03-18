@@ -10,79 +10,21 @@ const {
     deleteUser, 
     getAllUsers,
     isUserBlocked,
-    logAuthAttempt 
+    logAuthAttempt,
+    // Nuevas funciones centralizadas
+    extractBasicAuth,
+    validateBasicAuthCredentials,
+    requireAdmin,
+    requireAuth
 } = require('./auth-utils');
 
 const router = express.Router();
 
-// Middleware para proteger rutas (solo admins pueden gestionar usuarios)
-function requireAdmin(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
+// Middleware para proteger rutas (solo admins pueden gestionar usuarios) - REFACTORIZADO
+const requireAdminMiddleware = requireAdmin();
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ error: 'Token no proporcionado' });
-    }
-
-    // Aquí deberías validar el token JWT o las credenciales
-    // Por ahora, implementaremos una validación básica
-    const credentials = Buffer.from(token, 'base64').toString('ascii');
-    const [username, password] = credentials.split(':');
-
-    // Validar credenciales contra la base de datos
-    validateUser(username, password)
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({ error: 'Credenciales inválidas' });
-            }
-            
-            // Verificar si es admin
-            if (user.rol !== 'admin') {
-                return res.status(403).json({ error: 'Acceso denegado. Se requiere rol de administrador' });
-            }
-
-            // Adjuntar usuario a la request
-            req.user = user;
-            next();
-        })
-        .catch(error => {
-            console.error('Error validando usuario:', error);
-            res.status(500).json({ error: 'Error interno del servidor' });
-        });
-}
-
-// Middleware para validar credenciales en endpoints de autenticación
-function validateCredentials(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ error: 'Token no proporcionado' });
-    }
-
-    const credentials = Buffer.from(token, 'base64').toString('ascii');
-    const [username, password] = credentials.split(':');
-
-    validateUser(username, password)
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({ error: 'Credenciales inválidas' });
-            }
-
-            req.user = user;
-            next();
-        })
-        .catch(error => {
-            console.error('Error validando credenciales:', error);
-            res.status(500).json({ error: 'Error interno del servidor' });
-        });
-}
+// Middleware para validar credenciales en endpoints de autenticación - REFACTORIZADO
+const validateCredentialsMiddleware = requireAuth();
 
 // Endpoint de login
 router.post('/login', async (req, res) => {
@@ -140,7 +82,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Endpoint para cambiar contraseña
-router.post('/change-password', validateCredentials, async (req, res) => {
+router.post('/change-password', validateCredentialsMiddleware, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const userId = req.user.id;
@@ -191,7 +133,7 @@ router.post('/change-password', validateCredentials, async (req, res) => {
 });
 
 // Endpoint para obtener perfil de usuario
-router.get('/profile', validateCredentials, async (req, res) => {
+router.get('/profile', validateCredentialsMiddleware, async (req, res) => {
     try {
         const user = await getUserById(req.user.id);
         
@@ -226,7 +168,7 @@ router.get('/profile', validateCredentials, async (req, res) => {
 });
 
 // Endpoint para actualizar perfil (solo el usuario puede actualizar su propio perfil)
-router.put('/profile', validateCredentials, async (req, res) => {
+router.put('/profile', validateCredentialsMiddleware, async (req, res) => {
     try {
         const { nombre_completo, email } = req.body;
         const userId = req.user.id;
@@ -256,7 +198,7 @@ router.put('/profile', validateCredentials, async (req, res) => {
 });
 
 // Endpoint para gestionar usuarios (solo admins)
-router.get('/users', requireAdmin, async (req, res) => {
+router.get('/users', requireAdminMiddleware, async (req, res) => {
     try {
         const { activo, rol } = req.query;
         const filters = {};
@@ -281,7 +223,7 @@ router.get('/users', requireAdmin, async (req, res) => {
 });
 
 // Endpoint para crear usuario (solo admins)
-router.post('/users', requireAdmin, async (req, res) => {
+router.post('/users', requireAdminMiddleware, async (req, res) => {
     try {
         const { username, password, nombre_completo, email, rol } = req.body;
 
@@ -316,7 +258,7 @@ router.post('/users', requireAdmin, async (req, res) => {
 });
 
 // Endpoint para actualizar usuario (solo admins)
-router.put('/users/:id', requireAdmin, async (req, res) => {
+router.put('/users/:id', requireAdminMiddleware, async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const updates = req.body;
@@ -346,7 +288,7 @@ router.put('/users/:id', requireAdmin, async (req, res) => {
 });
 
 // Endpoint para eliminar usuario (desactivar, solo admins)
-router.delete('/users/:id', requireAdmin, async (req, res) => {
+router.delete('/users/:id', requireAdminMiddleware, async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
 
@@ -375,7 +317,7 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
 });
 
 // Endpoint para resetear intentos fallidos (solo admins)
-router.post('/users/:id/reset-attempts', requireAdmin, async (req, res) => {
+router.post('/users/:id/reset-attempts', requireAdminMiddleware, async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         
@@ -421,7 +363,7 @@ router.post('/users/:id/reset-attempts', requireAdmin, async (req, res) => {
 });
 
 // Endpoint para obtener logs de autenticación (solo admins)
-router.get('/auth-logs', requireAdmin, async (req, res) => {
+router.get('/auth-logs', requireAdminMiddleware, async (req, res) => {
     try {
         const { username, tipoEvento, limit = 100 } = req.query;
         

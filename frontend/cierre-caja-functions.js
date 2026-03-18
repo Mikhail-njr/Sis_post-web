@@ -30,9 +30,7 @@ async function calculateCloseRegister() {
 
         // Preparar headers con autenticación
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         // Preparar datos para el request
         const requestData = {
@@ -240,23 +238,14 @@ async function confirmCierreCaja() {
 
         // Preparar headers con autenticación
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
-        // Validar que los datos necesarios estén presentes
-        // Validar que los datos necesarios estén presentes
         // Validar que los datos necesarios estén presentes
         if (!data ||
             data.dinero_inicial === undefined ||
             data.total_ventas === undefined ||
             data.total_esperado === undefined) {
             console.error('❌ Error: Datos incompletos para confirmar cierre. Datos recibidos:', data);
-            throw new Error('Datos de cierre de caja incompletos. Los datos deben incluir dinero_inicial, total_ventas y total_esperado.');
-        }
-
-        // Los datos ya vienen calculados del backend, no recalcular para evitar duplicación
-        if (data.dinero_inicial === undefined || data.total_ventas === undefined || data.total_esperado === undefined) {
             throw new Error('Datos de cierre de caja incompletos. Los datos deben incluir dinero_inicial, total_ventas y total_esperado.');
         }
 
@@ -288,6 +277,7 @@ async function confirmCierreCaja() {
 
         if (!response.ok) {
             const errorData = await response.json();
+            console.error('❌ Error del servidor:', errorData);
             throw new Error(errorData.error || 'Error al confirmar el cierre de caja');
         }
 

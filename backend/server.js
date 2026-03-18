@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const basicAuth = require('express-basic-auth');
+const { conditionalAuthDB } = require('./auth-utils');
+const usersEndpoints = require('./users-endpoints');
 const compression = require('compression');
 const { exec } = require('child_process');
 const WebSocket = require('ws');
@@ -84,20 +86,11 @@ app.use(cors());
 app.use(compression()); // Compresión HTTP para mejor rendimiento
 app.use(express.json());
 
-// Autenticación básica para operaciones que modifican datos
-const authMiddleware = basicAuth({
-    users: { 'admin': 'pos123' },
-    challenge: true,
-});
-
-// Middleware para saltar autenticación en ngrok
+// Autenticación basada en base de datos (definida en auth-utils.js)
+// La función conditionalAuth ahora usa conditionalAuthDB de auth-utils.js
+// Ahora usa autenticación basada en base de datos en lugar de credenciales hardcodeadas
 function conditionalAuth(req, res, next) {
-    const host = req.get('host') || '';
-    // Permitir tanto ngrok como localhost para desarrollo
-    if (host.includes('ngrok') || host.includes('localhost')) {
-        return next();
-    }
-    return authMiddleware(req, res, next);
+    return conditionalAuthDB(req, res, next);
 }
 
 // Middleware para proteger solo operaciones de escritura
@@ -116,6 +109,9 @@ app.use('/api/sales', conditionalAuth);
 app.use('/api/categories', protectWriteOperations);
 // Registrar endpoint de clientes (eliminado para evitar error 500 - endpoint ya está implementado en este mismo archivo)
 
+
+// Middleware para proteger rutas de usuarios (solo admins pueden gestionar usuarios)
+app.use('/api', usersEndpoints);
 
 // Proteger solo operaciones de escritura para clientes (con excepción de ngrok)
 app.use('/api/customers', (req, res, next) => {
@@ -246,6 +242,7 @@ async function initDatabase() {
                     numero_factura TEXT UNIQUE NOT NULL,
                     total REAL NOT NULL,
                     metodo_pago TEXT NOT NULL,
+                    cliente_id INTEGER REFERENCES clientes(id),
                     vuelto REAL DEFAULT 0,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )`
@@ -400,6 +397,34 @@ async function initDatabase() {
                     fecha_activacion DATETIME DEFAULT CURRENT_TIMESTAMP,
                     fecha_expiracion DATETIME,
                     datos_cliente TEXT
+                )`
+            },
+            {
+                name: 'usuarios',
+                sql: `CREATE TABLE IF NOT EXISTS usuarios (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    nombre_completo TEXT,
+                    email TEXT,
+                    rol TEXT DEFAULT 'admin' CHECK (rol IN ('admin', 'cajero', 'invitado')),
+                    activo INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    ultimo_acceso DATETIME,
+                    intentos_fallidos INTEGER DEFAULT 0,
+                    bloqueado_hasta DATETIME
+                )`
+            },
+            {
+                name: 'auth_logs',
+                sql: `CREATE TABLE IF NOT EXISTS auth_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT,
+                    tipo_evento TEXT CHECK (tipo_evento IN ('login_exitoso', 'login_fallido', 'logout', 'cambio_clave')),
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )`
             },
             {
@@ -1233,6 +1258,38 @@ async function initDatabase() {
             console.log('✅ Migración v18 completada');
         }
 
+        // v19: Agregar columna cliente_id a ventas
+        if (schemaVersion < 19) {
+            console.log('🔄 Aplicando migración de esquema v19: agregar columna cliente_id a ventas...');
+            try {
+                // Verificar si la columna ya existe
+                const tableInfo = await dbAll("PRAGMA table_info(ventas)");
+                const clienteIdExists = tableInfo.some(col => col.name === 'cliente_id');
+                
+                if (!clienteIdExists) {
+                    await dbRun(`ALTER TABLE ventas ADD COLUMN cliente_id INTEGER REFERENCES clientes(id)`);
+                    console.log('✅ Columna cliente_id agregada a ventas');
+                    
+                    // Contar ventas afectadas
+                    const ventasSinCliente = await dbAll(
+                        "SELECT COUNT(*) as count FROM ventas WHERE metodo_pago = 'cuenta_corriente' AND cliente_id IS NULL"
+                    );
+                    if (ventasSinCliente[0].count > 0) {
+                        console.log(`⚠️  Hay ${ventasSinCliente[0].count} ventas en cuenta corriente sin cliente asignado`);
+                    }
+                } else {
+                    console.log('ℹ️  Columna cliente_id ya existe en ventas');
+                }
+            } catch (error) {
+                console.error('❌ Error en migración v19:', error.message);
+            }
+
+            // Marcar migración como aplicada
+            await dbRun(`INSERT INTO schema_versions (version, description) VALUES (?, ?)`,
+                [19, 'Migración v19: agregar columna cliente_id a tabla ventas']);
+            console.log('✅ Migración v19 completada');
+        }
+
 
         // Verificar si hay datos de ejemplo que insertar
         const productCount = await dbAll("SELECT COUNT(*) as count FROM productos");
@@ -1250,6 +1307,21 @@ async function initDatabase() {
 
 // Insertar datos de ejemplo
 function insertSampleData() {
+    // Insertar usuario admin por defecto
+    const bcrypt = require('bcrypt');
+    const adminPasswordHash = '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'; // 'pos123'
+    
+    db.run(`
+        INSERT OR IGNORE INTO usuarios (username, password_hash, nombre_completo, email, rol, activo)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `, ['admin', adminPasswordHash, 'Administrador del Sistema', 'admin@empresa.com', 'admin', 1], (err) => {
+        if (err) {
+            console.log('⚠️  Error inserting admin user:', err.message);
+        } else {
+            console.log('✅ Usuario admin creado por defecto');
+        }
+    });
+
     const productos = [
         ['LAP-001', 'Laptop HP 15.6"', 'Laptop HP con pantalla 15.6 pulgadas', 899.99, 25, 'Tecnología'],
         ['MON-001', 'Monitor Samsung 24"', 'Monitor Samsung 24 pulgadas Full HD', 249.99, 15, 'Tecnología'],
@@ -3916,8 +3988,8 @@ app.post('/api/sales', async (req, res) => {
         try {
             // Insertar venta con timestamp ISO
             const saleResult = await dbRun(
-                "INSERT INTO ventas (numero_factura, total, metodo_pago, vuelto, created_at) VALUES (?, ?, ?, ?, ?)",
-                [facturaNumber, total, metodoPago, vuelto || 0, serverTimestamp]
+                "INSERT INTO ventas (numero_factura, total, metodo_pago, cliente_id, vuelto, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                [facturaNumber, total, metodoPago, cliente_id || null, vuelto || 0, serverTimestamp]
             );
 
             // Insertar items y actualizar stock usando sistema FIFO de lotes
@@ -4394,7 +4466,15 @@ app.post('/api/close-register-preview', async (req, res) => {
         }
 
         // Determinar fecha para el cierre
-        let targetDate = fechaEspecifica || fecha || new Date().toISOString().split('T')[0];
+        let targetDate = fechaEspecifica || fecha;
+        
+        // Si no hay fecha específica, usar la fecha del sistema (no UTC)
+        if (!targetDate) {
+            const now = new Date();
+            // Ajustar a la zona horaria del sistema (UTC-3 para Argentina)
+            const systemTime = new Date(now.getTime() + (SYSTEM_TIMEZONE_OFFSET * 60 * 60 * 1000));
+            targetDate = systemTime.toISOString().split('T')[0];
+        }
         console.log(`🔍 [DEBUG] targetDate inicial: ${targetDate}, fechaEspecifica: ${fechaEspecifica}, fecha: ${fecha}`);
         if (fechaEspecifica) {
             // Validar formato de fecha específica
@@ -4626,6 +4706,17 @@ app.post('/api/close-register-confirm', async (req, res) => {
 
         console.log('🔍 Datos recibidos para confirmar cierre:', req.body);
 
+        // Determinar la fecha de cierre correcta usando la hora local del servidor (UTC-3 para Argentina)
+        // Si no se proporciona fecha_cierre, usar la fecha actual del servidor
+        let targetDate = fecha_cierre || fecha;
+        if (!targetDate) {
+            // Usar la fecha local del servidor (UTC-3)
+            const now = new Date();
+            const systemTime = new Date(now.getTime() + (SYSTEM_TIMEZONE_OFFSET * 60 * 60 * 1000));
+            targetDate = systemTime.toISOString().split('T')[0];
+        }
+        console.log('🔍 [DEBUG] targetDate para cierre:', targetDate);
+
         // Validar campos requeridos
         if (dinero_inicial === undefined || dinero_inicial === null) {
             return res.status(400).json({ error: 'El campo dinero_inicial es requerido' });
@@ -4638,26 +4729,32 @@ app.post('/api/close-register-confirm', async (req, res) => {
         }
 
         // Obtener el último cierre completo para calcular el rango de ventas (NO confiar en datos del frontend)
-        const lastClose = await dbAll(`
-            SELECT id, fecha_hora_cierre, fecha_cierre, numero_cierre_dia, ultima_venta_id
-            FROM cierres_caja
-            ORDER BY fecha_hora_cierre DESC, id DESC
-            LIMIT 1
-        `);
+        let lastClose = [];
+        try {
+            lastClose = await dbAll(`
+                SELECT id, fecha_hora_cierre, fecha_cierre, numero_cierre_dia, ultima_venta_id
+                FROM cierres_caja
+                ORDER BY fecha_hora_cierre DESC, id DESC
+                LIMIT 1
+            `);
+            console.log('🔍 [DEBUG] lastClose:', lastClose);
+        } catch (error) {
+            console.error('🔍 [ERROR] Error obteniendo lastClose:', error.message);
+        }
 
         // Construir condición para ventas: usar ultima_venta_id del último cierre si existe, sino fecha/hora
         let salesCondition = "DATE(v.created_at, '+3 hours') = DATE(?)";
-        let salesParams = [fecha_cierre];
+        let salesParams = [targetDate];
 
         if (lastClose.length > 0) {
             if (lastClose[0].ultima_venta_id !== null) {
                 // Usar ultima_venta_id para filtro preciso
                 salesCondition = "v.id > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
-                salesParams = [lastClose[0].ultima_venta_id, fecha_cierre];
+                salesParams = [lastClose[0].ultima_venta_id, targetDate];
             } else if (tipo_cierre !== 'retroactivo') {
                 // Si no hay ultima_venta_id y es cierre normal, usar fecha_hora_cierre
                 salesCondition = "v.created_at > ? AND DATE(v.created_at, '+3 hours') <= DATE(?)";
-                salesParams = [lastClose[0].fecha_hora_cierre, fecha_cierre];
+                salesParams = [lastClose[0].fecha_hora_cierre, targetDate];
             }
             // Para cierres retroactivos, siempre incluir todas las ventas del día (ignorar ultimo cierre)
         }
@@ -4677,12 +4774,17 @@ app.post('/api/close-register-confirm', async (req, res) => {
         const totalVentas = parseFloat(dailySales[0]?.total || 0);
         const cantidadVentas = dailySales[0]?.cantidad || 0;
 
+        console.log('🔍 [DEBUG] dineroInicialParsed:', dineroInicialParsed);
+        console.log('🔍 [DEBUG] totalVentas:', totalVentas);
+        console.log('🔍 [DEBUG] cantidadVentas:', cantidadVentas);
+
         // Validar que totalVentas sea un número válido
         if (isNaN(totalVentas) || !isFinite(totalVentas)) {
-            throw new Error('No se pudo obtener total de ventas válido de la base de datos');
+            console.warn('⚠️ [WARN] totalVentas es NaN o no es finito, ajustando a 0');
         }
 
         const totalEsperado = dineroInicialParsed + totalVentas;
+        console.log('🔍 [DEBUG] Después de calcular totalEsperado:', totalEsperado);
 
         // Calcular diferencia (si se proporciona dinero_contado desde frontend)
         const diferencia = req.body.dinero_contado !== undefined ?
@@ -4701,7 +4803,7 @@ app.post('/api/close-register-confirm', async (req, res) => {
                 WHERE fecha_cierre = ?
                 ORDER BY numero_cierre_dia DESC
                 LIMIT 1
-            `, [fecha_cierre]);
+            `, [targetDate]);
         } catch (error) {
             console.warn('Error obteniendo cierres del día para confirmación:', error.message);
             cierresDelDia = [];
@@ -4709,8 +4811,10 @@ app.post('/api/close-register-confirm', async (req, res) => {
 
         const numeroCierreDia = cierresDelDia.length > 0 ? cierresDelDia[0].numero_cierre_dia + 1 : 1;
 
-        // Obtener timestamp actual para fecha_hora_cierre
-        const fechaHoraCierre = new Date().toISOString();
+        // Obtener timestamp actual para fecha_hora_cierre (ajustado a UTC-3)
+        const now = new Date();
+        now.setHours(now.getHours() + 3);
+        const fechaHoraCierre = now.toISOString();
 
         // Obtener la ultima_venta_id para este cierre
         let ultimaVentaId = null;
@@ -4728,7 +4832,7 @@ app.post('/api/close-register-confirm', async (req, res) => {
             `INSERT INTO cierres_caja
             (fecha, fecha_cierre, fecha_hora_cierre, dinero_inicial, total_ventas, total_esperado, diferencia, cantidad_ventas, tipo_cierre, notas, numero_cierre_dia, ultima_venta_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [fecha, fecha_cierre, fechaHoraCierre, dinero_inicial, totalVentas, totalEsperado, diferencia, cantidadVentas, tipo_cierre || 'normal', notas || '', numeroCierreDia, ultimaVentaId]
+            [fechaHoraCierre, targetDate, fechaHoraCierre, dinero_inicial, totalVentas, totalEsperado, diferencia, cantidadVentas, tipo_cierre || 'normal', notas || '', numeroCierreDia, ultimaVentaId]
         );
 
         // Si es un cierre retroactivo, actualizar el estado de días sin cierre
@@ -4737,26 +4841,26 @@ app.post('/api/close-register-confirm', async (req, res) => {
                 UPDATE dias_sin_cierre
                 SET estado = 'resuelto', ultima_actualizacion = datetime('now')
                 WHERE fecha = ?
-            `, [fecha_cierre]);
+            `, [targetDate]);
         }
 
         // Registrar la operación en el log
         logOperation(
             'CIERRE_CAJA',
-            `Cierre de caja ${tipo_cierre || 'normal'} #${numeroCierreDia} realizado - Fecha: ${fecha_cierre} - Total: ${formatCurrency(totalEsperado)}`,
+            `Cierre de caja ${tipo_cierre || 'normal'} #${numeroCierreDia} realizado - Fecha: ${targetDate} - Total: ${formatCurrency(totalEsperado)}`,
             'Sistema',
             'cierres_caja',
             result.id,
             null,
             {
-                fecha_cierre,
+                fecha_cierre: targetDate,
                 numero_cierre_dia: numeroCierreDia,
                 fecha_hora_cierre: fechaHoraCierre,
                 dinero_inicial,
                 total_ventas: totalVentas,
-                total_esperado,
+                total_esperado: totalEsperado,
                 diferencia,
-                cantidad_ventas,
+                cantidad_ventas: cantidadVentas,
                 tipo_cierre: tipo_cierre || 'normal',
                 ultima_venta_id: ultimaVentaId
             }
@@ -4781,8 +4885,10 @@ app.post('/api/close-register-confirm', async (req, res) => {
     }
 });
 
-// Ruta para cierre de caja (legacy - mantiene compatibilidad)
+// Ruta para cierre de caja (LEGACY - DEPRECATED - Usar /api/close-register-confirm en su lugar)
+// Esta ruta se mantiene solo por compatibilidad con clientes antiguos
 app.post('/api/close-register', async (req, res) => {
+    console.log('⚠️ [DEPRECATED] Endpoint /api/close-register llamado - Use /api/close-register-confirm en su lugar');
     try {
         const { fecha, dineroInicial, dineroContado } = req.body;
 
@@ -7708,15 +7814,6 @@ app.post('/api/reset-data-selective', conditionalAuth, async (req, res) => {
 //                 results.lotes += lotesResult.changes;
 //             }
 //
-//             // Resetear cierres de caja
-//             if (resetCierres) {
-//                 const cierresResult = await dbRun("DELETE FROM cierres_caja");
-//                 results.cierres = cierresResult.changes;
-//
-//                 // Resetear días sin cierre
-//                 await dbRun("DELETE FROM dias_sin_cierre");
-//             }
-//
 //             // Resetear proveedores
 //             if (resetProveedores) {
 //                 // Eliminar proveedores
@@ -8014,14 +8111,6 @@ app.get('/api/diagnostic', async (req, res) => {
             status: 'ERROR'
         });
     }
-});
-
-// Endpoint de prueba de autenticación
-app.get('/api/test-auth', (req, res) => {
-    console.log('🔓 Ejecutando /api/test-auth sin autenticación');
-    console.log('📨 Headers de la request:', JSON.stringify(req.headers, null, 2));
-    console.log('🔑 Authorization header:', req.headers.authorization || 'No presente');
-    res.json({ authenticated: true, message: 'Autenticación exitosa' });
 });
 
 

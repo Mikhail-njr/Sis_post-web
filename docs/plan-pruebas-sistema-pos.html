@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Pruebas - Sistema POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .metadata {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .metadata span {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header h2 {
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .section-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .test-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-group h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .test-group h3::before {
+            content: "▶";
+            color: #667eea;
+            font-size: 0.8em;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .test-label {
+            flex: 1;
+        }
+
+        .test-label .test-name {
+            font-weight: 500;
+            color: #444;
+        }
+
+        .test-label .test-desc {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .priority {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: #ff4444;
+            color: white;
+        }
+
+        .priority-medium {
+            background: #ffaa00;
+            color: white;
+        }
+
+        .priority-low {
+            background: #44aa44;
+            color: white;
+        }
+
+        .module-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f0f0f0;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .status-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .status-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-card .count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .summary-card .label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .test-steps {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .test-steps ol {
+            margin-left: 20px;
+            color: #444;
+        }
+
+        .test-steps li {
+            margin: 5px 0;
+        }
+
+        .expected-result {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .expected-result strong {
+            color: #2e7d32;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Plan de Pruebas del Sistema POS</h1>
+            <p>Documento de testing completo para validar todas las funcionalidades del sistema de Punto de Venta</p>
+            <div class="metadata">
+                <span>📅 Fecha: 17/03/2026</span>
+                <span>👤 Versión: 1.0</span>
+                <span>⏱️ Tiempo estimado: 4 horas</span>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Resumen de Pruebas -->
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="count">8</div>
+                    <div class="label">Módulos a Probar</div>
+                </div>
+                <div class="summary-card">
+                    <div class="count">45+</div>
+                    <div class="label">Casos de Prueba</div>
+                </div>
+                <div class="summary-card">
+                    <div class="count">12</div>
+                    <div class="label">Endpoints Críticos</div>
+                </div>
+                <div class="summary-card">
+                    <div class="count">5</div>
+                    <div class="label">Integraciones</div>
+                </div>
+            </div>
+
+            <!-- Módulo 1: Autenticación y Seguridad -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">1</span>
+                    <h2>🔐 Autenticación y Seguridad</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>Login de Usuarios</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Inicio de sesión válido <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que un usuario registrado puede iniciar sesión con credenciales válidas</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Navegar a la página de login</li>
+                                        <li>Ingresar nombre de usuario válido</li>
+                                        <li>Ingresar contraseña correcta</li>
+                                        <li>Hacer clic en "Iniciar Sesión"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema redirige al dashboard y crea una sesión válida
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Inicio de sesión con credenciales inválidas <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el sistema rechaza usuarios con credenciales incorrectas</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Navegar a la página de login</li>
+                                        <li>Ingresar un usuario que no existe</li>
+                                        <li>Ingresar una contraseña incorrecta</li>
+                                        <li>Hacer clic en "Iniciar Sesión"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra mensaje de error "Credenciales inválidas"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Cierre de sesión <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el cierre de sesión invalida la sesión actual</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Iniciar sesión como usuario válido</li>
+                                        <li>Hacer clic en "Cerrar Sesión"</li>
+                                        <li>Intentar acceder a una ruta protegida</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema redirige al login y no permite acceso a rutas protegidas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Gestión de Credenciales</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Cambio de contraseña <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que un usuario puede cambiar su contraseña</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Iniciar sesión como usuario</li>
+                                        <li>Ir a configuración de cuenta</li>
+                                        <li>Seleccionar "Cambiar Contraseña"</li>
+                                        <li>Ingresar contraseña actual</li>
+                                        <li>Ingresar nueva contraseña (mínimo 6 caracteres)</li>
+                                        <li>Confirmar nueva contraseña</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra mensaje de éxito y la nueva contraseña funciona
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Protección de rutas <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que las rutas protegidas requieren autenticación</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Cerrar sesión o usar navegador privado</li>
+                                        <li>Intentar acceder directamente a /dashboard</li>
+                                        <li>Intentar acceder directamente a /api/stats</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema redirige al login o retorna error 401
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Sistema de Licencias</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Activación de licencia <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que el sistema permite activar una licencia válida</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Navegar a la página de activación</li>
+                                        <li>Ingresar una clave de licencia válida</li>
+                                        <li>Completar datos del cliente</li>
+                                        <li>Confirmar activación</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema activa la licencia y permite el acceso completo
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Desactivación de licencia <span class="priority priority-low">Baja</span></span>
+                                <span class="test-desc">Verificar que el sistema permite desactivar una licencia</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Iniciar sesión como administrador</li>
+                                        <li>Ir a configuración de licencia</li>
+                                        <li>Seleccionar "Desactivar Licencia"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema desactiva la licencia y限a el acceso a funciones premium
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 2: Gestión de Productos -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">2</span>
+                    <h2>📦 Gestión de Productos</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>CRUD de Productos</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear nuevo producto <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede crear un producto con todos los campos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Navegar a gestión de productos</li>
+                                        <li>Hacer clic en "Nuevo Producto"</li>
+                                        <li>Completar: código, nombre, descripción, precio, stock, categoría</li>
+                                        <li>Guardar producto</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El producto aparece en el listado y se puede buscar
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Editar producto existente <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede modificar un producto</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un producto existente</li>
+                                        <li>Modificar el precio o nombre</li>
+                                        <li>Guardar cambios</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Los cambios se reflejan inmediatamente en el listado
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Eliminar producto <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede eliminar un producto</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un producto</li>
+                                        <li>Hacer clic en "Eliminar"</li>
+                                        <li>Confirmar eliminación</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El producto se elimina del listado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Búsqueda y Filtrado</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Búsqueda por código de barras <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el sistema encuentra productos por código de barras</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Usar el scanner o ingresar código de barras manualmente</li>
+                                        <li>Verificar que el producto aparece en los resultados</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra el producto relacionado con ese código de barras
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Búsqueda por nombre <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que la búsqueda por nombre funciona correctamente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ingresar parte del nombre del producto en el buscador</li>
+                                        <li>Verificar resultados</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra todos los productos que coinciden con la búsqueda
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Filtrado por categoría <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se pueden filtrar productos por categoría</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar una categoría del filtro</li>
+                                        <li>Verificar que solo aparecen productos de esa categoría</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El listado muestra solo productos de la categoría seleccionada
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Gestión de Lotes</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear lote de productos <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede crear un lote con fecha de vencimiento</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a gestión de lotes</li>
+                                        <li>Crear nuevo lote con: producto, número, fecha vencimiento, cantidad, costo</li>
+                                        <li>Guardar lote</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El lote se crea y se asocia correctamente al producto
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Productos próximos a vencer <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que el sistema identifica lotes próximos a vencer</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Crear lote con fecha de vencimiento dentro de 7 días</li>
+                                        <li>Verificar que aparece en la lista de productos próximos a vencer</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra los lotes que vencen en los próximos 7 días
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Productos vencidos <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el sistema identifica productos vencidos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Verificar que aparecen lotes con fecha pasada en la lista de vencidos</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra todos los lotes vencidos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Promociones</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear promoción <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se pueden crear promociones con productos asociados</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a gestión de promociones</li>
+                                        <li>Crear nueva promoción con título y productos</li>
+                                        <li>Guardar promoción</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La promoción se crea y aplica correctamente en ventas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 3: Gestión de Clientes -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">3</span>
+                    <h2>👥 Gestión de Clientes</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>CRUD de Clientes</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear nuevo cliente <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede registrar un nuevo cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a gestión de clientes</li>
+                                        <li>Hacer clic en "Nuevo Cliente"</li>
+                                        <li>Completar: nombre, documento, teléfono, email, dirección</li>
+                                        <li>Guardar cliente</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El cliente se crea y aparece en el listado
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Editar cliente <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede modificar información de un cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un cliente</li>
+                                        <li>Modificar algún campo (teléfono o dirección)</li>
+                                        <li>Guardar cambios</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Los cambios se reflejan en el listado y cuenta corriente
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Eliminar cliente <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede eliminar un cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un cliente sin deudas</li>
+                                        <li>Eliminar el cliente</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El cliente se elimina (con validación de no tener deudas activas)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Cuenta Corriente</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Ver cuenta corriente de cliente <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se muestran todas las deudas de un cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un cliente</li>
+                                        <li>Ir a "Cuenta Corriente"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestran todas las deudas con productos, fechas y montos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Pago parcial de deuda <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede realizar un pago parcial de una deuda</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar una deuda</li>
+                                        <li>Registrar un pago menor al total</li>
+                                        <li>Verificar que la deuda queda como pendiente</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La deuda se actualiza con el monto pendiente correcto
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Pago total de deuda <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede saldar completamente una deuda</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar una deuda</li>
+                                        <li>Registrar pago igual al monto total</li>
+                                        <li>Verificar que la deuda se marca como pagada</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La deuda se marca como pagada y ya no aparece como pendiente
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Limpiar deudas de cliente <span class="priority priority-low">Baja</span></span>
+                                <span class="test-desc">Verificar que un administrador puede limpiar todas las deudas de un cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Iniciar sesión como administrador</li>
+                                        <li>Seleccionar un cliente</li>
+                                        <li>Usar la opción "Limpiar Deudas"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Todas las deudas del cliente se eliminan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 4: Gestión de Ventas -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">4</span>
+                    <h2>💰 Gestión de Ventas</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>Ventas en Efectivo</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Realizar venta en efectivo <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar el flujo completo de una venta en efectivo</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Escanear o buscar productos</li>
+                                        <li>Agregar productos al carrito</li>
+                                        <li>Seleccionar método de pago "Efectivo"</li>
+                                        <li>Ingresar monto recibido</li>
+                                        <li>Verificar cálculo de vuelto</li>
+                                        <li>Confirmar venta</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La venta se registra, el stock se descuenta y se genera ticket
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Venta con tarjeta de débito/crédito <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar ventas con métodos de pago electrónicos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Agregar productos al carrito</li>
+                                        <li>Seleccionar método de pago "Tarjeta"</li>
+                                        <li>Confirmar venta</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La venta se registra correctamente con método de pago tarjeta
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Ventas a Cuenta Corriente</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Venta a cuenta corriente <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede registrar una venta a cuenta corriente de un cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Buscar y seleccionar un cliente</li>
+                                        <li>Agregar productos al carrito</li>
+                                        <li>Seleccionar "Cuenta Corriente" como método de pago</li>
+                                        <li>Confirmar venta</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se crea una deuda en la cuenta del cliente con los productos vendidos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Venta a cuenta corriente sin cliente <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que no se puede hacer venta a cuenta sin seleccionar cliente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Agregar productos al carrito</li>
+                                        <li>Seleccionar "Cuenta Corriente"</li>
+                                        <li>No seleccionar ningún cliente</li>
+                                        <li>Intentar confirmar</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra error indicando que debe seleccionar un cliente
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Gestión de Ventas</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Cancelar venta <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede cancelar una venta y reintegrar stock</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Buscar una venta reciente</li>
+                                        <li>Seleccionar opción "Cancelar Venta"</li>
+                                        <li>Confirmar cancelación</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> La venta se cancela y el stock de productos se reintegra
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Ver historial de ventas <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede ver el historial completo de ventas</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a sección de ventas</li>
+                                        <li>Verificar que aparecen todas las ventas</li>
+                                        <li>Verificar filtros por fecha</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestra el listado de todas las ventas con detalles
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 5: Gestión de Proveedores -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">5</span>
+                    <h2>🚚 Gestión de Proveedores</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>CRUD de Proveedores</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear nuevo proveedor <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede registrar un nuevo proveedor</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a gestión de proveedores</li>
+                                        <li>Crear nuevo proveedor con datos completos</li>
+                                        <li>Guardar proveedor</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El proveedor se crea y aparece en el listado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Pedidos a Proveedores</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Crear pedido a proveedor <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede crear un pedido de productos a un proveedor</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un proveedor</li>
+                                        <li>Crear nuevo pedido</li>
+                                        <li>Agregar productos al pedido</li>
+                                        <li>Establecer fecha de entrega estimada</li>
+                                        <li>Guardar pedido</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El pedido se crea con estado "pendiente"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Confirmar recepción de pedido <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que al recibir un pedido se crean automáticamente los lotes</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un pedido en estado "pendiente"</li>
+                                        <li>Confirmar recepción de productos</li>
+                                        <li>Verificar que se crean lotes</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El pedido cambia a "recibido" y se crean lotes con costos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Cambiar estado de pedido <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede cambiar el estado de un pedido</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Seleccionar un pedido</li>
+                                        <li>Cambiar estado a "cancelado" o "recibido"</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El estado del pedido se actualiza correctamente
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 6: Cierre de Caja -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">6</span>
+                    <h2>📊 Cierre de Caja</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>Preview de Cierre</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Vista previa de cierre de caja <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede ver una preview del cierre antes de confirmar</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a cierre de caja</li>
+                                        <li>Solicitar vista previa</li>
+                                        <li>Verificar que muestra: total ventas, métodos de pago, cantidad de transacciones</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestra un resumen con todas las ventas del día
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Confirmación de Cierre</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Confirmar cierre de caja <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que se puede confirmar un cierre de caja</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Revisar la vista previa</li>
+                                        <li>Confirmar el cierre</li>
+                                        <li>Verificar que se guarda el registro</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El cierre se registra y las ventas quedan associadas a ese cierre
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Historial de cierres <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede ver el historial de cierres</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a historial de cierres</li>
+                                        <li>Verificar que aparecen todos los cierres anteriores</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestra el listado de todos los cierres con fechas y totales
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Verificar días sin cierre <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que el sistema avisa si hay días sin cerrar</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Verificar si hay cierres pendientes</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra los días que no tienen cierre registrado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 7: Reportes y Dashboard -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">7</span>
+                    <h2>📈 Reportes y Dashboard</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>Dashboard</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Carga del dashboard <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el dashboard carga correctamente con todos los datos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Acceder al dashboard</li>
+                                        <li>Verificar que se cargan las métricas principales</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestran: ventas del día, productos con bajo stock, clientes con deudas
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Estadísticas en tiempo real <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que las estadísticas se actualizan correctamente</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Realizar una venta</li>
+                                        <li>Verificar que las estadísticas se actualizan</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Las métricas del dashboard reflejan los nuevos datos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Reportes</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Reporte de rentabilidad <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el reporte de rentabilidad muestra ganancia por producto</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a reportes</li>
+                                        <li>Seleccionar "Rentabilidad por Producto"</li>
+                                        <li>Verificar que muestra: precio costo, precio venta, ganancia</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestra la ganancia bruta por cada producto vendido
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Reporte de operaciones <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que se puede ver el registro de operaciones</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ir a registro de operaciones</li>
+                                        <li>Verificar que muestra todas las operaciones del sistema</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Se muestra un log de todas las operaciones realizadas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulo 8: Integración y Rendimiento -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-number">8</span>
+                    <h2>⚡ Integración y Rendimiento</h2>
+                </div>
+                <div class="section-content">
+                    <div class="test-group">
+                        <h3>Integración Frontend-Backend</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Conexión con API <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que el frontend se comunica correctamente con el backend</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Realizar una operación desde el frontend</li>
+                                        <li>Verificar que los datos se guardan en la base de datos</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Todas las operaciones se reflejan correctamente en la base de datos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Manejo de errores de red <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que el sistema maneja correctamente errores de conexión</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Simular pérdida de conexión</li>
+                                        <li>Intentar realizar una operación</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema muestra un mensaje de error apropiado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Rendimiento</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Tiempo de respuesta <span class="priority priority-medium">Media</span></span>
+                                <span class="test-desc">Verificar que los endpoints responden en tiempo razonable</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Medir tiempo de respuesta de endpoints principales</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> Los endpoints responden en menos de 2 segundos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div name="test-label">
+                                <span class="test-name">Carga de datos grandes <span class="priority priority-low">Baja</span></span>
+                                <span class="test-desc">Verificar el rendimiento con grandes cantidades de datos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Crear gran cantidad de registros</li>
+                                        <li>Verificar que las consultas siguen siendo rápidas</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema mantiene buen rendimiento con datos grandes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-group">
+                        <h3>Base de Datos</h3>
+                        <div class="test-item">
+                            <div class="test-checkbox"></div>
+                            <div class="test-label">
+                                <span class="test-name">Integridad de datos <span class="priority priority-high">Alta</span></span>
+                                <span class="test-desc">Verificar que no hay datos inconsistentes en la base de datos</span>
+                                <div class="test-steps">
+                                    <ol>
+                                        <li>Ejecutar diagnóstico de consistencia</li>
+                                        <li>Verificar que no hay deudas huérfanas o productos sin stock</li>
+                                    </ol>
+                                </div>
+                                <div class="expected-result">
+                                    <strong>Resultado esperado:</strong> El sistema reporta cualquier inconsistencia encontrada
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff4444;"></div>
+                <span>Prioridad Alta</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffaa00;"></div>
+                <span>Prioridad Media</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #44aa44;"></div>
+                <span>Prioridad Baja</span>
+            </div>
+        </div>
+
+        <footer>
+            <p>📝 Plan de Pruebas - Sistema POS | Documento generado el 17/03/2026</p>
+            <p>Para ejecutar las pruebas, marque los checkboxes correspondientes y registre los resultados</p>
+        </footer>
+    </div>
+</body>
+</html>

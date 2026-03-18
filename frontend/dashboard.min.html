@@ -12,6 +12,7 @@
     <script src="openConfirmDeliveryModal.js"></script>
     <script src="dashboard.js"></script>
     <script src="cierre-caja-functions.js"></script>
+    <script src="user-management.js"></script>
     <script>
         // Event listener para el botón de cierre de caja
         document.addEventListener('DOMContentLoaded', function() {
@@ -56,6 +57,9 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <button id="refresh-dashboard-btn" class="btn btn-secondary" onclick="DashboardCache.refresh()" style="font-size: 14px; padding: 8px 16px;" title="Actualizar datos del dashboard">
                     🔄 Actualizar
+                </button>
+                <button class="btn btn-secondary" onclick="openUserManagementModal()" style="font-size: 14px; padding: 8px 16px; background: #6f42c1; color: white;" title="Gestionar usuarios">
+                    👥 Usuarios
                 </button>
                 <!-- Botón de Notificaciones -->
                 <div style="position: relative;">
@@ -505,6 +509,9 @@
                     <!-- Actualización automática de precios; botón removido -->
                     <button class="btn btn-secondary btn-spacing" onclick="showDebtsSummary()">
                         📊 Resumen de Deudas
+                    </button>
+                    <button class="btn btn-secondary btn-spacing" onclick="openUserManagementModal()" style="background: #6f42c1;">
+                        👥 Usuarios
                     </button>
                 </div>
 
@@ -3253,12 +3260,10 @@
                     let diferenciaDisplay = `${diferenciaTotal >= 0 ? '+' : ''}${formatCurrency(diferenciaTotal)}`;
                     let diferenciaClass = diferenciaTotal > 0 ? 'danger' : diferenciaTotal < 0 ? 'success' : 'neutral';
 
-                    // Primera fila de la factura - mostrar número y fecha solo en la primera fila
-                    const isFirstRow = idx === 0;
-
-                    // Si es la primera fila, mostrar factura y fecha; si no, dejar celdas vacías
-                    const facturaCell = isFirstRow ? `<td rowspan="${cantidadProductos}"><strong>${numFactura}</strong></td>` : '';
-                    const fechaCell = isFirstRow ? `<td rowspan="${cantidadProductos}">${fechaFormateada}</td>` : '';
+                    // Mostrar siempre la información de la factura y fecha en cada fila
+                    // Esto evita problemas con rowspan cuando hay filas ocultas
+                    const facturaCell = `<td><strong>${numFactura}</strong></td>`;
+                    const fechaCell = `<td>${fechaFormateada}</td>`;
                     
                     // El botón de pagar aparece en la primera fila y corresponde al TOTAL de la deuda
                     // Verificar el estado de pagado del producto
@@ -3273,7 +3278,7 @@
                         ` : '');
 
                     deudasHtml += `
-                        <tr>
+                        <tr data-invoice="${numFactura}">
                             ${facturaCell}
                             ${fechaCell}
                             <td>${nombreProducto}</td>
@@ -3380,28 +3385,33 @@
             const rows = table.querySelectorAll('tbody tr');
             let visibleCount = 0;
             
-            rows.forEach((row) => {
-                // Find the actual invoice cell (may not be cells[0] due to rowspan)
-                let invoiceCellValue = '';
+            rows.forEach((row, rowIndex) => {
+                //优先使用 data-invoice 属性获取发票号码
+                let invoiceCellValue = row.getAttribute('data-invoice') || '';
                 let statusCellValue = '';
-                
-                // Check all cells to find invoice and status
                 const cells = row.cells;
-                for (let i = 0; i < cells.length; i++) {
-                    const cellText = cells[i].textContent.trim();
-                    // If this cell has rowspan and contains an invoice number, it's the invoice cell
-                    if (cells[i].rowSpan > 1 && cellText.match(/^FAC-/)) {
-                        invoiceCellValue = cellText;
-                    }
-                    // If this is the Estado column (by position or by header)
-                    if (estadoIndex >= 0 && i === estadoIndex) {
-                        statusCellValue = cellText;
-                    }
-                }
                 
-                // Fallback: check cells[0] for invoice if not found
-                if (!invoiceCellValue && cells[0]) {
-                    invoiceCellValue = cells[0].textContent.trim();
+                // 如果没有 data-invoice，回退到旧的逻辑
+                if (!invoiceCellValue) {
+                    // Find the actual invoice cell (may not be cells[0] due to rowspan)
+                    // Check all cells to find invoice and status
+                    
+                    for (let i = 0; i < cells.length; i++) {
+                        const cellText = cells[i].textContent.trim();
+                        // If this cell has rowspan and contains an invoice number, it's the invoice cell
+                        if (cells[i].rowSpan > 1 && cellText.match(/^FAC-/)) {
+                            invoiceCellValue = cellText;
+                        }
+                        // If this is the Estado column (by position or by header)
+                        if (estadoIndex >= 0 && i === estadoIndex) {
+                            statusCellValue = cellText;
+                        }
+                    }
+                    
+                    // Fallback: check cells[0] for invoice if not found
+                    if (!invoiceCellValue && cells[0]) {
+                        invoiceCellValue = cells[0].textContent.trim();
+                    }
                 }
                 
                 // For status, also check all cells for status badges
@@ -7563,6 +7573,62 @@
             });
         }
     </script>
+
+    <!-- Modal de gestión de usuarios -->
+    <div id="userManagementModal" class="edit-modal" style="display: none;">
+        <div class="edit-form" style="max-width: 700px; background: linear-gradient(145deg, #1e1e2e, #2a2a3e); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <div style="background: linear-gradient(90deg, #4CAF50, #45a049); padding: 20px; border-radius: 12px 12px 0 0; margin: -20px -20px 20px -20px;">
+                <h3 style="margin: 0; color: white; font-size: 22px;">👥 Gestión de Usuarios</h3>
+            </div>
+            <div id="userList" style="max-height: 280px; overflow-y: auto; margin-bottom: 20px; background: #16161e; border-radius: 8px; padding: 10px;">
+                <p style="color: #aaa; text-align: center; padding: 20px;">Cargando usuarios...</p>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="showAddUserForm()" style="margin-bottom: 15px; background: linear-gradient(90deg, #2196F3, #1976D2); border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                ➕ Agregar Usuario
+            </button>
+            <div id="userForm" style="display: none; border: 1px solid #3a3a4e; border-radius: 8px; padding: 20px; background: #1a1a28; margin-top: 15px;">
+                <h4 id="userFormTitle" style="color: #4CAF50; margin: 0 0 20px 0; font-size: 18px; border-bottom: 1px solid #3a3a4e; padding-bottom: 10px;">Nuevo Usuario</h4>
+                <form id="userFormElement">
+                    <input type="hidden" id="editUserId">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="username" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Usuario *</label>
+                            <input type="text" id="username" required style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Contraseña <span id="passwordHint" style="color: #f39c12; font-size: 11px;">(requerido)</span></label>
+                            <input type="password" id="password" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="nombreCompleto" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Nombre Completo</label>
+                        <input type="text" id="nombreCompleto" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="email" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Email</label>
+                            <input type="email" id="email" style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group">
+                            <label for="rol" style="color: #aaa; font-size: 13px; display: block; margin-bottom: 5px;">Rol *</label>
+                            <select id="rol" required style="width: 100%; padding: 10px; background: #252535; border: 1px solid #3a3a4e; border-radius: 6px; color: white; box-sizing: border-box;">
+                                <option value="admin">👑 Administrador</option>
+                                <option value="cajero">💰 Cajero</option>
+                                <option value="invitado">👤 Invitado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="hideUserForm()" style="background: #616161; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="userSubmitBtn" style="background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Crear Usuario</button>
+                    </div>
+                </form>
+            </div>
+            <div class="button-group" style="margin-top: 20px; text-align: center;">
+                <button type="button" class="btn btn-secondary" onclick="closeUserManagementModal()" style="background: #f44336; color: white; border: none; padding: 12px 40px; border-radius: 6px; cursor: pointer; font-weight: 600;">Cerrar</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 

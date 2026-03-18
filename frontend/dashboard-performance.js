@@ -209,9 +209,7 @@ const DashboardLoader = {
                 'X-Request-Time': Date.now().toString()
             };
 
-            if (authCredentials) {
-                headers['Authorization'] = `Basic ${btoa(authCredentials.username + ':' + authCredentials.password)}`;
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}${config.endpoint}`, {
                 method: config.method,

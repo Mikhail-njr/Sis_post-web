@@ -39,9 +39,7 @@ function closeConfirmDeliveryModal() {
 async function loadOrderForDelivery(orderId) {
     try {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
         
         const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}`, { headers });
         if (response.status === 401) {
@@ -349,9 +347,7 @@ async function confirmDelivery() {
         
         // Enviar confirmación de entrega
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
         
         // Obtener el orderId del modal o contexto
         const orderId = window.currentDeliveryOrderId || (window.deliveryOrder && window.deliveryOrder.id);

@@ -1059,7 +1059,7 @@ async function generateProductCode() {
     try {
         // Obtener todos los productos para verificar códigos existentes
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) headers['Authorization'] = `Basic ${btoa(authCredentials.username + ':' + authCredentials.password)}`;
+        
         
         const response = await fetch(`${API_BASE}/products`, { headers });
         if (!response.ok) throw new Error('Error al obtener productos');
@@ -1214,7 +1214,7 @@ window.generateUniqueCode = generateUniqueCode;
 async function editProduct(productId) {
     try {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) headers['Authorization'] = `Basic ${btoa(authCredentials.username + ':' + authCredentials.password)}`;
+        
         
         // Obtener datos del producto
         const response = await window.ApiClient.apiRequest(`/products/${productId}`);
@@ -1283,7 +1283,7 @@ async function saveProductChanges(event) {
     
     try {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) headers['Authorization'] = `Basic ${btoa(authCredentials.username + ':' + authCredentials.password)}`;
+        
         
         const response = await window.ApiClient.apiRequest(`/products/${productId}`, {
             method: 'PUT',

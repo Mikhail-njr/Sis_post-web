@@ -2,38 +2,21 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const db = require('./database-connection');
 
+// Importar funciones centralizadas de autenticación
+const { requireAdmin } = require('./auth-utils');
+
 const router = express.Router();
 
+// Middleware para verificar admin - reutilizable
+const requireAdminMiddleware = requireAdmin();
+
 // Endpoint para obtener las credenciales actuales (solo admin)
-router.get('/api/credentials', async (req, res) => {
+router.get('/api/credentials', requireAdminMiddleware, async (req, res) => {
     try {
-        // Verificar autenticación básica
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Basic ')) {
-            return res.status(401).json({ error: 'Autenticación requerida' });
-        }
-
-        const base64Credentials = authHeader.split(' ')[1];
-        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-        const [username, password] = credentials.split(':');
-
-        // Verificar credenciales actuales
-        const user = await db.get("SELECT * FROM usuarios WHERE username = ? AND activo = 1", [username]);
-        if (!user) {
-            return res.status(401).json({ error: 'Credenciales inválidas' });
-        }
-
-        // Verificar contraseña
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
-        if (!isValidPassword) {
-            return res.status(401).json({ error: 'Credenciales inválidas' });
-        }
-
-        // Verificar rol de admin
-        if (user.rol !== 'admin') {
-            return res.status(403).json({ error: 'Acceso denegado: se requiere rol de administrador' });
-        }
-
+        // El middleware ya verificó las credenciales y el rol de admin
+        // req.user contiene el usuario autenticado
+        const user = req.user;
+        
         // Retornar información del usuario (sin la contraseña)
         res.json({
             success: true,
@@ -171,34 +154,11 @@ router.put('/api/credentials', async (req, res) => {
 });
 
 // Endpoint para listar todos los usuarios (solo admin)
-router.get('/api/users', async (req, res) => {
+router.get('/api/users', requireAdminMiddleware, async (req, res) => {
     try {
-        // Verificar autenticación básica
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Basic ')) {
-            return res.status(401).json({ error: 'Autenticación requerida' });
-        }
-
-        const base64Credentials = authHeader.split(' ')[1];
-        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-        const [username, password] = credentials.split(':');
-
-        // Verificar credenciales
-        const user = await db.get("SELECT * FROM usuarios WHERE username = ? AND activo = 1", [username]);
-        if (!user) {
-            return res.status(401).json({ error: 'Credenciales inválidas' });
-        }
-
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
-        if (!isValidPassword) {
-            return res.status(401).json({ error: 'Credenciales inválidas' });
-        }
-
-        // Verificar rol de admin
-        if (user.rol !== 'admin') {
-            return res.status(403).json({ error: 'Acceso denegado: se requiere rol de administrador' });
-        }
-
+        // El middleware ya verificó las credenciales y el rol de admin
+        // req.user contiene el usuario autenticado
+        
         // Obtener todos los usuarios
         const users = await db.all("SELECT id, username, nombre_completo, email, rol, activo, created_at, updated_at FROM usuarios ORDER BY username");
 
@@ -214,36 +174,12 @@ router.get('/api/users', async (req, res) => {
 });
 
 // Endpoint para crear nuevo usuario (solo admin)
-router.post('/api/users', async (req, res) => {
+router.post('/api/users', requireAdminMiddleware, async (req, res) => {
     try {
         const { username, password, nombre_completo, email, rol } = req.body;
 
-        // Verificar autenticación básica del admin
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Basic ')) {
-            return res.status(401).json({ error: 'Autenticación requerida' });
-        }
-
-        const base64Credentials = authHeader.split(' ')[1];
-        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-        const [adminUsername, adminPassword] = credentials.split(':');
-
-        // Verificar credenciales del admin
-        const admin = await db.get("SELECT * FROM usuarios WHERE username = ? AND activo = 1", [adminUsername]);
-        if (!admin) {
-            return res.status(401).json({ error: 'Credenciales de administrador inválidas' });
-        }
-
-        const isValidPassword = await bcrypt.compare(adminPassword, admin.password_hash);
-        if (!isValidPassword) {
-            return res.status(401).json({ error: 'Credenciales de administrador inválidas' });
-        }
-
-        // Verificar rol de admin
-        if (admin.rol !== 'admin') {
-            return res.status(403).json({ error: 'Acceso denegado: se requiere rol de administrador' });
-        }
-
+        // req.user contiene el usuario autenticado (ya verificado por el middleware)
+        
         // Validaciones
         if (!username || !password || !rol) {
             return res.status(400).json({ error: 'Username, password y rol son requeridos' });

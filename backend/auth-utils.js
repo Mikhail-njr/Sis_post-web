@@ -475,5 +475,135 @@ module.exports = {
     deleteUser,
     getAllUsers,
     isUserBlocked,
-    logAuthAttempt
+    logAuthAttempt,
+    // Funciones centralizadas para eliminar código duplicado
+    extractBasicAuth,
+    validateBasicAuthCredentials,
+    requireAdmin,
+    requireAuth,
+    // Nueva función de autenticación condicional basada en DB
+    conditionalAuthDB
 };
+
+// ============================================
+// FUNCIONES CENTRALIZADAS DE AUTENTICACIÓN
+// Eliminadas código duplicado en el proyecto
+// ============================================
+
+/**
+ * Extrae credenciales del header Authorization Basic
+ * @param {Object} req - Objeto de solicitud Express
+ * @returns {Object|null} - {username, password} o null si no es Basic Auth
+ */
+function extractBasicAuth(req) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+        return null;
+    }
+    
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
+    
+    if (!username || !password) {
+        return null;
+    }
+    
+    return { username, password };
+}
+
+/**
+ * Valida credenciales Basic Auth contra la base de datos
+ * @param {Object} req - Objeto de solicitud Express
+ * @returns {Promise<Object|null>} - Usuario validado o null
+ */
+async function validateBasicAuthCredentials(req) {
+    const auth = extractBasicAuth(req);
+    if (!auth) {
+        return null;
+    }
+    
+    return await validateUser(auth.username, auth.password);
+}
+
+/**
+ * Middleware Express para requerir autenticación de admin
+ * @returns {Function} - Middleware de Express
+ */
+function requireAdmin() {
+    return async (req, res, next) => {
+        try {
+            const user = await validateBasicAuthCredentials(req);
+            
+            if (!user) {
+                return res.status(401).json({ error: 'Credenciales inválidas' });
+            }
+            
+            if (user.rol !== 'admin') {
+                return res.status(403).json({ error: 'Acceso denegado: se requiere rol de administrador' });
+            }
+            
+            req.user = user;
+            next();
+        } catch (error) {
+            console.error('Error en requireAdmin:', error);
+            res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    };
+}
+
+/**
+ * Middleware Express para requerir autenticación (cualquier usuario)
+ * @returns {Function} - Middleware de Express
+ */
+function requireAuth() {
+    return async (req, res, next) => {
+        try {
+            const user = await validateBasicAuthCredentials(req);
+            
+            if (!user) {
+                return res.status(401).json({ error: 'Credenciales inválidas' });
+            }
+            
+            req.user = user;
+            next();
+        } catch (error) {
+            console.error('Error en requireAuth:', error);
+            res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    };
+}
+
+/**
+ * Middleware de autenticación condicional que usa base de datos
+ * Para desarrollo (localhost/ngrok) permite acceso sin autenticación
+ * Para producción requiere autenticación válida
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @param {Function} next - Función next de Express
+ */
+async function conditionalAuthDB(req, res, next) {
+    // Siempre verificar credenciales contra la base de datos
+    // Nota: Para localhost en desarrollo, se puede desactivar quitando este comentario:
+    // const host = req.get('host') || '';
+    // if (host.includes('ngrok') || host.includes('localhost') || host.includes('127.0.0.1')) {
+    //     return next();
+    // }
+    
+    // Para producción, verificar credenciales contra la base de datos
+    try {
+        const user = await validateBasicAuthCredentials(req);
+        
+        if (!user) {
+            return res.status(401).json({ 
+                error: 'Credenciales inválidas o autenticación requerida' 
+            });
+        }
+        
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error('Error en conditionalAuthDB:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}

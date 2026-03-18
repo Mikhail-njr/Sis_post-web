@@ -698,7 +698,7 @@
                        <input type="hidden" id="cuentaCorriente-clienteId" value="">
                        <input type="hidden" id="cuentaCorriente-clienteNombre" value="">
                        <div id="cuentaCorriente-info" style="margin-top: 10px; display: none;">
-                          <div style="font-size: 12px; color: #666;">
+                          <div style="font-size: 12px; color: #000;">
                              <strong>Cliente:</strong> <span id="cuentaCorriente-nombre">No seleccionado</span>
                           </div>
                        </div>
@@ -790,6 +790,7 @@
     <script>
         // Función para actualizar la UI basada en el estado de autenticación
         function updateUIBasedOnAuth() {
+            console.log('🔍 [INDEX DEBUG] updateUIBasedOnAuth llamado - isLoggedIn:', isLoggedIn);
             const loginBtn = document.getElementById('loginBtn');
             if (loginBtn) {
                 if (isLoggedIn) {
@@ -808,6 +809,7 @@
         }
 
         // Llamar a updateUIBasedOnAuth después de cargar la página
+        console.log('🔍 [INDEX DEBUG] Llamando updateUIBasedOnAuth (inicial)');
         updateUIBasedOnAuth();
     </script>
     <script>

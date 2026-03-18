@@ -1,12 +1,6 @@
     // API_BASE ya está declarado en script.js
     // isLoggedIn y authCredentials también están en script.js
-
-    // >>> INTEGRACIÓN DEL SCRIPT DE DIAGNÓSTICO <<<
-    (function() {
-        const script = document.createElement('script');
-        script.src = 'diagnostic-clientes-cuenta-corriente.js';
-        document.head.appendChild(script);
-    })();
+    // El script de diagnóstico ya se carga en dashboard.html
 
     // Helper function to create modals (eliminates duplicated code)
     function createModal(className, content) {
@@ -62,12 +56,8 @@
 
     // Función centralizada para obtener productos
     async function fetchProductsData() {
-        const headers = {
-            'Content-Type': 'application/json',
-        };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        // Usar función centralizada para headers de autenticación
+        const headers = window.ApiClient.getBasicAuthHeaders();
 
         const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
         if (response.status === 401) {
@@ -78,9 +68,6 @@
         if (!response.ok) throw new Error('Error al obtener productos');
         return await response.json();
     }
-    
-    // Exponer fetchProductsData al ámbito global
-    window.fetchProductsData = fetchProductsData;
 
     let globalProductosData = []; // Variable global para almacenar datos de productos
     let productosActuales = {}; // Mapa id -> producto para facilitar búsquedas desde modales/diagnósticos
@@ -90,14 +77,8 @@
     let currentTopProductsLimit = 10; // Límite actual de productos más vendidos mostrados
 
     async function fetchAndDisplayData() {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + btoa('admin:pos123')
-        };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
-
+        // Headers agregados automáticamente por auth-integration.js
+        
         // Fetch de productos y lotes (cargar lotes primero para asegurar sincronización)
         try {
             // Primero cargar lotes
@@ -202,27 +183,6 @@
                     loading.textContent = 'Error al cargar pedidos. Asegúrate de que el servidor esté activo.';
                 }
             }
-        }
-
-        // Fetch de proveedores para la tabla
-        try {
-            // Verificar si fetchSuppliers está disponible
-            if (typeof fetchSuppliers === 'function') {
-                await fetchSuppliers();
-                console.log('✅ Tabla de proveedores cargada');
-            } else {
-                console.warn('⚠️ fetchSuppliers no está disponible todavía');
-            }
-        } catch (error) {
-            console.error('Error fetching suppliers table:', error);
-        }
-
-        // Forzar expandir la sección de proveedores si está colapsada para mostrar la tabla
-        const proveedoresSection = document.querySelector('#proveedores-section');
-        if (proveedoresSection && proveedoresSection.classList.contains('collapsed')) {
-            proveedoresSection.classList.remove('collapsed');
-            const icon = proveedoresSection.querySelector('.section-icon');
-            if (icon) icon.textContent = '▼';
         }
 
         // Fetch de registro de operaciones
@@ -423,9 +383,6 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
             // Obtener datos del producto
             const response = await fetch(`${window.ApiClient.API_BASE}/products/${productId}`, { headers });
             if (response.status === 401) {
@@ -493,9 +450,6 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
             const response = await fetch(`${window.ApiClient.API_BASE}/products/${productId}`, {
                 method: 'PUT',
                 headers: headers,
@@ -640,10 +594,6 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
-
             const response = await fetch(`${window.ApiClient.API_BASE}/products`, { headers });
             if (!response.ok) return;
 
@@ -710,9 +660,6 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
             const response = await fetch(`${window.ApiClient.API_BASE}/products`, {
                 method: 'POST',
                 headers: headers,
@@ -747,26 +694,41 @@
     }
 
     // Event listeners para el formulario de edición
-    document.getElementById('editProductForm').addEventListener('submit', saveProductChanges);
+    const editProductForm = document.getElementById('editProductForm');
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', saveProductChanges);
+    }
 
     // Event listeners para el formulario de agregar proveedor
-    document.getElementById('addSupplierForm').addEventListener('submit', createSupplier);
+    const addSupplierForm = document.getElementById('addSupplierForm');
+    if (addSupplierForm) {
+        addSupplierForm.addEventListener('submit', createSupplier);
+    }
 
     // Event listeners para el formulario de crear promoción
-    document.getElementById('createPromotionForm').addEventListener('submit', createPromotion);
+    const createPromotionForm = document.getElementById('createPromotionForm');
+    if (createPromotionForm) {
+        createPromotionForm.addEventListener('submit', createPromotion);
+    }
 
     // Cerrar modales al hacer clic fuera
-    document.getElementById('editModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeEditModal();
-        }
-    });
+    const editModal = document.getElementById('editModal');
+    if (editModal) {
+        editModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+    }
 
-    document.getElementById('addModal').addEventListener('click', function(e) {
+    const addModal = document.getElementById('addModal');
+    if (addModal) {
+        addModal.addEventListener('click', function(e) {
         if (e.target === this) {
             closeAddModal();
-        }
-    });
+            }
+        });
+    }
 
     // Event listeners para secciones colapsables
     document.querySelectorAll('.section-header').forEach(header => {
@@ -795,18 +757,24 @@
     });
 
     // Event listeners para modal de opciones de reporte
-    document.getElementById('reportOptionsModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeReportOptionsModal();
-        }
-    });
+    const reportOptionsModal = document.getElementById('reportOptionsModal');
+    if (reportOptionsModal) {
+        reportOptionsModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReportOptionsModal();
+            }
+        });
+    }
 
     // Event listeners para modal de soporte
-    document.getElementById('supportModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeSupportModal();
-        }
-    });
+    const supportModal = document.getElementById('supportModal');
+    if (supportModal) {
+        supportModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSupportModal();
+            }
+        });
+    }
 
 
     // Variables para promociones
@@ -816,9 +784,7 @@
     // Función para cargar promociones
     async function loadPromotions() {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             const response = await fetch(`${window.ApiClient.API_BASE}/promotions`, { headers });
@@ -897,9 +863,7 @@
     // Función para cargar productos para promoción
     async function loadProductsForPromotion() {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             allProducts = await fetchProductsData();
@@ -1037,9 +1001,7 @@
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         const promotionData = {
             titulo: title,
@@ -1108,9 +1070,7 @@
         loading.style.display = 'block';
 
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             const response = await fetch(`${window.ApiClient.API_BASE}/promotions/${promotionId}`, { headers });
@@ -1175,9 +1135,7 @@
         try {
             // Obtener la promoción actual
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/promotions/${promotionId}`, { headers });
             if (!response.ok) throw new Error('Error al obtener promoción');
@@ -1279,9 +1237,7 @@
 
         // Headers para autenticación
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             showAlert('Reseteando datos...', 'success');
@@ -1580,9 +1536,7 @@
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             const response = await fetch(`${window.ApiClient.API_BASE}/promotions/${promotionId}`, {
@@ -1646,9 +1600,7 @@
     async function loadClientes() {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/customers`, { headers });
 
@@ -1703,9 +1655,7 @@
             showLoadingIndicator('Actualizando precios de deudas...', '🔄');
 
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             // Realizar la solicitud con timeout extendido
             const response = await fetch(`${window.ApiClient.API_BASE}/debts/update-prices`, {
@@ -1936,9 +1886,7 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/customers?dni=${dni}`, { headers });
             if (response.ok) {
@@ -1989,9 +1937,7 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             // Verificar si ya existe un cliente con el mismo DNI
             if (formData.dni) {
@@ -2038,9 +1984,7 @@
     async function editClient(clienteId) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, { headers });
             if (response.status === 401) {
@@ -2096,9 +2040,7 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, {
                 method: 'PUT',
@@ -2135,9 +2077,7 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, {
                 method: 'DELETE',
@@ -2168,81 +2108,48 @@
     async function viewClientDebts(clienteId) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
-            // Obtener datos del cliente y deudas en paralelo
-            const [clienteResponse, debtsResponse] = await Promise.all([
-                fetch(`${window.ApiClient.API_BASE}/clientes/${clienteId}`, { headers }),
-                fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers })
-            ]);
-
-            if (clienteResponse.status === 401 || debtsResponse.status === 401) {
+            // Obtener deudas del cliente
+            const response = await fetch(`${window.ApiClient.API_BASE}/debts?cliente_id=${clienteId}`, { headers });
+            if (response.status === 401) {
                 isLoggedIn = false;
                 updateUIBasedOnAuth();
                 throw new Error('Autenticación requerida');
             }
-            if (!clienteResponse.ok) throw new Error('Error al obtener datos del cliente');
-            if (!debtsResponse.ok) throw new Error('Error al obtener deudas');
+            if (!response.ok) throw new Error('Error al obtener deudas');
 
-            const cliente = await clienteResponse.json();
-            const deudas = await debtsResponse.json();
+            const deudas = await response.json();
 
             // DIAGNÓSTICO: Log de deudas obtenidas
-            console.log('🔍 [viewClientDebts] Cliente:', cliente);
             console.log('🔍 [viewClientDebts] Deudas obtenidas:', deudas.length);
+            console.log('🔍 [viewClientDebts] Deudas con precios:', deudas.map(d => ({
+                producto: d.producto_nombre,
+                precio_unitario: d.precio_unitario,
+                precio_actual: d.precio_actual_producto,
+                cantidad: d.producto_cantidad
+            })));
 
-            displayClientDebts(deudas, cliente);
+            displayClientDebts(deudas);
             document.getElementById('clientDebtsModal').classList.add('show');
 
         } catch (error) {
             console.error('Error obteniendo deudas del cliente:', error);
             alert('Error al cargar deudas del cliente: ' + error.message);
         }
+    }
+
     // Función para mostrar las deudas del cliente
-    function displayClientDebts(deudas, cliente) {
+    function displayClientDebts(deudas) {
         const content = document.getElementById('clientDebtsContent');
 
-        // Si no hay deudas, mostrar solo los datos del cliente
         if (!deudas || deudas.length === 0) {
-            const clienteInfo = cliente ? `
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px;">
-                    <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                            <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
-                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                            <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
-                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                            <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
-                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                            <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
-                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
-                            <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
-                            <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="text-align: center; padding: 40px; color: #666; margin-top: 20px;">
-                    <h4 style="color: #ffffff;">No hay deudas registradas</h4>
-                    <p>Este cliente no tiene deudas pendientes en este momento.</p>
-                </div>
-            ` : `
+            content.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <h4 style="color: #ffffff;">No hay deudas registradas</h4>
                     <p>Este cliente no tiene deudas pendientes en este momento.</p>
                 </div>
             `;
-            content.innerHTML = clienteInfo;
             return;
         }
 
@@ -2262,15 +2169,14 @@
                 };
             }
             
-            // Usar monto_pendiente directamente de la base de datos (no recalcular)
-            const cantidad = deuda.producto_cantidad || 1;
-            const precioActual = parseFloat(deuda.precio_actual_producto) || 0;
-            // El monto pendiente ya está almacenado correctamente en la base de datos
-            const pendienteItem = parseFloat(deuda.monto_pendiente) || 0;
+            // Calcular pendiente: si no está pagado, usar subtotal; si está pagado, es 0
+            const pendienteItem = deuda.producto_pagado === 0 || deuda.producto_pagado === '0' || !deuda.producto_pagado 
+                ? parseFloat(deuda.producto_subtotal) || 0 
+                : 0;
             
             facturasAgrupadas[numFactura].productos.push(deuda);
             facturasAgrupadas[numFactura].totalPendiente += pendienteItem;
-            if (parseFloat(deuda.monto_pendiente || 0) > 0) {
+            if (pendienteItem > 0) {
                 facturasAgrupadas[numFactura].tienePendiente = true;
             }
         });
@@ -2280,53 +2186,21 @@
         const facturasPendientes = Object.values(facturasAgrupadas).filter(f => f.tienePendiente).length;
         const facturasTotales = Object.keys(facturasAgrupadas).length;
 
-        // Datos del cliente para mostrar
-        const clienteInfo = cliente ? `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">👤 Datos del Cliente</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                        <strong style="color: #ffd700; font-size: 12px;">Nombre</strong>
-                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nombre || 'No disponible'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                        <strong style="color: #ffd700; font-size: 12px;">Teléfono</strong>
-                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.telefono || 'No disponible'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                        <strong style="color: #ffd700; font-size: 12px;">DNI</strong>
-                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.dni || 'No disponible'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px;">
-                        <strong style="color: #ffd700; font-size: 12px;">Dirección</strong>
-                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.direccion || 'No disponible'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; grid-column: span 2;">
-                        <strong style="color: #ffd700; font-size: 12px;">📝 Nota</strong>
-                        <div style="color: #ffffff; font-size: 14px; font-weight: 500; margin-top: 4px;">${cliente.nota || 'Sin nota'}</div>
-                    </div>
-                </div>
-            </div>
-        ` : '';
-
         let deudasHtml = `
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
-                ${clienteInfo}
-                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 15px 0; color: #ffffff;">💳 Resumen de Cuenta Corriente</h4>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Total Pendiente:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
-                        </div>
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Facturas Pendientes:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #ffc107; margin-top: 5px;">${facturasPendientes} de ${facturasTotales}</div>
-                        </div>
-                        <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
-                            <strong style="color: #ffffff;">Total Facturas:</strong>
-                            <div style="font-size: 18px; font-weight: bold; color: #17a2b8; margin-top: 5px;">${facturasTotales}</div>
-                        </div>
+            <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 15px 0; color: #ffffff;">Resumen de Cuenta Corriente</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #ffffff;">Total Pendiente:</strong>
+                        <div style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px;">${formatCurrency(totalPendiente)}</div>
+                    </div>
+                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #ffffff;">Facturas Pendientes:</strong>
+                        <div style="font-size: 18px; font-weight: bold; color: #ffc107; margin-top: 5px;">${facturasPendientes} de ${facturasTotales}</div>
+                    </div>
+                    <div style="background: #3d3d3d; padding: 15px; border-radius: 6px; text-align: center;">
+                        <strong style="color: #ffffff;">Total Facturas:</strong>
+                        <div style="font-size: 18px; font-weight: bold; color: #17a2b8; margin-top: 5px;">${facturasTotales}</div>
                     </div>
                 </div>
             </div>
@@ -2369,8 +2243,10 @@
             const primerProducto = factura.productos[0];
             const cantidadProductos = factura.productos.length;
             
-            // Determinar estado general de la factura
-            const tieneProductosPendientes = factura.productos.some(p => parseFloat(p.monto_pendiente || 0) > 0);
+            // Determinar estado general de la factura basado en productos pendientes
+            const tieneProductosPendientes = factura.productos.some(p => 
+                p.producto_pagado === 0 || p.producto_pagado === '0' || !p.producto_pagado
+            );
             const estadoClass = !tieneProductosPendientes ? 'lote-vigente' : 'lote-proximo-vencer';
             const estadoText = !tieneProductosPendientes ? 'Pagada' : 'Pendiente';
 
@@ -2387,12 +2263,11 @@
                 precioActual = deuda.precio_actual_producto;
                 nombreProducto = deuda.producto_nombre;
 
-                // CÁLCULOS: usar monto_pendiente de la base de datos
-                const precioOriginalTotal = parseFloat(deuda.precio_unitario) * cantidad;
-                const precioActualTotal = parseFloat(precioActual) * cantidad;
-                // Usar el monto pendiente almacenado en la BD, no recalcular
-                const pendienteRecalc = parseFloat(deuda.monto_pendiente) || 0;
-                const diferenciaTotal = precioActualTotal - precioOriginalTotal;
+                // Calcular pendiente: si no está pagado, usar subtotal; si está pagado, es 0
+            const pendienteRecalc = deuda.producto_pagado === 0 || deuda.producto_pagado === '0' || !deuda.producto_pagado 
+                ? parseFloat(deuda.producto_subtotal) || 0 
+                : 0;
+            const diferenciaTotal = precioActualTotal - precioOriginalTotal;
 
                 let precioActualDisplay = '-';
                 let diferenciaDisplay = '-';
@@ -2407,20 +2282,23 @@
                     diferenciaDisplay = 'No calculable';
                 }
 
-                // Primera fila de la factura - mostrar número y fecha
-                const showFacturaInfo = idx === 0;
-                const rowSpan = cantidadProductos > 1 ? `rowspan="${cantidadProductos}"` : '';
+                // Mostrar siempre la información de la factura y fecha en cada fila
+                // Esto evita problemas con rowspan cuando hay filas ocultas por el filtro
+                const facturaCell = `<td style="padding: 10px;"><strong>${numFactura}</strong></td>`;
+                const fechaCell = `<td style="padding: 10px;">${fechaFormateada}</td>`;
                 
                 // Determinar si este producto específico tiene deuda pendiente
-                const pendienteItem = parseFloat(deuda.monto_pendiente || 0) > 0;
+                const pendienteItem = deuda.producto_pagado === 0 || deuda.producto_pagado === '0' || !deuda.producto_pagado;
                 
                 // Generar botones de acción para cada producto individualmente
                 let accionesHtml = '';
                 if (pendienteItem) {
-                    // Usar el monto pendiente almacenado en la BD para el botón de pago
-                    const pendienteEsteProducto = parseFloat(deuda.monto_pendiente) || 0;
+                    // Calcular el monto pendiente de este producto
+                    const pendienteEsteProducto = deuda.producto_pagado === 0 || deuda.producto_pagado === '0' || !deuda.producto_pagado 
+                        ? parseFloat(deuda.producto_subtotal) || 0 
+                        : 0;
                     accionesHtml = `
-                        <button onclick="registerPayment(${deuda.id}, ${pendienteEsteProducto}, '${numFactura}', ${deuda.producto_id})" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px;">Pagar</button>
+                        <button onclick="registerPayment(${deuda.id}, ${pendienteEsteProducto}, '${numFactura}', ${deuda.producto_id})" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px;">Pagar ${pendienteEsteProducto}</button>
                         <button onclick="showPaymentHistory(${deuda.id})" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Historial</button>
                     `;
                 } else {
@@ -2429,8 +2307,8 @@
                 
                 deudasHtml += `
                     <tr style="border-bottom: 1px solid #555;">
-                        ${showFacturaInfo ? `<td style="padding: 10px;" ${rowSpan}><strong>${numFactura}</strong></td>` : ''}
-                        ${showFacturaInfo ? `<td style="padding: 10px;" ${rowSpan}>${fechaFormateada}</td>` : ''}
+                        ${facturaCell}
+                        ${fechaCell}
                         <td style="padding: 10px;">${nombreProducto}</td>
                         <td style="padding: 10px; text-align: right;">${cantidad}</td>
                         <td style="padding: 10px; text-align: right;">${formatCurrency(precioOriginalTotal)}</td>
@@ -2445,53 +2323,24 @@
             });
         });
 
-        deudasHtml += `
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-
         content.innerHTML = deudasHtml;
     }
 
-
-        const montoPago = parseFloat(prompt(`Ingrese el monto a pagar para la factura ${numeroFactura} (Pendiente: ${formatCurrency(montoPendiente)}):`, montoPendiente));
-
-        if (isNaN(montoPago) || montoPago <= 0) {
-            alert('Monto inválido');
-            return;
-        }
-
-        if (montoPago > montoPendiente) {
-            alert('El monto a pagar no puede ser mayor al monto pendiente');
-            return;
-        }
-
+    // Función para registrar un pago de deuda
+    async function registerPayment(deudaId, montoPago, numeroFactura, productoId = null) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
-            // Determinar qué endpoint usar según si hay productoId
             let endpoint;
             let body;
             
             if (productoId) {
-                // Pagar solo un producto específico de la deuda
                 endpoint = `${window.ApiClient.API_BASE}/debts/${deudaId}/producto/${productoId}/payment`;
-                body = JSON.stringify({
-                    monto: montoPago
-                });
-                console.log('🔍 [registerPayment] Pagando producto específico:', { deudaId, productoId, montoPago });
+                body = JSON.stringify({ monto: montoPago });
             } else {
-                // Pagar la deuda completa (comportamiento original)
                 endpoint = `${window.ApiClient.API_BASE}/debts/${deudaId}/payment`;
-                body = JSON.stringify({
-                    monto: montoPago
-                });
-                console.log('🔍 [registerPayment] Pagando deuda completa:', { deudaId, montoPago });
+                body = JSON.stringify({ monto: montoPago });
             }
 
             const response = await fetch(endpoint, {
@@ -2511,17 +2360,10 @@
             }
 
             const result = await response.json();
-            console.log('✅ [registerPayment] Pago registrado:', result);
             alert('Pago registrado exitosamente');
             
-            // Recargar las deudas del cliente - necesitamos el clienteId
-            // El resultado del backend puede incluir cliente_id o podemos obtenerlo de la deuda actual
             if (result.cliente_id) {
                 viewClientDebts(result.cliente_id);
-            } else {
-                // Si no hay cliente_id en el resultado, intentar obtenerlo de la URL actual
-                // Esto es un fallback - en la práctica viewClientDebts se llama con el ID correcto
-                console.warn('⚠️ [registerPayment] No se recibió cliente_id en el resultado');
             }
 
         } catch (error) {
@@ -2539,9 +2381,7 @@
     async function showPaymentHistory(deudaId) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/debts/${deudaId}/payments`, { headers });
 
@@ -2747,9 +2587,7 @@
 
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             showAlert('Deshaciendo cambios...', 'success');
 
@@ -2805,9 +2643,7 @@
             showLoadingIndicator('Actualizando precios de deudas...', '🔄');
 
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             // Paso 1: Obtener todas las deudas pendientes
             const debtsResponse = await fetch(`${window.ApiClient.API_BASE}/debts?estado=pendiente`, { headers });
@@ -2870,9 +2706,7 @@
     async function showDebtsSummary() {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             // Obtener clientes con deudas
             const response = await fetch(`${window.ApiClient.API_BASE}/customers?with_debts=true`, { headers });
@@ -3004,9 +2838,7 @@
     function exportDebtsSummary() {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             fetch(`${window.ApiClient.API_BASE}/customers?with_debts=true`, { headers })
                 .then(response => response.json())
@@ -3056,37 +2888,57 @@
     }
 
     // Event listeners para formularios de clientes
-    document.getElementById('addClientForm').addEventListener('submit', createClient);
-    document.getElementById('editClientForm').addEventListener('submit', saveClientChanges);
+    const addClientForm = document.getElementById('addClientForm');
+    if (addClientForm) {
+        addClientForm.addEventListener('submit', createClient);
+    }
+    const editClientForm = document.getElementById('editClientForm');
+    if (editClientForm) {
+        editClientForm.addEventListener('submit', saveClientChanges);
+    }
 
     // Event listeners para modales de clientes
-    document.getElementById('addClientModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeAddClientModal();
-        }
-    });
+    const addClientModal = document.getElementById('addClientModal');
+    if (addClientModal) {
+        addClientModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddClientModal();
+            }
+        });
+    }
 
-    document.getElementById('editClientModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeEditClientModal();
-        }
-    });
+    const editClientModal = document.getElementById('editClientModal');
+    if (editClientModal) {
+        editClientModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditClientModal();
+            }
+        });
+    }
 
-    document.getElementById('clientDebtsModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeClientDebtsModal();
-        }
-    });
+    const clientDebtsModal = document.getElementById('clientDebtsModal');
+    if (clientDebtsModal) {
+        clientDebtsModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeClientDebtsModal();
+            }
+        });
+    }
 
-    document.getElementById('debtsUpdateSummaryModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDebtsUpdateSummaryModal();
-        }
-    });
+    const debtsUpdateSummaryModal = document.getElementById('debtsUpdateSummaryModal');
+    if (debtsUpdateSummaryModal) {
+        debtsUpdateSummaryModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDebtsUpdateSummaryModal();
+            }
+        });
+    }
 
     // Event listener removido: updateDebtsModal ya no existe (actualización automática)
 
-    document.getElementById('debtsSummaryModal').addEventListener('click', function(e) {
+    const debtsSummaryModal = document.getElementById('debtsSummaryModal');
+    if (debtsSummaryModal) {
+        debtsSummaryModal.addEventListener('click', function(e) {
         if (e.target === this) {
             closeDebtsSummaryModal();
         }
@@ -3095,9 +2947,7 @@
     // Función para cargar registro de operaciones
     async function loadOperationsLog() {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         const container = document.getElementById('operations-log-container');
         const loading = document.querySelector('#operations-log-section .loading');
@@ -3190,9 +3040,7 @@
     // Función para cargar historial de cierres de caja
     async function loadCierres() {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         const table = document.getElementById('historial-cierres-table');
         const loading = document.querySelector('#historial-cierres-section .loading');
@@ -3433,9 +3281,7 @@
     // Función para cargar el estado del logging
     async function loadLoggingStatus() {
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             const response = await fetch(`${window.ApiClient.API_BASE}/settings/logging-enabled`, { headers });
@@ -3481,9 +3327,7 @@
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             const response = await fetch(`${window.ApiClient.API_BASE}/settings/logging-enabled`, {
@@ -3683,9 +3527,7 @@
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        if (authCredentials) {
-            headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-        }
+        
 
         try {
             showAlert('Cargando ventas filtradas...', 'success');
@@ -3979,9 +3821,9 @@
             const indicator = document.getElementById('license-indicator');
 
             if (data.activated) {
-                indicator.innerHTML = '<span style="color: #28a745;">✅ Plus Activado - Características Plus Disponibles</span>';
+                indicator.innerHTML = '<span style="color: #28a745;">✅ Licencia Activada - Características Premium Disponibles</span>';
             } else {
-                indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Plus - Características Limitadas</span>';
+                indicator.innerHTML = '<span style="color: #dc3545;">⚠️ Sin Licencia - Características Limitadas</span>';
             }
         } catch (error) {
             console.error('Error loading license status:', error);
@@ -4103,9 +3945,7 @@
         try {
             // Siempre cargar desde API para asegurar datos actualizados
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
             const response = await fetch(`${window.ApiClient.API_BASE}/suppliers`, { headers });
             if (response.status === 401) {
                 isLoggedIn = false;
@@ -4283,9 +4123,7 @@
             showAlert('Creando pedido...', 'success');
 
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
             const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders`, {
                 method: 'POST',
                 headers: headers,
@@ -4358,9 +4196,7 @@
     async function loadSupplierOrders() {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
             const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders`, { headers });
             if (response.status === 401) {
                 isLoggedIn = false;
@@ -4411,9 +4247,7 @@
     async function updateOrderStatus(orderId, newStatus, hasDeliveryDate, selectElement) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
             const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: headers,
@@ -4447,9 +4281,7 @@
     async function viewOrderDetails(orderId) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
             const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}`, { headers });
             if (response.status === 401) {
                 isLoggedIn = false;
@@ -4528,48 +4360,6 @@
         }
     }
 
-    // Función para actualizar estado del pedido
-    async function updateOrderStatus(orderId, newStatus, hasDeliveryDate) {
-        if (!newStatus) return;
-
-        // Si el nuevo estado es "entregado", abrir modal de confirmación
-        if (newStatus === 'entregado') {
-            openConfirmDeliveryModal(orderId);
-            return; // No actualizar estado directamente, esperar confirmación del modal
-        }
-
-        try {
-            const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
-            const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}/status`, {
-                method: 'PUT',
-                headers: headers,
-                body: JSON.stringify({ estado: newStatus })
-            });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al actualizar estado');
-            }
-
-            const result = await response.json();
-            showAlert(result.message || 'Estado actualizado exitosamente', 'success');
-
-            loadSupplierOrders();
-
-        } catch (error) {
-            console.error('Error updating order status:', error);
-            showAlert('Error al actualizar estado: ' + error.message, 'error');
-        }
-    }
-
     // Funciones auxiliares para colores y textos de estado
     function getStatusColor(status) {
         const colors = {
@@ -4609,9 +4399,7 @@
     async function loadTopProducts(limit = 10) {
         try {
             const headers = { 'Content-Type': 'application/json' };
-            if (authCredentials) {
-                headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
-            }
+            
 
             const response = await fetch(`${window.ApiClient.API_BASE}/stats?limit=${limit}`, { headers });
             if (response.status === 401) {
@@ -5942,6 +5730,19 @@
         }
     }
 
+    // ============================================
+    // EXPORTAR FUNCIONES DE CIERRE DE CAJA A WINDOW
+    // ============================================
+    window.loadCierres = loadCierres;
+    window.handleCierreSelection = handleCierreSelection;
+    window.showCierreDetails = showCierreDetails;
+    window.checkPendingClosures = checkPendingClosures;
+    window.dismissPendingAlert = dismissPendingAlert;
+    window.showRetroactiveClosure = showRetroactiveClosure;
+    window.closeRetroactiveModal = closeRetroactiveModal;
+    window.calculateRetroactiveClosure = calculateRetroactiveClosure;
+    console.log('✅ Funciones de cierre de caja exportadas a window');
+
     // Función para mostrar modal de reset selectivo
     function showResetModal() {
         const modalContent = `
@@ -6253,16 +6054,6 @@
             if (sectionElement && sectionElement.classList.contains('dashboard-section')) {
                 // Expandir la sección
                 sectionElement.classList.remove('collapsed');
-                // Actualizar el ícono
-                const icon = sectionElement.querySelector('.section-icon');
-                if (icon) icon.textContent = '▼';
-                
-                // Si es la sección de proveedores, cargar los proveedores
-                if (hash === 'proveedores-section') {
-                    if (typeof fetchSuppliers === 'function') {
-                        fetchSuppliers();
-                    }
-                }
                 // Scroll hacia la sección
                 sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
@@ -6320,63 +6111,4 @@
             console.error('❌ Botón closeRegisterBtn NO encontrado');
         }
     });
-</script>
-
-    <!-- Botón flotante para ir al inicio -->
-    <button id="scrollToTopBtn" class="scroll-to-top-btn" onclick="scrollToTop()" title="Ir al inicio">
-        ⬆️
-    </button>
-
-    <style>
-        .scroll-to-top-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #17a2b8;
-            color: white;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            display: none; /* Oculto inicialmente */
-        }
-
-        .scroll-to-top-btn:hover {
-            background: #138496;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-        }
-
-        .scroll-to-top-btn.show {
-            display: block;
-        }
-    </style>
-
-    <script>
-        // Función para mostrar/ocultar el botón de scroll
-        window.addEventListener('scroll', function() {
-            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-            if (window.pageYOffset > 300) {
-                scrollToTopBtn.classList.add('show');
-            } else {
-                scrollToTopBtn.classList.remove('show');
-            }
-        });
-
-        // Función para ir al inicio
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-    </script>
-
-</body>
-
-</html>
+}

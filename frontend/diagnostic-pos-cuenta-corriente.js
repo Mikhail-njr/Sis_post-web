@@ -101,17 +101,19 @@
             });
 
             if (response.ok) {
-                const clients = await response.json();
+                const responseData = await response.json();
+                // El endpoint /api/customers devuelve {clientes: [...], pagination: {...}}
+                const clients = responseData.clientes || [];
                 log(`✅ Endpoint de clientes funciona. Clientes encontrados: ${clients.length}`);
 
                 diagnosticResults.push({
                     test: 'Endpoint Clientes',
                     status: 'success',
-                    message: `Se obtuvieron ${clients.length} clientes correctamente`
+                    message: `Se obtuvo${responseData.pagination ? `n ${responseData.pagination.total}` : 'ron'} ${clients.length} clientes correctamente`
                 });
 
                 // Verificar si hay clientes con deudas
-                const clientsWithDebts = clients.filter(client => client.deuda && client.deuda > 0);
+                const clientsWithDebts = clients.filter(client => client.total_deuda && parseFloat(client.total_deuda) > 0);
                 if (clientsWithDebts.length > 0) {
                     log(`✅ Se encontraron ${clientsWithDebts.length} clientes con deudas`);
                     diagnosticResults.push({
