@@ -4138,16 +4138,8 @@
     // Refactor: Cargar pedidos a proveedores y renderizar usando helper
     async function loadSupplierOrders() {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-            const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener pedidos');
-            const orders = await response.json();
+            // Usar apiRequest centralizado
+            const orders = await window.ApiClient.apiRequest('/supplier-orders', { method: 'GET' });
 
             const tableBody = document.querySelector('#pedidos-table tbody');
             if (!tableBody) return;
@@ -4223,16 +4215,8 @@
     // Función para ver detalles del pedido
     async function viewOrderDetails(orderId) {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-            const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener detalles del pedido');
-            const order = await response.json();
+            // Usar apiRequest centralizado
+            const order = await window.ApiClient.apiRequest(`/supplier-orders/${orderId}`, { method: 'GET' });
 
             let detailsHtml = `
                 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
