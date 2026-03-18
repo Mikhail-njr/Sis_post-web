@@ -453,24 +453,11 @@
         }
 
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            const response = await fetch(`${window.ApiClient.API_BASE}/products/${productId}`, {
+            // Usar apiRequest centralizado para manejar 401 automáticamente
+            const result = await window.ApiClient.apiRequest(`/products/${productId}`, {
                 method: 'PUT',
-                headers: headers,
                 body: JSON.stringify(formData)
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al actualizar producto');
-            }
-
-            const result = await response.json();
 
             // Cerrar modal
             closeEditModal();
@@ -791,15 +778,8 @@
         
 
         try {
-            const response = await fetch(`${window.ApiClient.API_BASE}/promotions`, { headers });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al cargar promociones');
-
-            const promotions = await response.json();
+            // Usar apiRequest centralizado
+            const promotions = await window.ApiClient.apiRequest('/promotions', { method: 'GET' });
             displayPromotions(promotions);
         } catch (error) {
             console.error('Error loading promotions:', error);
