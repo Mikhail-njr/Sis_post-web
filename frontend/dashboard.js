@@ -650,24 +650,11 @@
         }
 
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            const response = await fetch(`${window.ApiClient.API_BASE}/products`, {
+            // Usar apiRequest centralizado
+            const result = await window.ApiClient.apiRequest('/products', {
                 method: 'POST',
-                headers: headers,
                 body: JSON.stringify(formData)
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al crear producto');
-            }
-
-            const result = await response.json();
 
             // Cerrar modal
             closeAddModal();
