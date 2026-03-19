@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control del Sistema POS</title>
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="win95.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../shared/auth.js"></script>
@@ -103,6 +104,9 @@
                         </button>
                         <button id="returnToPOSBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #1976d2; color: white;" onclick="returnToPOS()">
                             🏪 Ir a Caja
+                        </button>
+                        <button id="toggleStyleBtn" class="btn" style="font-size: 13px; padding: 6px 12px; background: #388e3c; color: white;" onclick="toggleDashboardStyle()">
+                            🎨 Cambiar Estilo
                         </button>
                     </div>
 
@@ -3452,6 +3456,51 @@
             sessionStorage.setItem('refreshPOSData', 'true');
             // Redirigir a index.html
             window.location.href = 'index.html';
+        }
+
+        // Función para cambiar entre estilos Windows 95 y dashboard original
+        function toggleDashboardStyle() {
+            const win95Link = document.querySelector('link[href="win95.css"]');
+            const dashboardLink = document.querySelector('link[href="dashboard.css"]');
+            
+            if (!win95Link || !dashboardLink) {
+                alert('No se encontraron las hojas de estilo');
+                return;
+            }
+            
+            const isWin95Enabled = win95Link.disabled !== true;
+            
+            if (isWin95Enabled) {
+                // Desactivar Win95, activar dashboard
+                win95Link.disabled = true;
+                dashboardLink.disabled = false;
+                showAlert('🎨 Estilo cambiado a: Dashboard Original', 'success');
+            } else {
+                // Activar Win95, desactivar dashboard
+                win95Link.disabled = false;
+                dashboardLink.disabled = true;
+                showAlert('🎨 Estilo cambiado a: Windows 95', 'success');
+            }
+            
+            // Guardar preferencia en localStorage
+            localStorage.setItem('dashboardStyle', isWin95Enabled ? 'original' : 'win95');
+        }
+
+        // Función para aplicar el estilo guardado al cargar
+        function applySavedStyle() {
+            const savedStyle = localStorage.getItem('dashboardStyle');
+            const win95Link = document.querySelector('link[href="win95.css"]');
+            const dashboardLink = document.querySelector('link[href="dashboard.css"]');
+            
+            if (!win95Link || !dashboardLink) return;
+            
+            if (savedStyle === 'original') {
+                win95Link.disabled = true;
+                dashboardLink.disabled = false;
+            } else if (savedStyle === 'win95') {
+                win95Link.disabled = false;
+                dashboardLink.disabled = true;
+            }
         }
 
         // Función para limpiar promociones duplicadas
@@ -8474,6 +8523,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             loadAuthFromStorage();
+            applySavedStyle(); // Aplicar estilo guardado
             if (checkDashboardAccess()) {
                 loadLicenseStatus(); // Cargar estado de licencia
                 fetchAndDisplayData().then(() => {

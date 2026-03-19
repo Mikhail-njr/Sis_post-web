@@ -42,24 +42,10 @@ async function calculateCloseRegister() {
         }
 
         // Llamar al endpoint de preview
-        const response = await fetch(`${window.ApiClient.API_BASE}/close-register-preview`, {
+        const data = await window.ApiClient.apiRequest('/close-register-preview', {
             method: 'POST',
-            headers: headers,
-            body: JSON.stringify(requestData)
+            body: requestData
         });
-
-        if (response.status === 401) {
-            isLoggedIn = false;
-            updateUIBasedOnAuth();
-            throw new Error('Autenticación requerida');
-        }
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al calcular el cierre de caja');
-        }
-
-        const data = await response.json();
 
         // Ocultar indicador de carga
         hideLoadingIndicator();
@@ -263,25 +249,10 @@ async function confirmCierreCaja() {
         };
 
         // Llamar al endpoint de confirmación
-        const response = await fetch(`${window.ApiClient.API_BASE}/close-register-confirm`, {
+        const result = await window.ApiClient.apiRequest('/close-register-confirm', {
             method: 'POST',
-            headers: headers,
-            body: JSON.stringify(confirmData)
+            body: confirmData
         });
-
-        if (response.status === 401) {
-            isLoggedIn = false;
-            updateUIBasedOnAuth();
-            throw new Error('Autenticación requerida');
-        }
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ Error del servidor:', errorData);
-            throw new Error(errorData.error || 'Error al confirmar el cierre de caja');
-        }
-
-        const result = await response.json();
 
         // Ocultar indicador de carga
         hideLoadingIndicator();

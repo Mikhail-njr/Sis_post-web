@@ -1362,6 +1362,57 @@
                 backupData.data.stats = {};
             }
 
+            // ========== CLIENTES Y CUENTA CORRIENTE ==========
+            
+            // Clientes
+            try {
+                const clientsRes = await fetch(`${window.ApiClient.API_BASE}/clientes`, { headers });
+                if (clientsRes.ok) {
+                    const clientsData = await clientsRes.json();
+                    backupData.data.clientes = clientsData.clientes || clientsData || [];
+                }
+            } catch (e) {
+                console.warn('Error backing up clients:', e);
+                backupData.data.clientes = [];
+            }
+
+            // Deudas
+            try {
+                const debtsRes = await fetch(`${window.ApiClient.API_BASE}/debts`, { headers });
+                if (debtsRes.ok) {
+                    backupData.data.deudas = await debtsRes.json();
+                }
+            } catch (e) {
+                console.warn('Error backing up debts:', e);
+                backupData.data.deudas = [];
+            }
+
+            // Deudas con productos (información completa)
+            try {
+                const debtsWithProductsRes = await fetch(`${window.ApiClient.API_BASE}/debts-with-current-total`, { headers });
+                if (debtsWithProductsRes.ok) {
+                    backupData.data.deudas_con_productos = await debtsWithProductsRes.json();
+                }
+            } catch (e) {
+                console.warn('Error backing up debts with products:', e);
+                backupData.data.deudas_con_productos = [];
+            }
+
+            // Resumen de deudas por cliente
+            try {
+                const debtsSummaryRes = await fetch(`${window.ApiClient.API_BASE}/customers/debts-summary`, { headers });
+                if (debtsSummaryRes.ok) {
+                    backupData.data.deudas_resumen = await debtsSummaryRes.json();
+                }
+            } catch (e) {
+                console.warn('Error backing up debts summary:', e);
+                backupData.data.deudas_resumen = { clientes: [] };
+            }
+
+            // Actualizar versión del backup para indicar que incluye cuenta corriente
+            backupData.version = '1.1';
+            backupData.includes_cuenta_corriente = true;
+
             // Crear archivo JSON y descargarlo
             const dataStr = JSON.stringify(backupData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -1570,19 +1621,7 @@
     // Función para cargar clientes
     async function loadClientes() {
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            
-
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers`, { headers });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al obtener clientes');
-
-            const response_data = await response.json();
+            const response_data = await window.ApiClient.apiRequest('/customers', { method: 'GET' });
             
             // El endpoint devuelve { success: true, data: rows, count: rows.length }
             // Compatibilidad: buscar en 'clientes', 'data', o directamente en el array
@@ -1629,19 +1668,9 @@
             
 
             // Realizar la solicitud con timeout extendido
-            const response = await fetch(`${window.ApiClient.API_BASE}/debts/update-prices`, {
-                method: 'POST',
-                headers: headers
+            const result = await window.ApiClient.apiRequest('/debts/update-prices', {
+                method: 'POST'
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) throw new Error('Error al actualizar precios de deudas');
-
-            const result = await response.json();
 
             // Ocultar indicador y mostrar resultados
             hideLoadingIndicator();
@@ -1921,26 +1950,10 @@
                 }
             }
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers`, {
+            const result = await window.ApiClient.apiRequest('/customers', {
                 method: 'POST',
-                headers: headers,
-                body: JSON.stringify(formData)
+                body: formData
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                if (response.status === 409) {
-                    throw new Error(errorData.error || 'Cliente duplicado detectado. Por favor verifique si el cliente ya existe en el sistema.');
-                }
-                throw new Error(errorData.error || 'Error al crear cliente');
-            }
-
-            const result = await response.json();
             alert('Cliente creado exitosamente');
             closeAddClientModal();
             loadClientes(); // Recargar la lista
@@ -2003,23 +2016,10 @@
             const headers = { 'Content-Type': 'application/json' };
             
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, {
+            const result = await window.ApiClient.apiRequest(`/customers/${clienteId}`, {
                 method: 'PUT',
-                headers: headers,
-                body: JSON.stringify(formData)
+                body: formData
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al actualizar cliente');
-            }
-
-            const result = await response.json();
             alert('Cliente actualizado exitosamente');
             closeEditClientModal();
             loadClientes(); // Recargar la lista
@@ -2040,22 +2040,9 @@
             const headers = { 'Content-Type': 'application/json' };
             
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/customers/${clienteId}`, {
-                method: 'DELETE',
-                headers: headers
+            const result = await window.ApiClient.apiRequest(`/customers/${clienteId}`, {
+                method: 'DELETE'
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al eliminar cliente');
-            }
-
-            const result = await response.json();
             alert('Cliente eliminado exitosamente');
             loadClientes(); // Recargar la lista
 
@@ -2293,23 +2280,10 @@
                 body = JSON.stringify({ monto: montoPago });
             }
 
-            const response = await fetch(endpoint, {
+            const result = await window.ApiClient.apiRequest(endpoint, {
                 method: 'POST',
-                headers: headers,
                 body: body
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al registrar pago');
-            }
-
-            const result = await response.json();
             alert('Pago registrado exitosamente');
             
             if (result.cliente_id) {
@@ -2333,20 +2307,7 @@
             const headers = { 'Content-Type': 'application/json' };
             
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/debts/${deudaId}/payments`, { headers });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al obtener historial de pagos');
-            }
-
-            const payments = await response.json();
+            const payments = await window.ApiClient.apiRequest(`/debts/${deudaId}/payments`, { method: 'GET' });
             displayPaymentHistory(payments);
             document.getElementById('paymentHistoryModal').classList.add('show');
 
@@ -2541,22 +2502,9 @@
 
             showAlert('Deshaciendo cambios...', 'success');
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/rollback-debts-update`, {
-                method: 'POST',
-                headers: headers
+            const result = await window.ApiClient.apiRequest('/rollback-debts-update', {
+                method: 'POST'
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al deshacer cambios');
-            }
-
-            const result = await response.json();
             alert('Cambios deshechos exitosamente');
             closeDebtsUpdateSummaryModal();
             loadClientes(); // Recargar clientes
@@ -3470,17 +3418,7 @@
 
         try {
             showAlert('Cargando ventas filtradas...', 'success');
-            const response = await fetch(url, { headers });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-
-            if (!response.ok) throw new Error('Error al filtrar ventas');
-
-            const ventas = await response.json();
+            const ventas = await window.ApiClient.apiRequest(url.replace(window.ApiClient.API_BASE, ''), { method: 'GET' });
             displaySalesGrouped(ventas);
             showAlert('Ventas filtradas exitosamente', 'success');
 
@@ -3532,23 +3470,9 @@
         try {
             showAlert('Cancelando venta...', 'success');
 
-            const response = await fetch(`${window.ApiClient.API_BASE}/sales/${saleId}`, {
-                method: 'DELETE',
-                headers: headers
+            const result = await window.ApiClient.apiRequest(`/sales/${saleId}`, {
+                method: 'DELETE'
             });
-
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al cancelar la venta');
-            }
-
-            const result = await response.json();
             showAlert(result.message || 'Venta cancelada exitosamente', 'success');
 
             // Recargar las ventas para actualizar la vista
@@ -4057,25 +3981,19 @@
             const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders`, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify({
+                body: {
                     proveedor_id: supplierId,
                     fecha_entrega_estimada: deliveryDate || null,
                     items: items,
                     notas: notes
-                })
+                }
             });
 
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al crear el pedido');
+            if (!result.success) {
+                throw new Error(result.error || 'Error al crear el pedido');
             }
 
-            const result = await response.json();
+            const result = result;
             showAlert(result.message || 'Pedido creado exitosamente', 'success');
 
             closeCreateOrderModal();
@@ -4170,21 +4088,10 @@
         try {
             const headers = { 'Content-Type': 'application/json' };
             
-            const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}/status`, {
+            const result = await window.ApiClient.apiRequest(`/supplier-orders/${orderId}/status`, {
                 method: 'PUT',
-                headers: headers,
-                body: JSON.stringify({ estado: newStatus })
+                body: { estado: newStatus }
             });
-            if (response.status === 401) {
-                isLoggedIn = false;
-                updateUIBasedOnAuth();
-                throw new Error('Autenticación requerida');
-            }
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al actualizar estado');
-            }
-            const result = await response.json();
             showAlert(result.message || 'Estado actualizado exitosamente', 'success');
             // Siempre recargar la lista para reflejar el estado real
             await loadSupplierOrders();

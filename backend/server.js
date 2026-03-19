@@ -5400,6 +5400,98 @@ app.post('/api/restore-backup', conditionalAuth, async (req, res) => {
                 }
             }
 
+            // ========== RESTAURAR CLIENTES Y CUENTA CORRIENTE ==========
+            
+            // 8. Restaurar clientes (si existen en el backup)
+            let clientesRestaurados = 0;
+            if (backupData.data.clientes && Array.isArray(backupData.data.clientes)) {
+                // Primero limpiar pagos_deudas y deuda_productos por si hay deuda asociada a clientes
+                await dbRun("DELETE FROM pagos_deudas");
+                await dbRun("DELETE FROM deuda_productos");
+                await dbRun("DELETE FROM deudas");
+                await dbRun("DELETE FROM clientes");
+                
+                for (const cliente of backupData.data.clientes) {
+                    try {
+                        await dbRun(
+                            `INSERT INTO clientes (id, nombre, telefono, direccion, dni, nota, created_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                            [
+                                cliente.id,
+                                cliente.nombre,
+                                cliente.telefono || '',
+                                cliente.direccion || '',
+                                cliente.dni || '',
+                                cliente.nota || '',
+                                cliente.created_at || new Date().toISOString()
+                            ]
+                        );
+                        clientesRestaurados++;
+                    } catch (e) {
+                        console.warn('Error restoring cliente:', cliente.id, e.message);
+                    }
+                }
+                console.log(`✅ ${clientesRestaurados} clientes restaurados`);
+            }
+
+            // 9. Restaurar deudas (si existen en el backup)
+            let deudasRestauradas = 0;
+            if (backupData.data.deudas && Array.isArray(backupData.data.deudas)) {
+                for (const deuda of backupData.data.deudas) {
+                    try {
+                        await dbRun(
+                            `INSERT INTO deudas (id, cliente_id, venta_id, monto_original, monto_pendiente, estado, created_at, updated_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                            [
+                                deuda.id,
+                                deuda.cliente_id,
+                                deuda.venta_id || null,
+                                deuda.monto_original,
+                                deuda.monto_pendiente,
+                                deuda.estado || 'pendiente',
+                                deuda.created_at || new Date().toISOString(),
+                                deuda.updated_at || null
+                            ]
+                        );
+                        deudasRestauradas++;
+                    } catch (e) {
+                        console.warn('Error restoring deuda:', deuda.id, e.message);
+                    }
+                }
+                console.log(`✅ ${deudasRestauradas} deudas restauradas`);
+            }
+
+            // 10. Restaurar deudas_con_productos (si existen)
+            let productosDeudaRestaurados = 0;
+            if (backupData.data.deudas_con_productos && backupData.data.deudas_con_productos.deudas) {
+                for (const deudaData of backupData.data.deudas_con_productos.deudas) {
+                    if (deudaData.productos && Array.isArray(deudaData.productos)) {
+                        for (const producto of deudaData.productos) {
+                            try {
+                                await dbRun(
+                                    `INSERT INTO deuda_productos 
+                                     (id, deuda_id, producto_id, cantidad, precio_unitario, subtotal, monto_pendiente)
+                                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                                    [
+                                        producto.id || producto.producto_id,
+                                        deudaData.id,
+                                        producto.producto_id,
+                                        producto.cantidad,
+                                        producto.precio_unitario,
+                                        producto.subtotal,
+                                        producto.monto_pendiente || producto.subtotal
+                                    ]
+                                );
+                                productosDeudaRestaurados++;
+                            } catch (e) {
+                                console.warn('Error restoring deuda_producto:', producto.id, e.message);
+                            }
+                        }
+                    }
+                }
+                console.log(`✅ ${productosDeudaRestaurados} productos de deudas restaurados`);
+            }
+
             await dbRun("COMMIT");
 
             // Registrar la operación de restauración
@@ -5421,7 +5513,13 @@ app.post('/api/restore-backup', conditionalAuth, async (req, res) => {
                 success: true,
                 message: 'Backup restaurado exitosamente',
                 timestamp: backupData.timestamp,
-                sections_restored: Object.keys(backupData.data)
+                sections_restored: Object.keys(backupData.data),
+                cuenta_corriente: {
+                    clientes_restaurados: clientesRestaurados,
+                    deudas_restauradas: deudasRestauradas,
+                    productos_deuda_restaurados: productosDeudaRestaurados,
+                    incluye_cuenta_corriente: backupData.includes_cuenta_corriente || false
+                }
             });
 
         } catch (error) {
@@ -6794,56 +6892,6 @@ app.get('/api/lotes/:id', async (req, res) => {
     }
 });
 
-
-// Verificar si un número de lote ya existe
-app.get('/api/lotes/check/:numero_lote', async (req, res) => {
-    try {
-        const numeroLote = req.params.numero_lote;
-
-        if (!numeroLote || numeroLote.trim() === '') {
-            return res.status(400).json({ error: 'Número de lote requerido' });
-        }
-
-        const existingLote = await dbAll("SELECT id FROM lotes WHERE numero_lote = ?", [numeroLote.trim()]);
-
-        res.json({
-            exists: existingLote.length > 0,
-            numero_lote: numeroLote.trim()
-        });
-    } catch (error) {
-        console.error('Error verificando lote:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Sugerir un número de lote disponible
-app.get('/api/lotes/suggest', async (req, res) => {
-    try {
-        // Obtener todos los números de lote existentes
-        const existingLotes = await dbAll("SELECT numero_lote FROM lotes WHERE numero_lote IS NOT NULL AND numero_lote != ''");
-
-        // Extraer números de los lotes existentes (asumiendo formato como LOT-001, LOT-002, etc.)
-        const numbers = existingLotes
-            .map(lote => lote.numero_lote)
-            .filter(lote => lote.match(/^\d+$/)) // Solo números puros
-            .map(lote => parseInt(lote))
-            .filter(num => !isNaN(num));
-
-        // Encontrar el máximo número
-        const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-
-        // Sugerir el siguiente número
-        const suggestedNumber = (maxNumber + 1).toString().padStart(3, '0'); // Formato 001, 002, etc.
-
-        res.json({
-            suggested: suggestedNumber,
-            format: 'número incremental'
-        });
-    } catch (error) {
-        console.error('Error sugiriendo lote:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // Buscar producto por código de barras (optimizado con caché)
 app.get('/api/products/search-by-barcode/:barcode', async (req, res) => {

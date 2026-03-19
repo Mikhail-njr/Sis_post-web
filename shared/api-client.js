@@ -26,10 +26,25 @@ async function apiRequest(endpoint, options = {}) {
             headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
         }
 
+        // Ensure body is properly stringified as JSON
+        let fetchOptions = { ...options };
+        if (fetchOptions.body && typeof fetchOptions.body === 'object') {
+            fetchOptions.body = JSON.stringify(fetchOptions.body);
+        }
+
         const response = await fetch(`${API_BASE}${endpoint}`, {
             headers: headers,
-            ...options
+            ...fetchOptions
         });
+
+        // NEW CODE: Get response body before checking status (needed for error details)
+        let responseData = null;
+        const responseText = await response.text();
+        try {
+            responseData = responseText ? JSON.parse(responseText) : null;
+        } catch (e) {
+            // Not JSON
+        }
 
         if (response.status === 401) {
             // Authentication required - show login modal
@@ -45,9 +60,15 @@ async function apiRequest(endpoint, options = {}) {
                             retryHeaders['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
                         }
 
+                        // Ensure body is properly stringified as JSON for retry
+                        let retryOptions = { ...options };
+                        if (retryOptions.body && typeof retryOptions.body === 'object') {
+                            retryOptions.body = JSON.stringify(retryOptions.body);
+                        }
+
                         const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
                             headers: retryHeaders,
-                            ...options
+                            ...retryOptions
                         });
 
                         if (!retryResponse.ok) {
@@ -64,10 +85,18 @@ async function apiRequest(endpoint, options = {}) {
         }
 
         if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
+            // Try to get the error message from response body
+            let errorMessage = `Error ${response.status}: ${response.statusText}`;
+            if (responseData && responseData.error) {
+                errorMessage = responseData.error;
+                if (responseData.details && Array.isArray(responseData.details)) {
+                    errorMessage += ' - ' + responseData.details.join(', ');
+                }
+            }
+            throw new Error(errorMessage);
         }
 
-        return await response.json();
+        return responseData;
     } catch (error) {
         console.error('Error en API request:', error);
         throw error;
@@ -93,13 +122,28 @@ async function apiRequestWithRetry(endpoint, options = {}, maxRetries = 3, retry
                 headers['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
             }
 
+            // Ensure body is properly stringified as JSON
+            let fetchOptions = { ...options };
+            if (fetchOptions.body && typeof fetchOptions.body === 'object') {
+                fetchOptions.body = JSON.stringify(fetchOptions.body);
+            }
+
             const response = await fetch(`${API_BASE}${endpoint}`, {
                 headers: headers,
                 signal: controller.signal,
-                ...options
+                ...fetchOptions
             });
 
             clearTimeout(timeoutId);
+
+            // Get response body before checking status (needed for error details)
+            let responseData = null;
+            const responseText = await response.text();
+            try {
+                responseData = responseText ? JSON.parse(responseText) : null;
+            } catch (e) {
+                // Not JSON
+            }
 
             if (response.status === 401) {
                 // Authentication required - show login modal
@@ -115,10 +159,16 @@ async function apiRequestWithRetry(endpoint, options = {}, maxRetries = 3, retry
                                 retryHeaders['Authorization'] = 'Basic ' + btoa(authCredentials.username + ':' + authCredentials.password);
                             }
 
+                            // Ensure body is properly stringified as JSON for retry
+                            let retryOptions = { ...options };
+                            if (retryOptions.body && typeof retryOptions.body === 'object') {
+                                retryOptions.body = JSON.stringify(retryOptions.body);
+                            }
+
                             const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
                                 headers: retryHeaders,
                                 signal: controller.signal,
-                                ...options
+                                ...retryOptions
                             });
 
                             if (!retryResponse.ok) {
@@ -135,10 +185,18 @@ async function apiRequestWithRetry(endpoint, options = {}, maxRetries = 3, retry
             }
 
             if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
+                // Try to get the error message from response body
+                let errorMessage = `Error ${response.status}: ${response.statusText}`;
+                if (responseData && responseData.error) {
+                    errorMessage = responseData.error;
+                    if (responseData.details && Array.isArray(responseData.details)) {
+                        errorMessage += ' - ' + responseData.details.join(', ');
+                    }
+                }
+                throw new Error(errorMessage);
             }
 
-            return await response.json();
+            return responseData;
         } catch (error) {
             if (attempt === maxRetries) {
                 console.error(`Error final en API request después de ${maxRetries} intentos:`, error);
@@ -160,9 +218,15 @@ async function simpleApiRequest(endpoint, options = {}) {
             ...options.headers
         };
 
+        // Ensure body is properly stringified as JSON
+        let fetchOptions = { ...options };
+        if (fetchOptions.body && typeof fetchOptions.body === 'object') {
+            fetchOptions.body = JSON.stringify(fetchOptions.body);
+        }
+
         const response = await fetch(`${API_BASE}${endpoint}`, {
             headers: headers,
-            ...options
+            ...fetchOptions
         });
 
         if (!response.ok) {

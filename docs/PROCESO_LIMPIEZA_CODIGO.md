@@ -83,11 +83,10 @@ async function fetchWithAuth(url, options = {}) {
 ## ⏳ Pendientes (No Realizados)
 
 ### 1. Refactorización de Frontend (Continuación)
-- **13 occurrences restantes** de manejo de error 401 en `dashboard.js`
-- Otros archivos con fetch() directo:
-  - `frontend/cierre-caja-functions.js`
-  - `frontend/openConfirmDeliveryModal.js`
-  - `frontend/diagnostic-*.js`
+- ✅ **COMPLETADO**: 13 occurrences de manejo de error 401 en `dashboard.js` refactorizadas a `ApiClient.apiRequest()`
+- ✅ **COMPLETADO**: `frontend/cierre-caja-functions.js` - 2 occurrences refactorizadas
+- ✅ **COMPLETADO**: `frontend/openConfirmDeliveryModal.js` - 2 occurrences refactorizadas
+- ⏭️ **NO REQUERIDO**: `frontend/diagnostic-*.js` - Scripts de diagnóstico independientes
 
 ### 2. Refactorización de Backend
 - **32+ transacciones con rollback** podrían usar `withTransaction()` de `backend/error-handler.js`
@@ -125,7 +124,33 @@ El codebase YA tiene las herramientas para resolver estos problemas:
 
 ---
 
-## 📝 Commits Realizados
+## 🔄 MEJORA IMPLEMENTADA: Sistema de Backup Completo
+
+### Fecha: Sesión actual
+
+### Problema Anterior
+El sistema de backup NO incluía datos de clientes y cuenta corriente (deudas).
+
+### Solución Implementada
+
+#### Frontend ([`frontend/dashboard.js`](frontend/dashboard.js))
+Ahora el backup incluye:
+- ✅ Clientes (`/api/clientes`)
+- ✅ Deudas (`/api/debts`)
+- ✅ Deudas con productos (`/api/debts-with-current-total`)
+- ✅ Resumen de deudas por cliente (`/api/customers/debts-summary`)
+- Versión actualizada a **1.1**
+
+#### Backend ([`backend/server.js`](backend/server.js))
+El endpoint `/api/restore-backup` ahora restaura:
+- ✅ Clientes (limpieza previa y restauración)
+- ✅ Deudas (con estado y montos)
+- ✅ Productos de deudas (ítems asociados)
+- Respuesta mejorada con stats de restauración
+
+---
+
+##  Commits Realizados
 
 1. `c35ec3a` - Implementación completa del sistema POS
 2. `a2c2d8f` - Eliminar archivo duplicado chroma-detect-duplication.js

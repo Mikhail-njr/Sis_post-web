@@ -38,18 +38,7 @@ function closeConfirmDeliveryModal() {
 // Función para cargar información del pedido para entrega
 async function loadOrderForDelivery(orderId) {
     try {
-        const headers = { 'Content-Type': 'application/json' };
-        
-        
-        const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}`, { headers });
-        if (response.status === 401) {
-            isLoggedIn = false;
-            updateUIBasedOnAuth();
-            throw new Error('Autenticación requerida');
-        }
-        if (!response.ok) throw new Error('Error al obtener detalles del pedido');
-        
-        const order = await response.json();
+        const order = await window.ApiClient.apiRequest(`/supplier-orders/${orderId}`, { method: 'GET' });
         
         // Mostrar información del pedido
         const orderInfo = document.getElementById('deliveryOrderInfo');
@@ -356,28 +345,15 @@ async function confirmDelivery() {
             return;
         }
         const bodyToSend = {
-            fecha_entrega: actualDeliveryDate || new Date().toISOString().split('T')[0],
+            fecha_entrega_real: actualDeliveryDate || new Date().toISOString().split('T')[0],
             items: items,
-            extra_items: extraItems
+            extraItems: extraItems
         };
         console.log('🟢 Body enviado a confirm-delivery:', JSON.stringify(bodyToSend, null, 2));
-        const response = await fetch(`${window.ApiClient.API_BASE}/supplier-orders/${orderId}/confirm-delivery`, {
+        const result = await window.ApiClient.apiRequest(`/supplier-orders/${orderId}/confirm-delivery`, {
             method: 'POST',
-            headers: headers,
-            body: JSON.stringify(bodyToSend)
+            body: bodyToSend
         });
-        
-        if (response.status === 401) {
-            isLoggedIn = false;
-            updateUIBasedOnAuth();
-            throw new Error('Autenticación requerida');
-        }
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al confirmar entrega');
-        }
-        
-        const result = await response.json();
         showAlert(result.message || 'Entrega confirmada exitosamente', 'success');
         
         closeConfirmDeliveryModal();
