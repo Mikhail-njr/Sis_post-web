@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛒 Sistema POS - Prototipo</title>
     <link rel="stylesheet" href="win95.css">
+    <link rel="stylesheet" href="dashboard.css" disabled>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
     <style>
         * {
@@ -631,6 +632,9 @@
 • '001' encuentra cualquier código que contenga '001'">❓</span></h2>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Buscar productos..." style="flex: 1;">
+                    <button onclick="document.getElementById('searchInput').value = ''; searchProducts(); document.getElementById('searchInput').focus();" 
+                            style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; margin-left: 5px; font-size: 16px;" 
+                            title="Limpiar búsqueda">✕</button>
                     <div class="search-filters" style="display: flex; gap: 10px; align-items: center;">
                         <label style="font-weight: bold; color: #2c3e50;">Buscar en:</label>
                         <label style="display: flex; align-items: center; gap: 3px; font-size: 14px;">
@@ -647,7 +651,7 @@
                         <option value="">Todas las categorías</option>
                     </select>
                     <button onclick="searchProducts()">Buscar</button>
-                    <button id="barcodeScanBtn" onclick="toggleUSBScanner()" style="background: #17a2b8; color: white;">📱 Activar Escáner</button>
+                    <button id="barcodeScanBtn" type="button" onclick="toggleUSBScanner(); return false;" onmousedown="return false;" style="background: #17a2b8; color: white;">📱 Activar Escáner</button>
                     <button id="promotionFilterBtn" onclick="togglePromotionFilter()" style="background: #ff6b6b; color: white;">🎉 Solo Promociones</button>
                 </div>
 
@@ -781,6 +785,30 @@
 
 
     <script>
+        // Función para aplicar el estilo guardado al cargar
+        function applySavedStyle() {
+            const savedStyle = localStorage.getItem('dashboardStyle');
+            const win95Link = document.querySelector('link[href="win95.css"]');
+            const dashboardLink = document.querySelector('link[href="dashboard.css"]');
+            
+            if (!win95Link || !dashboardLink) return;
+            
+            if (savedStyle === 'original') {
+                win95Link.disabled = true;
+                dashboardLink.disabled = false;
+            } else if (savedStyle === 'win95') {
+                win95Link.disabled = false;
+                dashboardLink.disabled = true;
+            } else {
+                // Por defecto, Win95 habilitado
+                win95Link.disabled = false;
+                dashboardLink.disabled = true;
+            }
+        }
+        
+        // Aplicar estilo guardado al cargar la página
+        applySavedStyle();
+        
         console.log('🔍 [index.html] Cargando scripts...');
     </script>
     <script src="../shared/auth.js"></script>
@@ -836,7 +864,10 @@
         let usbScannerBuffer = '';
         let lastKeyTime = 0;
         let usbScannerTimeout = null;
-        const USB_SCANNER_TIMEOUT = 100; // ms entre caracteres para considerar entrada automática
+        const USB_SCANNER_TIMEOUT = 150; // ms entre caracteres para considerar entrada automática (aumentado para evitar duplicados)
+        const SCANNER_PREFIX = 'p-'; // Prefijo que envía la pistola antes del código
+        let isInScannerMode = false; // Flag para saber si estamos recibiendo datos del escáner
+        let isProcessingCode = false; // Flag para evitar procesamiento doble
 
         // Variable para controlar si los sonidos están habilitados
         let soundEnabled = false;
@@ -1360,7 +1391,7 @@
                 card.onclick = () => selectProduct(product.id);
 
                 card.innerHTML = `
-                    <div style="flex-grow: 1;">
+                    <div style="flex: 1; min-width: 0;">
                         <span class="product-code">${product.codigo}</span>
                         <div class="product-name">${product.nombre}</div>
                         ${hasDiscount ? `<div style="color: #e74c3c; font-weight: bold; font-size: 0.9em;">🎉 ${product.descuento_porcentaje}% OFF</div>` : ''}
@@ -1526,9 +1557,47 @@
                     const product = data.product;
                     const lote = data.lote;
 
-                    // Verificar stock disponible
+                    // Información del lote para debugging
+                    console.log('🔍 Producto encontrado:', product.nombre, '- Lote:', lote, '- Status:', data.status);
+
+                    // Verificar estado del producto según el backend
+                    if (data.status === 'sin_stock') {
+                        showAlert(`❌ ${data.status_message || 'Producto sin stock disponible'}`, 'error');
+                        if (source === 'USB') {
+                            updateUSBScannerStatus('Sin stock', 'error');
+                            setTimeout(() => updateUSBScannerStatus('Listo', 'active'), 3000);
+                        }
+                        return;
+                    }
+
+                    // Verificar si el producto está vencido
+                    if (data.status === 'vencido' || (lote && lote.estado_vencimiento === 'vencido')) {
+                        const diasVencido = lote?.dias_para_vencer ? Math.abs(lote.dias_para_vencer) : 'varios';
+                        showAlert(`⚠️ PRODUCTO VENCIDO hace ${diasVencido} días! ${data.status_message || ''}`, 'error');
+                        if (source === 'USB') {
+                            updateUSBScannerStatus('VENCIDO', 'error');
+                            setTimeout(() => updateUSBScannerStatus('Listo', 'active'), 5000);
+                        }
+                        // No retornamos - permitimos vender productos vencidos si hay stock
+                    }
+
+                    // Verificar si está próximo a vencer (dentro de 7 días)
+                    if (lote && (lote.estado_vencimiento === 'proximo_vencer' || lote.dias_para_vencer <= 7)) {
+                        const diasRestantes = lote.dias_para_vencer;
+                        const mensajeVencimiento = `⚠️ VENCE en ${diasRestantes} días (${lote.fecha_vencimiento})`;
+                        console.log('🔍 [DEBUG] ' + mensajeVencimiento);
+                        
+                        // Mostrar advertencia pero permitir venta
+                        showAlert(mensajeVencimiento, 'warning');
+                        if (source === 'USB') {
+                            updateUSBScannerStatus(`Vence en ${diasRestantes}d`, 'error');
+                            setTimeout(() => updateUSBScannerStatus('Listo', 'active'), 5000);
+                        }
+                    }
+
+                    // Verificar stock disponible (última verificación)
                     if (!lote || lote.cantidad_actual <= 0) {
-                        showAlert('NO hay stock!', 'error');
+                        showAlert('❌ NO hay stock!', 'error');
                         if (source === 'USB') {
                             updateUSBScannerStatus('Sin stock', 'error');
                             setTimeout(() => updateUSBScannerStatus('Listo', 'active'), 3000);
@@ -2496,6 +2565,15 @@
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar detección de escáner USB
+            try {
+                if (typeof initUSBScannerDetection === 'function') {
+                    initUSBScannerDetection();
+                }
+            } catch (error) {
+                console.error('Error al inicializar escáner USB:', error);
+            }
+            
             // Initialize authentication state and update UI
             loadAuthFromStorage();
 
@@ -2782,6 +2860,9 @@
             const barcodeScanBtn = document.getElementById('barcodeScanBtn');
             const usbInput = document.getElementById('usb-scanner-input');
             
+            // Evitar que el botón tome el foco
+            barcodeScanBtn.blur();
+            
             if (scannerEnabled) {
                 // Desactivar el escáner
                 scannerEnabled = false;
@@ -2797,10 +2878,19 @@
                 barcodeScanBtn.textContent = '📱 Desactivar Escáner';
                 barcodeScanBtn.style.background = '#28a745';
                 if (usbInput) {
-                    usbInput.focus(); // Enfocar el campo invisible
+                    // Enfocar el campo invisible después de un pequeño delay
+                    setTimeout(() => {
+                        if (usbInput) {
+                            usbInput.focus();
+                            usbInput.select();
+                        }
+                    }, 100);
                 }
                 updateUSBScannerStatus('Escáner Activado', 'active');
             }
+            
+            // Devolver false para evitar el comportamiento por defecto
+            return false;
         }
 
         // Función para inicializar detección de escáner USB
@@ -2813,31 +2903,205 @@
             usbInput.style.left = '-9999px';
             usbInput.style.top = '-9999px';
             usbInput.style.opacity = '0';
-            usbInput.style.pointerEvents = 'none';
-            usbInput.style.zIndex = '-1';
+            usbInput.style.pointerEvents = 'auto';
+            usbInput.style.zIndex = '9999';
+            usbInput.style.width = '1px';
+            usbInput.style.height = '1px';
+            usbInput.autocomplete = 'off';
             document.body.appendChild(usbInput);
 
             // No enfocar el campo invisible inicialmente
             // usbInput.focus(); // Comentar esta línea
 
-            // Listener para capturar entrada del escáner
+            // ===== CAPTURA GLOBAL DE TECLADO CON PREFIJO =====
+            // Usar capture phase para capturar las teclas ANTES de que otros elementos las procesen
+            document.addEventListener('keydown', function(e) {
+                // Solo procesar si el escáner está habilitado y hay una sesión activa
+                if (!scannerEnabled) return;
+                
+                const currentTime = Date.now();
+                const timeDiff = currentTime - lastKeyTime;
+                lastKeyTime = currentTime;
+
+                // DETECCIÓN DE PREFIJO DEL ESCÁNER
+                // Si el buffer está vacío y viene el carácter del prefijo, activar modo escáner
+                if (usbScannerBuffer === '' && e.key === SCANNER_PREFIX) {
+                    usbScannerBuffer = SCANNER_PREFIX;
+                    isInScannerMode = true;
+                    
+                    // Enfocar el campo de búsqueda principal
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.value = '';
+                    }
+                    
+                    // También enfocar el campo USB si existe
+                    if (usbInput) {
+                        usbInput.focus();
+                    }
+                    
+                    e.preventDefault();
+                    return;
+                }
+
+                // Si hay una pausa larga (>500ms), limpiar buffer y salir del modo escáner
+                if (timeDiff > 500) {
+                    // Si no estamos en modo escáner y vino un prefijo antes, limpiar
+                    if (!isInScannerMode && usbScannerBuffer.startsWith(SCANNER_PREFIX)) {
+                        usbScannerBuffer = '';
+                    }
+                    usbScannerBuffer = '';
+                    isInScannerMode = false;
+                    clearTimeout(usbScannerTimeout);
+                }
+
+                // Si es Enter y tenemos un buffer con prefijo, procesar como escáner
+                if (e.key === 'Enter' && usbScannerBuffer.length > 0) {
+                    // Si ya se está procesando, ignorar
+                    if (isProcessingCode) {
+                        usbScannerBuffer = '';
+                        isInScannerMode = false;
+                        clearTimeout(usbScannerTimeout);
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    let codeToProcess = usbScannerBuffer.trim();
+                    
+                    // Si el código tiene prefijo, removerlo
+                    if (codeToProcess.startsWith(SCANNER_PREFIX)) {
+                        codeToProcess = codeToProcess.substring(SCANNER_PREFIX.length);
+                    }
+                    
+                    // Si el código es muy largo (>20 caracteres), probablemente son dos códigos concatenados
+                    // Tomar solo los primeros 13 caracteres (EAN-13)
+                    if (codeToProcess.length > 13) {
+                        console.log('Código muy largo (Enter), tomando solo los primeros 13 dígitos');
+                        codeToProcess = codeToProcess.substring(0, 13);
+                    }
+                    
+                    if (codeToProcess.length >= 8) {
+                        isProcessingCode = true;
+                        processUSBScannerCode(codeToProcess);
+                        // Resetear el flag después de un pequeño delay
+                        setTimeout(() => { isProcessingCode = false; }, 500);
+                    }
+                    
+                    usbScannerBuffer = '';
+                    isInScannerMode = false;
+                    clearTimeout(usbScannerTimeout);
+                    return;
+                }
+
+                // Si es un carácter válido (número), agregarlo al buffer
+                if (e.key.length === 1 && /^[0-9]$/.test(e.key)) {
+                    usbScannerBuffer += e.key;
+
+                    // Configurar timeout para procesar si no viene más entrada
+                    clearTimeout(usbScannerTimeout);
+                    usbScannerTimeout = setTimeout(() => {
+                        // Si ya se está procesando, ignorar
+                        if (isProcessingCode) {
+                            usbScannerBuffer = '';
+                            return;
+                        }
+                        
+                        // Si el código tiene prefijo, removerlo
+                        let codeToProcess = usbScannerBuffer;
+                        if (codeToProcess.startsWith(SCANNER_PREFIX)) {
+                            codeToProcess = codeToProcess.substring(SCANNER_PREFIX.length);
+                        }
+                        
+                        // Si el código es muy largo (>20 caracteres), probablemente son dos códigos concatenados
+                        // Tomar solo los primeros 13 caracteres (EAN-13)
+                        if (codeToProcess.length > 13) {
+                            console.log('Código muy largo, tomando solo los primeros 13 dígitos');
+                            codeToProcess = codeToProcess.substring(0, 13);
+                        }
+                        
+                        if (codeToProcess.length >= 8) { // Mínimo EAN-8
+                            isProcessingCode = true;
+                            processUSBScannerCode(codeToProcess);
+                            // Resetear el flag después de un pequeño delay
+                            setTimeout(() => { isProcessingCode = false; }, 500);
+                        }
+                        usbScannerBuffer = '';
+                        isInScannerMode = false;
+                    }, USB_SCANNER_TIMEOUT);
+                }
+            }, true); // true = useCapture para obtener las teclas primero
+            // ==============================================
+
+            // NOTA: El listener del campo usbInput ya no es necesario porque el listener global
+            // con capture phase (useCapture = true) ya captura todos los eventos de teclado.
+            // Eliminamos este listener para evitar duplicación de procesamiento.
+            /*
+            // Listener para capturar entrada del escáner (legacy - ya no necesario con captura global)
             usbInput.addEventListener('keydown', function(e) {
                 const currentTime = Date.now();
                 const timeDiff = currentTime - lastKeyTime;
                 lastKeyTime = currentTime;
 
+                // DETECCIÓN DE PREFIJO DEL ESCÁNER en el campo legacy
+                if (usbScannerBuffer === '' && e.key === SCANNER_PREFIX) {
+                    usbScannerBuffer = SCANNER_PREFIX;
+                    isInScannerMode = true;
+                    
+                    // Enfocar el campo de búsqueda
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.value = '';
+                    }
+                    
+                    e.preventDefault();
+                    return;
+                }
+
                 // Si hay una pausa larga (>500ms), limpiar buffer (entrada manual)
                 if (timeDiff > 500) {
                     usbScannerBuffer = '';
+                    isInScannerMode = false;
                     clearTimeout(usbScannerTimeout);
+                }
+                
+                // DETECCIÓN DE RÁFAGA: Si los caracteres vienen muy rápido (<80ms entre cada uno)
+                // significa que es el escáner, no escritura manual. Enfocar automáticamente.
+                if (timeDiff > 0 && timeDiff < 80 && e.key.length === 1) {
+                    // Verificar si otro campo tiene el foco
+                    const activeElement = document.activeElement;
+                    const isInputField = activeElement && (
+                        activeElement.tagName === 'INPUT' || 
+                        activeElement.tagName === 'TEXTAREA' ||
+                        activeElement.contentEditable === 'true'
+                    );
+                    
+                    // Si hay un campo activo que NO es el nuestro, enfocar el campo del escáner
+                    if (isInputField && activeElement !== usbInput) {
+                        // Solo enfocar si el buffer tiene al menos 1 carácter
+                        if (usbScannerBuffer.length > 0) {
+                            usbInput.focus();
+                        }
+                    }
                 }
 
                 // Si es Enter y tenemos un buffer, procesar como escáner
                 if (e.key === 'Enter' && usbScannerBuffer.length > 0) {
+                    // Verificar si ya se está procesando para evitar duplicados
+                    if (isProcessingCode) {
+                        usbScannerBuffer = '';
+                        clearTimeout(usbScannerTimeout);
+                        return;
+                    }
                     e.preventDefault();
+                    isProcessingCode = true;
                     processUSBScannerCode(usbScannerBuffer.trim());
                     usbScannerBuffer = '';
                     clearTimeout(usbScannerTimeout);
+                    // Resetear flag después de delay
+                    setTimeout(() => { isProcessingCode = false; }, 500);
                     return;
                 }
 
@@ -2848,28 +3112,42 @@
                     // Configurar timeout para procesar si no viene más entrada
                     clearTimeout(usbScannerTimeout);
                     usbScannerTimeout = setTimeout(() => {
+                        // Verificar si ya se está procesando para evitar duplicados
+                        if (isProcessingCode) {
+                            usbScannerBuffer = '';
+                            return;
+                        }
                         if (usbScannerBuffer.length >= 8) { // Mínimo EAN-8
+                            isProcessingCode = true;
                             processUSBScannerCode(usbScannerBuffer);
+                            // Resetear flag después de delay
+                            setTimeout(() => { isProcessingCode = false; }, 500);
                         }
                         usbScannerBuffer = '';
                     }, USB_SCANNER_TIMEOUT);
                 }
             });
+            */ // Fin del código legacy comentado
 
-            // Mantener el foco en el campo USB cuando se pierde
-            document.addEventListener('click', function() {
-                // Solo reenfocar si el escáner está activado
+            // Mantener el foco en el campo USB cuando se pierde, pero no interferir con inputs manuales
+            document.addEventListener('click', function(e) {
+                // Solo reenfocar si el escáner está activado Y el clic no fue en un input
                 if (scannerEnabled) {
-                    const activeElement = document.activeElement;
-                    const isImportantInput = activeElement && (
-                        activeElement.tagName === 'INPUT' ||
-                        activeElement.tagName === 'SELECT' ||
-                        activeElement.tagName === 'TEXTAREA' ||
-                        activeElement.contentEditable === 'true'
-                    );
+                    const target = e.target;
+                    const isUserInput = target.tagName === 'INPUT' || 
+                                       target.tagName === 'SELECT' || 
+                                       target.tagName === 'TEXTAREA' ||
+                                       target.contentEditable === 'true' ||
+                                       target.tagName === 'BUTTON';
 
-                    if (!isImportantInput) {
-                        setTimeout(() => usbInput.focus(), 100);
+                    // Si el usuario hizo clic en algo que no es el input USB, no reenfocar
+                    // Esto permite que el usuario use la caja de búsqueda manualmente si desea
+                    if (!isUserInput) {
+                        setTimeout(() => {
+                            if (scannerEnabled && document.activeElement !== usbInput) {
+                                usbInput.focus();
+                            }
+                        }, 100);
                     }
                 }
             });
@@ -2883,6 +3161,12 @@
         // Función para procesar código del escáner USB
         function processUSBScannerCode(code) {
             console.log(`Código detectado desde escáner USB: ${code}`);
+            
+            // Limpiar el campo de búsqueda después de procesar
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+            }
 
             // Validar el código (usando la función existente)
             if (!isValidBarcode(code)) {
@@ -2918,14 +3202,39 @@
                     color: #0c5460;
                     display: inline-block;
                     margin-left: 10px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
                 `;
                 usbStatus.textContent = '🔗 Escáner USB: Listo';
                 usbStatus.style.color = '#155724';
                 usbStatus.style.background = '#d4edda';
                 usbStatus.style.borderColor = '#c3e6cb';
+                
+                // Agregar tooltip con información
+                usbStatus.title = 'Haz clic para activar el escáner USB';
+                usbStatus.onclick = function() {
+                    const usbInput = document.getElementById('usb-scanner-input');
+                    if (usbInput) {
+                        usbInput.focus();
+                        updateUSBScannerStatus('Activo - Escanea ahora', 'active');
+                        setTimeout(() => updateUSBScannerStatus('Listo', 'active'), 3000);
+                    }
+                };
+                
                 headerActions.appendChild(usbStatus);
             }
         }
+        
+        // Alternar visibilidad del panel de debug
+        function toggleDebugPanel() {
+            const panel = document.getElementById('scanner-debug-panel');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        // Exponer función globalmente
+        window.toggleDebugPanel = toggleDebugPanel;
 
         // Función para actualizar el estado del indicador USB
         function updateUSBScannerStatus(status, type = 'info') {

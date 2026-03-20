@@ -907,17 +907,20 @@ input:focus, select:focus, textarea:focus {
     box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #ffffff !important;
     border-radius: 0 !important;
     cursor: pointer !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    box-sizing: border-box !important;
 }
 
 .product-card:hover {
-    background: #000080 !important;
-    color: #ffffff !important;
+    border-color: #000080 !important;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #ffffff, 0 0 0 2px #000080 !important;
 }
 
 .product-card.selected {
-    background: #000080 !important;
-    color: #ffffff !important;
-    border-color: #000000 #ffffff #ffffff #808080 !important;
+    border-color: #000080 !important;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #ffffff, 0 0 0 2px #000080 !important;
 }
 
 /* Override sections */
@@ -1004,9 +1007,10 @@ input:focus, select:focus, textarea:focus {
 
 /* Ensure cards and items are centered and auto-sized */
 .product-card, .promotion-card, .invoice-card, .lote-card {
-    width: auto !important;
+    width: 100% !important;
     max-width: 100% !important;
     margin: 10px auto !important;
+    box-sizing: border-box !important;
 }
 
 /* Tables auto width */
