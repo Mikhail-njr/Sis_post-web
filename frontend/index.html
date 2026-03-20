@@ -865,8 +865,6 @@
         let lastKeyTime = 0;
         let usbScannerTimeout = null;
         const USB_SCANNER_TIMEOUT = 150; // ms entre caracteres para considerar entrada automática (aumentado para evitar duplicados)
-        const SCANNER_PREFIX = 'p-'; // Prefijo que envía la pistola antes del código
-        let isInScannerMode = false; // Flag para saber si estamos recibiendo datos del escáner
         let isProcessingCode = false; // Flag para evitar procesamiento doble
 
         // Variable para controlar si los sonidos están habilitados
@@ -2923,45 +2921,17 @@
                 const timeDiff = currentTime - lastKeyTime;
                 lastKeyTime = currentTime;
 
-                // DETECCIÓN DE PREFIJO DEL ESCÁNER
-                // Si el buffer está vacío y viene el carácter del prefijo, activar modo escáner
-                if (usbScannerBuffer === '' && e.key === SCANNER_PREFIX) {
-                    usbScannerBuffer = SCANNER_PREFIX;
-                    isInScannerMode = true;
-                    
-                    // Enfocar el campo de búsqueda principal
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) {
-                        searchInput.focus();
-                        searchInput.value = '';
-                    }
-                    
-                    // También enfocar el campo USB si existe
-                    if (usbInput) {
-                        usbInput.focus();
-                    }
-                    
-                    e.preventDefault();
-                    return;
-                }
-
-                // Si hay una pausa larga (>500ms), limpiar buffer y salir del modo escáner
+                // Si hay una pausa larga (>500ms), limpiar buffer
                 if (timeDiff > 500) {
-                    // Si no estamos en modo escáner y vino un prefijo antes, limpiar
-                    if (!isInScannerMode && usbScannerBuffer.startsWith(SCANNER_PREFIX)) {
-                        usbScannerBuffer = '';
-                    }
                     usbScannerBuffer = '';
-                    isInScannerMode = false;
                     clearTimeout(usbScannerTimeout);
                 }
 
-                // Si es Enter y tenemos un buffer con prefijo, procesar como escáner
+                // Si es Enter y tenemos un buffer, procesar como escáner
                 if (e.key === 'Enter' && usbScannerBuffer.length > 0) {
                     // Si ya se está procesando, ignorar
                     if (isProcessingCode) {
                         usbScannerBuffer = '';
-                        isInScannerMode = false;
                         clearTimeout(usbScannerTimeout);
                         return;
                     }
@@ -2969,11 +2939,6 @@
                     e.preventDefault();
                     
                     let codeToProcess = usbScannerBuffer.trim();
-                    
-                    // Si el código tiene prefijo, removerlo
-                    if (codeToProcess.startsWith(SCANNER_PREFIX)) {
-                        codeToProcess = codeToProcess.substring(SCANNER_PREFIX.length);
-                    }
                     
                     // Si el código es muy largo (>20 caracteres), probablemente son dos códigos concatenados
                     // Tomar solo los primeros 13 caracteres (EAN-13)
@@ -2990,7 +2955,6 @@
                     }
                     
                     usbScannerBuffer = '';
-                    isInScannerMode = false;
                     clearTimeout(usbScannerTimeout);
                     return;
                 }
@@ -3008,126 +2972,24 @@
                             return;
                         }
                         
-                        // Si el código tiene prefijo, removerlo
-                        let codeToProcess = usbScannerBuffer;
-                        if (codeToProcess.startsWith(SCANNER_PREFIX)) {
-                            codeToProcess = codeToProcess.substring(SCANNER_PREFIX.length);
-                        }
-                        
                         // Si el código es muy largo (>20 caracteres), probablemente son dos códigos concatenados
                         // Tomar solo los primeros 13 caracteres (EAN-13)
-                        if (codeToProcess.length > 13) {
+                        if (usbScannerBuffer.length > 13) {
                             console.log('Código muy largo, tomando solo los primeros 13 dígitos');
-                            codeToProcess = codeToProcess.substring(0, 13);
+                            usbScannerBuffer = usbScannerBuffer.substring(0, 13);
                         }
                         
-                        if (codeToProcess.length >= 8) { // Mínimo EAN-8
+                        if (usbScannerBuffer.length >= 8) { // Mínimo EAN-8
                             isProcessingCode = true;
-                            processUSBScannerCode(codeToProcess);
+                            processUSBScannerCode(usbScannerBuffer);
                             // Resetear el flag después de un pequeño delay
                             setTimeout(() => { isProcessingCode = false; }, 500);
                         }
                         usbScannerBuffer = '';
-                        isInScannerMode = false;
                     }, USB_SCANNER_TIMEOUT);
                 }
             }, true); // true = useCapture para obtener las teclas primero
             // ==============================================
-
-            // NOTA: El listener del campo usbInput ya no es necesario porque el listener global
-            // con capture phase (useCapture = true) ya captura todos los eventos de teclado.
-            // Eliminamos este listener para evitar duplicación de procesamiento.
-            /*
-            // Listener para capturar entrada del escáner (legacy - ya no necesario con captura global)
-            usbInput.addEventListener('keydown', function(e) {
-                const currentTime = Date.now();
-                const timeDiff = currentTime - lastKeyTime;
-                lastKeyTime = currentTime;
-
-                // DETECCIÓN DE PREFIJO DEL ESCÁNER en el campo legacy
-                if (usbScannerBuffer === '' && e.key === SCANNER_PREFIX) {
-                    usbScannerBuffer = SCANNER_PREFIX;
-                    isInScannerMode = true;
-                    
-                    // Enfocar el campo de búsqueda
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) {
-                        searchInput.focus();
-                        searchInput.value = '';
-                    }
-                    
-                    e.preventDefault();
-                    return;
-                }
-
-                // Si hay una pausa larga (>500ms), limpiar buffer (entrada manual)
-                if (timeDiff > 500) {
-                    usbScannerBuffer = '';
-                    isInScannerMode = false;
-                    clearTimeout(usbScannerTimeout);
-                }
-                
-                // DETECCIÓN DE RÁFAGA: Si los caracteres vienen muy rápido (<80ms entre cada uno)
-                // significa que es el escáner, no escritura manual. Enfocar automáticamente.
-                if (timeDiff > 0 && timeDiff < 80 && e.key.length === 1) {
-                    // Verificar si otro campo tiene el foco
-                    const activeElement = document.activeElement;
-                    const isInputField = activeElement && (
-                        activeElement.tagName === 'INPUT' || 
-                        activeElement.tagName === 'TEXTAREA' ||
-                        activeElement.contentEditable === 'true'
-                    );
-                    
-                    // Si hay un campo activo que NO es el nuestro, enfocar el campo del escáner
-                    if (isInputField && activeElement !== usbInput) {
-                        // Solo enfocar si el buffer tiene al menos 1 carácter
-                        if (usbScannerBuffer.length > 0) {
-                            usbInput.focus();
-                        }
-                    }
-                }
-
-                // Si es Enter y tenemos un buffer, procesar como escáner
-                if (e.key === 'Enter' && usbScannerBuffer.length > 0) {
-                    // Verificar si ya se está procesando para evitar duplicados
-                    if (isProcessingCode) {
-                        usbScannerBuffer = '';
-                        clearTimeout(usbScannerTimeout);
-                        return;
-                    }
-                    e.preventDefault();
-                    isProcessingCode = true;
-                    processUSBScannerCode(usbScannerBuffer.trim());
-                    usbScannerBuffer = '';
-                    clearTimeout(usbScannerTimeout);
-                    // Resetear flag después de delay
-                    setTimeout(() => { isProcessingCode = false; }, 500);
-                    return;
-                }
-
-                // Si es un carácter válido, agregarlo al buffer
-                if (e.key.length === 1 && /^[0-9]$/.test(e.key)) {
-                    usbScannerBuffer += e.key;
-
-                    // Configurar timeout para procesar si no viene más entrada
-                    clearTimeout(usbScannerTimeout);
-                    usbScannerTimeout = setTimeout(() => {
-                        // Verificar si ya se está procesando para evitar duplicados
-                        if (isProcessingCode) {
-                            usbScannerBuffer = '';
-                            return;
-                        }
-                        if (usbScannerBuffer.length >= 8) { // Mínimo EAN-8
-                            isProcessingCode = true;
-                            processUSBScannerCode(usbScannerBuffer);
-                            // Resetear flag después de delay
-                            setTimeout(() => { isProcessingCode = false; }, 500);
-                        }
-                        usbScannerBuffer = '';
-                    }, USB_SCANNER_TIMEOUT);
-                }
-            });
-            */ // Fin del código legacy comentado
 
             // Mantener el foco en el campo USB cuando se pierde, pero no interferir con inputs manuales
             document.addEventListener('click', function(e) {
